@@ -14,15 +14,23 @@ class Game:
 
     def handle_input(self):
         pressed = pygame.key.get_pressed()
+        direction = None
 
         if pressed[pygame.K_z]:
             self.player.move_up()
+            direction = "up"
         if pressed[pygame.K_s]:
             self.player.move_down()
+            direction = "down"
         if pressed[pygame.K_q]:
             self.player.move_left()
+            direction = "left"
         if pressed[pygame.K_d]:
             self.player.move_right()
+            direction = "right"
+        
+        if direction:
+            self.player.change_animation(direction)
 
     def update(self):
         self.map_manager.update() #update de tous les sprites et collisions
