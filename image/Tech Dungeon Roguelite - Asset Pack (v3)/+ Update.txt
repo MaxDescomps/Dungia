@@ -1,0 +1,2 @@
++ Color Palette added
++ Idle/Talk/Run Character Animations now have an unarmed alternative
