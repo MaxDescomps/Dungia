@@ -25,6 +25,7 @@ class MapManager:
         self.player = player
         self.maps = dict()
         self.current_map = "tech2"
+        self.zoom = 2
 
         self.register_map("tech1", portals=[
             Portal(from_world="tech1", origin_point="enter_tech1", target_world="tech2", teleport_point="spawn_tech2")
@@ -64,7 +65,7 @@ class MapManager:
         tmx_data = pytmx.util_pygame.load_pygame(f"../image/{name}.tmx")
         map_data = pyscroll.data.TiledMapData(tmx_data)
         map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
-        map_layer.zoom = 2
+        map_layer.zoom = self.zoom
         
         #liste des rectangles de collision
         walls = []

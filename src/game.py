@@ -35,6 +35,13 @@ class Game:
     def update(self):
         self.map_manager.update() #update de tous les sprites et collisions
 
+    def debug(self):
+
+        #affiche la zone de collision du joueur en ajustant selon le zoom et le centrage
+        pygame.draw.rect(self.screen, (255,0,0),
+        (self.player.feet.x*self.map_manager.zoom - self.map_manager.get_group()._map_layer.view_rect.x*self.map_manager.zoom,
+         self.player.feet.y*self.map_manager.zoom- self.map_manager.get_group()._map_layer.view_rect.y*self.map_manager.zoom,
+         self.player.feet.width*self.map_manager.zoom, self.player.feet.height*self.map_manager.zoom), 1)
 
     def run(self):
 
@@ -49,6 +56,7 @@ class Game:
             self.handle_input() #gestion entree clavier
             self.update()
             self.map_manager.draw() #dessine et centre le monde
+            self.debug() #affichage de la collision du joueur
 
             pygame.display.flip() # rafraichit l'affichage
 
