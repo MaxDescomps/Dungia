@@ -34,9 +34,15 @@ class Game:
 
     def update(self):
         self.map_manager.update() #update de tous les sprites et collisions
+        self.player.crosshair.update()
+
+    def draw(self):
+        self.map_manager.draw() #dessine et centre le monde
+        self.screen.blit(self.player.crosshair.image, self.player.crosshair.rect.topleft) #affichage du crosshair
 
     def debug(self):
 
+        #bug si resize
         #affiche la zone de collision du joueur en ajustant selon le zoom et le centrage
         pygame.draw.rect(self.screen, (255,0,0),
         (self.player.feet.x*self.map_manager.zoom - self.map_manager.get_group()._map_layer.view_rect.x*self.map_manager.zoom,
@@ -55,7 +61,9 @@ class Game:
             self.player.save_location() #enregistre la position du joueur avant deplacement pour pouvoir move_back
             self.handle_input() #gestion entree clavier
             self.update()
-            self.map_manager.draw() #dessine et centre le monde
+
+            self.draw()
+
             self.debug() #affichage de la collision du joueur
 
             pygame.display.flip() # rafraichit l'affichage

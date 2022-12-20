@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import pygame, pytmx, pyscroll
 from player import *
+import pygame.sprite
 
 @dataclass
 class Portal:
@@ -61,11 +62,15 @@ class MapManager:
         self.player.save_location() #permet de ne pas se tp en boucle sur une collision?
 
     def register_map(self, name, portals=[], npcs=[]):
-        #charger carte tmx (faire une fonction generique? idem dans game.init)
-        tmx_data = pytmx.util_pygame.load_pygame(f"../image/{name}.tmx")
-        map_data = pyscroll.data.TiledMapData(tmx_data)
-        map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
-        map_layer.zoom = self.zoom
+        """
+        Charge une carte une seule fois pour le reste du programme depuis un fichier tmx en remplissant
+        une instance de la classe de données Map
+        """
+
+        tmx_data = pytmx.util_pygame.load_pygame(f"../image/{name}.tmx") #charge le fichier tmx avec les surfaces de pygame 
+        map_data = pyscroll.data.TiledMapData(tmx_data) #récupère les données de la carte
+        map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size()) #gère le déplacement de la carte (quand le joueur est au centre de l'écran)
+        map_layer.zoom = self.zoom #zoom sur la carte
         
         #liste des rectangles de collision
         walls = []

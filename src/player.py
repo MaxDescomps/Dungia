@@ -1,5 +1,6 @@
 import pygame
 from animation import AnimateSprite
+from crosshair import Crosshair
 
 class Entity(AnimateSprite):
 
@@ -41,6 +42,7 @@ class Player(Entity):
 
     def __init__(self):
         super().__init__("player", 0, 0)
+        self.crosshair = Crosshair("../image/crosshair.png")
 
 class NPC(Entity):
 
