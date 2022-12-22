@@ -10,16 +10,8 @@ class Entity(AnimateSprite):
         self.image = self.get_image(0, 0)#sprite effectif du joueur
         self.rect = self.image.get_rect() #rectangle de l'image du joueur
         self.position = [x, y]
-        self.speed = 2
         self.feet = pygame.Rect(0, 0, 28, 12) #zone de collision du joueur
         self.old_position = self.position.copy()
-
-        self.images = {
-            "down": self.get_image(0, 0),
-            "left": self.get_image(0, 32),
-            "right": self.get_image(0, 64),
-            "up": self.get_image(0, 96),
-        }
 
     def save_location(self): self.old_position = self.position.copy()
 
@@ -30,9 +22,6 @@ class Entity(AnimateSprite):
     def move_up(self): self.position[1] -= self.speed
 
     def move_down(self): self.position[1] += self.speed
-
-    def change_animation(self, direction):
-        self.image = self.images[direction]
     
     def update(self):
         self.rect.topleft = self.position #la position du joueur avec [0,0] le coin superieur gauche
