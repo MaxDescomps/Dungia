@@ -33,7 +33,7 @@ class MapManager:
         self.register_map("tech1", portals=[
             Portal(from_world="tech1", origin_point="enter_tech1", target_world="tech2", teleport_point="spawn_tech2")
         ], npcs=[
-            NPC("paul")
+            NPC("paul", dialog=["Salut c'est Julien je vous souhaite la bievenu!", "Je vais vous expliquer comment gagner de l'argent!"])
         ])
         self.register_map("tech2", portals=[
             Portal(from_world="tech2", origin_point="enter_tech1", target_world="tech1", teleport_point="spawn_tech2")
@@ -58,6 +58,10 @@ class MapManager:
         #joueur
         if self.player.feet.collidelist(self.get_walls()) > -1:
             self.player.move_back()
+        else:
+            for npc in self.get_npcs():
+                if self.player.feet.colliderect(npc.feet):
+                    self.player.move_back()
 
         #tirs
         for shot in self.get_shots():
@@ -93,7 +97,7 @@ class MapManager:
 
         # dessiner le groupe de calques
         group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=2) #groupe de calques
-        group.add(self.player) #ajout du joueur au groupe de calques
+        group.add(self.player, layer = 3) #ajout du joueur au groupe de calques
 
         #ajout des npc au groupe
         for npc in npcs:
@@ -102,13 +106,20 @@ class MapManager:
         #creer un objet map
         self.maps[name] = Map(name, walls, group, tmx_data, portals, npcs, shots)
 
-    def get_map(self): return self.maps[self.current_map]
+    def get_map(self):
+        return self.maps[self.current_map]
 
-    def get_group(self): return self.get_map().group
+    def get_group(self):
+        return self.get_map().group
 
-    def get_walls(self): return self.get_map().walls
+    def get_walls(self) -> list[pygame.Rect]:
+        return self.get_map().walls
 
-    def get_shots(self): return self.get_map().shots
+    def get_npcs(self) -> list[NPC]:
+        return self.get_map().npcs
+
+    def get_shots(self):
+        return self.get_map().shots
 
     def draw(self):
         self.get_group().draw(self.screen)
@@ -120,6 +131,19 @@ class MapManager:
 
     def get_object(self, name):
         return self.get_map().tmx_data.get_object_by_name(name)
+
+    def check_npc_collisions(self, dialog_box):
+
+        npcs = self.get_npcs()
+
+        if npcs:
+            for npc in npcs:
+                if npc.feet.colliderect(self.player.rect):
+                    dialog_box.execute(npc.dialog)
+                else:
+                    dialog_box.reading = 0
+        else:
+            dialog_box.reading = 0
     
     def teleport_npcs(self):
         for map in self.maps:

@@ -7,10 +7,10 @@ class Entity(AnimateSprite):
 
     def __init__(self, name, x, y):
         super().__init__(name)
-        self.image = self.get_image(0, 0)#sprite effectif du joueur
-        self.rect = self.image.get_rect() #rectangle de l'image du joueur
+        self.image = self.get_image(0, 0)#sprite effectif de l'entité
+        self.rect = self.image.get_rect() #rectangle de l'image de l'entité
         self.position = [x, y]
-        self.feet = pygame.Rect(0, 0, 28, 12) #zone de collision du joueur
+        self.feet = pygame.Rect(0, 0, 28, 12) #zone de collision de l'entité
         self.old_position = self.position.copy()
 
     def save_location(self): self.old_position = self.position.copy()
@@ -46,9 +46,10 @@ class Player(Entity):
 
 class NPC(Entity):
 
-    def __init__(self, name):
+    def __init__(self, name, dialog):
         super().__init__(name, 0, 0)
         self.name = name
+        self.dialog = dialog
 
     def teleport_spawn(self, map):
         point = map.tmx_data.get_object_by_name(self.name) #l'objet du tmx sur lequel on se teleporte

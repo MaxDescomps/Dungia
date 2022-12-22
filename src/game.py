@@ -1,23 +1,27 @@
 import pygame, pytmx, pyscroll
 from player import *
 from map import MapManager
+from dialog import DialogBox
 
 class Game:
+
     def __init__(self):
         # fenetre de jeu
-        self.screen = pygame.display.set_mode((1920,1080))
+        self.screen = pygame.display.set_mode((1920,1080), pygame.FULLSCREEN)
         pygame.display.set_caption("esieageon")
 
         #generer un joueur
         self.player = Player() #création joueur
         self.map_manager = MapManager(self.screen, self.player)
 
+        self.dialog_box = DialogBox(400, 100)
+
         #donne les informations au joueur pour gere la position du crosshair en jeu
         self.player.map_manager = self.map_manager
 
         self.running = True
 
-    def handle_key_input(self):
+    def handle_real_time_input(self):
         pressed = pygame.key.get_pressed()
         direction = None
 
@@ -37,7 +41,7 @@ class Game:
         if direction:
             self.player.change_animation(direction)
 
-    def handle_mouse_input(self):
+    def handle_input(self):
         for event in pygame.event.get():
 
             #évènement souris click
@@ -57,6 +61,10 @@ class Game:
                 elif event.button == 5:
                     # print("mouse wheel down")
                     pass
+            
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.map_manager.check_npc_collisions(self.dialog_box)
             
             #évènement souris fin de click
             elif event.type == pygame.MOUSEBUTTONUP:
@@ -78,6 +86,7 @@ class Game:
     def draw(self):
         self.map_manager.draw() #dessine et centre le monde
         self.screen.blit(self.player.crosshair.image, self.player.crosshair.rect.topleft) #affichage du crosshair
+        self.dialog_box.render(self.screen)
 
     def debug(self):
 
@@ -96,8 +105,8 @@ class Game:
         while self.running:
 
             self.player.save_location() #enregistre la position du joueur avant deplacement pour pouvoir move_back
-            self.handle_key_input() #gestion entree clavier
-            self.handle_mouse_input()
+            self.handle_real_time_input() #gestion entree clavier
+            self.handle_input()
             self.update()
 
             self.draw()
