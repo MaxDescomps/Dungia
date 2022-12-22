@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import pygame, pytmx, pyscroll
 from player import *
 import pygame.sprite
+from shot import PlayerShot
 
 @dataclass
 class Portal:
@@ -18,6 +19,7 @@ class Map:
     tmx_data: pytmx.TiledMap
     portals: list[Portal]
     npcs: list[NPC]
+    shots: list[PlayerShot]
 
 class MapManager:
 
@@ -26,7 +28,7 @@ class MapManager:
         self.player = player
         self.maps = dict()
         self.current_map = "tech2"
-        self.zoom = 2
+        self.zoom = 3
 
         self.register_map("tech1", portals=[
             Portal(from_world="tech1", origin_point="enter_tech1", target_world="tech2", teleport_point="spawn_tech2")
@@ -41,6 +43,8 @@ class MapManager:
         self.teleport_npcs()
 
     def check_collisions(self):
+        """Gère les collisions sur la carte"""
+
         #portails
         for portal in self.get_map().portals:
             if portal.from_world == self.current_map: #verif optionnelle?
@@ -51,10 +55,15 @@ class MapManager:
                     copy_portal = portal
                     self.current_map = portal.target_world
                     self.teleport_player(copy_portal.teleport_point)
-        #murs
-        for sprite in self.get_group().sprites():
-            if sprite.feet.collidelist(self.get_walls()) > -1:
-                sprite.move_back()
+        #joueur
+        if self.player.feet.collidelist(self.get_walls()) > -1:
+            self.player.move_back()
+
+        #tirs
+        for shot in self.get_shots():
+            if shot.rect.collidelist(self.get_walls()) > -1:
+                shot.kill()#enlève le tir de tous les groupes d'affichage
+                self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
 
     def teleport_player(self, name):
         point = self.get_object(name) #l'objet du tmx sur lequel on se teleporte
@@ -69,18 +78,21 @@ class MapManager:
 
         tmx_data = pytmx.util_pygame.load_pygame(f"../image/{name}.tmx") #charge le fichier tmx avec les surfaces de pygame 
         map_data = pyscroll.data.TiledMapData(tmx_data) #récupère les données de la carte
-        map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size()) #gère le déplacement de la carte (quand le joueur est au centre de l'écran)
-        map_layer.zoom = self.zoom #zoom sur la carte
+        self.map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size()) #gère le déplacement de la carte (quand le joueur est au centre de l'écran)
+        self.map_layer.zoom = self.zoom #zoom sur la carte
         
         #liste des rectangles de collision
         walls = []
+
+        #liste des tirs
+        shots = []
 
         for obj in tmx_data.objects:
             if obj.name == "collision":
                 walls.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
 
         # dessiner le groupe de calques
-        group = pyscroll.PyscrollGroup(map_layer=map_layer, default_layer=2) #groupe de calques
+        group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=2) #groupe de calques
         group.add(self.player) #ajout du joueur au groupe de calques
 
         #ajout des npc au groupe
@@ -88,13 +100,15 @@ class MapManager:
             group.add(npc)
 
         #creer un objet map
-        self.maps[name] = Map(name, walls, group, tmx_data, portals, npcs)
+        self.maps[name] = Map(name, walls, group, tmx_data, portals, npcs, shots)
 
     def get_map(self): return self.maps[self.current_map]
 
     def get_group(self): return self.get_map().group
 
     def get_walls(self): return self.get_map().walls
+
+    def get_shots(self): return self.get_map().shots
 
     def draw(self):
         self.get_group().draw(self.screen)

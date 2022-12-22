@@ -1,18 +1,25 @@
 import pygame
 from animation import AnimateSprite
 from crosshair import Crosshair
+from shot import *
 
 class Entity(AnimateSprite):
 
     def __init__(self, name, x, y):
         super().__init__(name)
-        self.image = self.get_image(0, 0) #sprite effectif du joueur
-        self.image.set_colorkey([0,0,0]) #enleve le noir (rgb 0,0,0) de l'image
+        self.image = self.get_image(0, 0)#sprite effectif du joueur
         self.rect = self.image.get_rect() #rectangle de l'image du joueur
         self.position = [x, y]
         self.speed = 2
         self.feet = pygame.Rect(0, 0, 28, 12) #zone de collision du joueur
         self.old_position = self.position.copy()
+
+        self.images = {
+            "down": self.get_image(0, 0),
+            "left": self.get_image(0, 32),
+            "right": self.get_image(0, 64),
+            "up": self.get_image(0, 96),
+        }
 
     def save_location(self): self.old_position = self.position.copy()
 
@@ -26,7 +33,6 @@ class Entity(AnimateSprite):
 
     def change_animation(self, direction):
         self.image = self.images[direction]
-        self.image.set_colorkey([0,0,0]) #enleve le noir (rgb 0,0,0) de l'image
     
     def update(self):
         self.rect.topleft = self.position #la position du joueur avec [0,0] le coin superieur gauche
@@ -43,6 +49,11 @@ class Player(Entity):
     def __init__(self):
         super().__init__("player", 0, 0)
         self.crosshair = Crosshair("../image/crosshair.png")
+
+        self.map_manager = None #gestionnaire de carte pour ajuster la position du crosshair en jeu, attribué dans Game.__init__()
+
+    def shoot(self):
+        return PlayerShot(self, 3, "techpack/Projectiles/projectiles x1")
 
 class NPC(Entity):
 
