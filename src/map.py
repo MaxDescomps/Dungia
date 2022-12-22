@@ -65,7 +65,8 @@ class MapManager:
 
         #tirs
         for shot in self.get_shots():
-            if shot.rect.collidelist(self.get_walls()) > -1:
+            print(shot.colliderect)
+            if shot.colliderect.collidelist(self.get_walls()) > -1:
                 shot.kill()#enlève le tir de tous les groupes d'affichage
                 self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
 

@@ -37,6 +37,11 @@ class PlayerShot(AnimateSprite):
         #rotation de l'image du tir en fonction de l'angle (optionnel si balle circulaire)
         self.rotate_img()
 
+        #calcul du rectangle de collision plus précis
+        self.colliderect = pygame.Rect(0, 0, 8, 8)
+        self.colliderect.center = self.rect.center
+
+        #copie de la position pour pouvoir faire des calculs sur nombres flottants
         self.pos = [None, None]
         self.pos[0] = self.rect[0]
         self.pos[1] = self.rect[1]
@@ -47,12 +52,17 @@ class PlayerShot(AnimateSprite):
         self.pos[0] += self.speed_x
         self.pos[1] += self.speed_y
 
+        #maj du rectangle d'affichage
         self.rect.topleft = self.pos
+        
+        #maj du rectangle de collision
+        self.colliderect.center = self.rect.center
 
     def rotate_img(self):
         """fait une rotation de l'image du tir en fonction de son angle"""
 
         rotated_image = pygame.transform.rotate(self.image, -math.degrees(self.angle)).convert_alpha() #rotation de l'image
-        self.rect = rotated_image.get_rect(center = self.image.get_rect(topleft = self.rect.topleft).center) #on corrige la modification du centre de l'image causé par le changement de son rectangle après rotation
+
+        self.rect = rotated_image.get_rect(center = self.rect.center) #on corrige la modification du centre de l'image causé par le changement de son rectangle après rotation
 
         self.image = rotated_image
