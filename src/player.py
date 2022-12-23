@@ -55,3 +55,13 @@ class NPC(Entity):
         point = map.tmx_data.get_object_by_name(self.name) #l'objet du tmx sur lequel on se teleporte
         self.position = [point.x, point.y]
         self.save_location() #permet de ne pas se tp en boucle sur une collision?
+
+class Mob(Entity):
+    def __init__(self, name):
+        super().__init__(name, 0, 0)
+        self.name = name
+
+    def teleport_spawn(self, map, spawn_name):
+        point = map.tmx_data.get_object_by_name(spawn_name) #l'objet du tmx sur lequel le mob se teleporte
+        self.position = [point.x, point.y]
+        self.save_location() #permet de ne pas se tp en boucle sur une collision?

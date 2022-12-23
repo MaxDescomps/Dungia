@@ -3,6 +3,13 @@ import pygame, pytmx, pyscroll
 from player import *
 import pygame.sprite
 from shot import PlayerShot
+from door import Door
+
+@dataclass
+class Room:
+    rect: pygame.Rect
+    doors: list[Door]
+    mobs: list[Mob]
 
 @dataclass
 class Portal:
@@ -20,6 +27,8 @@ class Map:
     portals: list[Portal]
     npcs: list[NPC]
     shots: list[PlayerShot]
+    doors: list[Door] #liste des portes de la carte pour calcul plus rapide des portes de chaque pièce
+    rooms: list[Room]
 
 class MapManager:
 
@@ -56,12 +65,24 @@ class MapManager:
                     self.current_map = portal.target_world
                     self.teleport_player(copy_portal.teleport_point)
         #joueur
+        #joueur - mur
         if self.player.feet.collidelist(self.get_walls()) > -1:
             self.player.move_back()
         else:
+            player_collided = False
+            
+            #joueur - npc
             for npc in self.get_npcs():
                 if self.player.feet.colliderect(npc.feet):
                     self.player.move_back()
+                    player_collided = True
+
+            if not player_collided:
+                #joueur - porte
+                for door in self.get_map().doors:
+                    if self.player.feet.colliderect(door.rect) and not door.opened:
+                        self.player.move_back()
+                        player_collided = True
 
         #tirs
         for shot in self.get_shots():
@@ -84,16 +105,48 @@ class MapManager:
         map_data = pyscroll.data.TiledMapData(tmx_data) #récupère les données de la carte
         self.map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size()) #gère le déplacement de la carte (quand le joueur est au centre de l'écran)
         self.map_layer.zoom = self.zoom #zoom sur la carte
-        
-        #liste des rectangles de collision
-        walls = []
 
         #liste des tirs
         shots = []
 
+        #liste des portes de la carte
+        doors = []
+        for obj in tmx_data.objects:
+            if obj.name == "door":
+                door = Door(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+
+                doors.append(door)
+
+        #liste des rectangles de collision
+        walls = []
+
+        #liste des pièces
+        rooms = []
+
+        #récupère les murs et pièces du tmx
         for obj in tmx_data.objects:
             if obj.name == "collision":
                 walls.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+
+            elif obj.name == "room":
+                #rectangle de la pièce
+                room_rect = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
+
+                #portes de la pièce
+                room_doors = []
+
+                #récupération des portes de la pièce
+                for door in doors:
+                    if door.rect.colliderect(room_rect):
+                        print(f"room: {room_rect}\ndoor: {door.rect}")
+
+                        room_doors.append(door)
+
+                #récuprération des mobs de la pièce?
+                room_mobs = []
+
+                rooms.append(Room(room_rect, room_doors, room_mobs))
+
 
         # dessiner le groupe de calques
         group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=2) #groupe de calques
@@ -103,8 +156,12 @@ class MapManager:
         for npc in npcs:
             group.add(npc)
 
+        #ajout des portes au groupe
+        for door in doors:
+            group.add(door, layer=4)
+
         #creer un objet map
-        self.maps[name] = Map(name, walls, group, tmx_data, portals, npcs, shots)
+        self.maps[name] = Map(name, walls, group, tmx_data, portals, npcs, shots, doors, rooms)
 
     def get_map(self):
         return self.maps[self.current_map]
