@@ -23,6 +23,7 @@ class Door(pygame.sprite.Sprite):
         self.closing = False #initialement sur False, indique que la porte se ferme
 
         self.opened = False #informe sur l'état ouvert de la porte (mis sur True à l'ouverture du jeu)
+        self.blocked = False #collision temporaire de la porte parfois nécessaire
 
         self.animation_index = 0
         self.rect = rect
@@ -55,7 +56,7 @@ class Door(pygame.sprite.Sprite):
 
                     self.opening = False
                     self.closing = False #empêche l'execution d'une fermeture demandée avant quand self.opened == False
-                    self.opened = True
+                    self.opened = True #on désactive la collision en dernier pour que le joueur attende la fin de l'animation d'ouverture
                 
                 self.clock = 0
 
@@ -63,6 +64,8 @@ class Door(pygame.sprite.Sprite):
         """Fermeture d'une porte avec animation"""
 
         if self.closing:
+            self.blocked = True #on active la collision temporaire en premier pour éviter que le joueur traverse la porte pendant l'animation
+
             self.image = self.images[self.animation_index]
             self.clock += self.speed * 10
 
@@ -74,7 +77,9 @@ class Door(pygame.sprite.Sprite):
 
                     self.closing = False
                     self.opening = False #empêche l'execution d'une ouverture demandée avant quand self.opened == True
-                    self.opened = False
+                    self.opened = False #active la collision définitive
+
+                    self.blocked = False #plus besoin de la collision temporaire elle est assurée au dessus
                 
                 self.clock = 0
 

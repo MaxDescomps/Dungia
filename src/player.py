@@ -37,8 +37,10 @@ class Player(Entity):
 
     def __init__(self):
         super().__init__("player", 0, 0)
-        self.crosshair = Crosshair("../image/crosshair.png")
+        self.max_pdv = 6 #pdv maximums
+        self.pdv = self.max_pdv #pdv effectifs
 
+        self.crosshair = Crosshair("../image/crosshair.png")
         self.map_manager = None #gestionnaire de carte pour ajuster la position du crosshair en jeu, attribué dans Game.__init__()
 
     def shoot(self):
@@ -62,10 +64,23 @@ class Mob(Entity):
     on invoque les mobs d'une pièce quand on colliderect un pièce mais pas la porte (fermeture de la porte)
     pour les invoquer on les fait spawn avec teleport_spawn en donnant le nom du spawn (spawn_mob[1-5] dans chaque pièce hostile)
     """
-    def __init__(self, name):
+    def __init__(self, name, fighting_mobs):
         super().__init__(name, 0, 0)
-        self.name = name
+        self.max_pdv = 6 #pdv maximums
+        self.pdv = self.max_pdv #pdv effectifs
+        self.name = name #nom du fichier image png
+        self.fighting_mobs = fighting_mobs #liste des mobs combattans actuellement dans la même pièce de la carte
     
     def teleport_spawn(self, point):
         self.position = [point[0], point[1]]
         self.save_location() #permet de ne pas se tp en boucle sur une collision?
+    
+    def update(self):
+        if self.pdv:
+            self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche
+            self.feet.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
+            self.pdv -= 1 #?temporaire
+        else:
+            self.kill() #retire le sprite des groupes d'affichage
+
+            self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce

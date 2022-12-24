@@ -40,6 +40,7 @@ class MapManager:
         self.player = player
         self.maps = dict()
         self.current_map = "tech2"
+        self.current_room = None
         self.zoom = 3
 
         self.register_map("tech1", portals=[
@@ -89,16 +90,26 @@ class MapManager:
                         in_doorway = True
 
                         #collision sur porte fermée
-                        if not door.opened:
+                        if not door.opened or door.blocked:
                             self.player.move_back()
                             player_collided = True
 
-            #joueur - nouvelle pièce
+            #joueur - pièce
             if not player_collided:
+                self.current_room = None
+
                 for room in self.get_map().rooms:
-                    if self.player.feet.colliderect(room.rect) and not room.visited and not in_doorway:
-                        room.visited = True
-                        self.manage_room_hostility(room)
+                    if self.player.feet.colliderect(room.rect):
+                        self.current_room = room
+
+                        #entrée dans une nouvelle pièce
+                        if not room.visited:
+                            if not in_doorway:
+                                room.visited = True
+                                self.manage_room_hostility()
+                        else:
+                            if not room.fighting_mobs: #attend que la vague de monstres soit vaincue
+                                self.manage_room_hostility()
 
         #tirs
         for shot in self.get_shots():
@@ -106,9 +117,13 @@ class MapManager:
                 shot.kill()#enlève le tir de tous les groupes d'affichage
                 self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
 
-    def manage_room_hostility(self, room):
-        print("ok")
-        
+    def manage_room_hostility(self):
+        """
+        Fais apparaitre les monstres d'une pièce (maximum 5 apparitions)
+        Cause la fermeture des portes d'une pièce hostile
+        """
+        room = self.current_room
+
         #si pièce hostile
         if room.mobs:
             #fermeture des portes
@@ -122,14 +137,17 @@ class MapManager:
                 try:
                     mob = room.mobs.pop(0)
                 except:
-                    print("plus de mobs à spawn dans la pièce")
+                    #plus de mobs à faire apparaitre
+                    break
                 else:
-                    print(room.mob_spawns)
-                    mob.teleport_spawn(room.mob_spawns[0])
+                    mob.teleport_spawn(room.mob_spawns[spawn_index])
                     room.fighting_mobs.append(mob)
                     self.get_group().add(mob)
 
                     spawn_index += 1
+        else:
+            for door in room.doors:
+                door.opening = True
 
     def teleport_player(self, name):
         point = self.get_object(name) #l'objet du tmx sur lequel on se teleporte
@@ -190,13 +208,17 @@ class MapManager:
 
                         room_doors.append(door)
 
+                #mobs combattants dans la pièce
+                room_fighting_mobs = []
+
                 #récuprération des mobs de la pièce?
                 room_mobs = []
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
                     # if bool(random.getrandbits(1)): #une chance sur deux
-                        room_mobs.append(Mob("boss"))
+                        room_mobs.append(Mob("boss", room_fighting_mobs))
+                        #?les mobs seront spawn aléatoirement plus tard
 
-                rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, []))
+                rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, room_fighting_mobs))
 
 
         # dessiner le groupe de calques
