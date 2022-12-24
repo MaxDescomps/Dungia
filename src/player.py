@@ -57,11 +57,15 @@ class NPC(Entity):
         self.save_location() #permet de ne pas se tp en boucle sur une collision?
 
 class Mob(Entity):
+    """Classe des monstres
+    ?utilisation future: on init les mobs qu'on range dans les pièces de la map (pas de max, ils spawn par vagues de 5)
+    on invoque les mobs d'une pièce quand on colliderect un pièce mais pas la porte (fermeture de la porte)
+    pour les invoquer on les fait spawn avec teleport_spawn en donnant le nom du spawn (spawn_mob[1-5] dans chaque pièce hostile)
+    """
     def __init__(self, name):
         super().__init__(name, 0, 0)
         self.name = name
-
-    def teleport_spawn(self, map, spawn_name):
-        point = map.tmx_data.get_object_by_name(spawn_name) #l'objet du tmx sur lequel le mob se teleporte
-        self.position = [point.x, point.y]
+    
+    def teleport_spawn(self, point):
+        self.position = [point[0], point[1]]
         self.save_location() #permet de ne pas se tp en boucle sur une collision?

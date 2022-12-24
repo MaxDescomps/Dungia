@@ -1,7 +1,7 @@
-from dataclasses import dataclass
-import pygame, pytmx, pyscroll
-from player import *
+import pygame, pytmx, pyscroll, random
 import pygame.sprite
+from dataclasses import dataclass
+from player import *
 from shot import PlayerShot
 from door import Door
 
@@ -10,6 +10,9 @@ class Room:
     rect: pygame.Rect
     doors: list[Door]
     mobs: list[Mob]
+    mob_spawns: list[(int, int)]
+    fighting_mobs: list[Mob]
+    visited: bool = False
 
 @dataclass
 class Portal:
@@ -42,7 +45,7 @@ class MapManager:
         self.register_map("tech1", portals=[
             Portal(from_world="tech1", origin_point="enter_tech1", target_world="tech2", teleport_point="spawn_tech2")
         ], npcs=[
-            NPC("paul", dialog=["Salut c'est Julien je vous souhaite la bievenu!", "Je vais vous expliquer comment gagner de l'argent!"])
+            NPC("paul", dialog=["Salut c'est Julien je vous souhaite la bienvenue!", "Je vais vous expliquer comment gagner de l'argent!"])
         ])
         self.register_map("tech2", portals=[
             Portal(from_world="tech2", origin_point="enter_tech1", target_world="tech1", teleport_point="spawn_tech2")
@@ -77,18 +80,56 @@ class MapManager:
                     self.player.move_back()
                     player_collided = True
 
+            #joueur - porte
+            in_doorway = False #dit si le joueur est dans le passage d'une porte
+
             if not player_collided:
-                #joueur - porte
                 for door in self.get_map().doors:
-                    if self.player.feet.colliderect(door.rect) and not door.opened:
-                        self.player.move_back()
-                        player_collided = True
+                    if self.player.feet.colliderect(door.rect):
+                        in_doorway = True
+
+                        #collision sur porte fermée
+                        if not door.opened:
+                            self.player.move_back()
+                            player_collided = True
+
+            #joueur - nouvelle pièce
+            if not player_collided:
+                for room in self.get_map().rooms:
+                    if self.player.feet.colliderect(room.rect) and not room.visited and not in_doorway:
+                        room.visited = True
+                        self.manage_room_hostility(room)
 
         #tirs
         for shot in self.get_shots():
             if shot.colliderect.collidelist(self.get_walls()) > -1:
                 shot.kill()#enlève le tir de tous les groupes d'affichage
                 self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+
+    def manage_room_hostility(self, room):
+        print("ok")
+        
+        #si pièce hostile
+        if room.mobs:
+            #fermeture des portes
+            for door in room.doors:
+                door.closing = True
+
+            #spawn des mobs
+            spawn_index = 0
+
+            for i in range(5):
+                try:
+                    mob = room.mobs.pop(0)
+                except:
+                    print("plus de mobs à spawn dans la pièce")
+                else:
+                    print(room.mob_spawns)
+                    mob.teleport_spawn(room.mob_spawns[0])
+                    room.fighting_mobs.append(mob)
+                    self.get_group().add(mob)
+
+                    spawn_index += 1
 
     def teleport_player(self, name):
         point = self.get_object(name) #l'objet du tmx sur lequel on se teleporte
@@ -109,13 +150,17 @@ class MapManager:
         #liste des tirs
         shots = []
 
-        #liste des portes de la carte
-        doors = []
+        #liste des portes et des points de spawn pour mob dans la carte
+        doors = [] #pas besoin de stocker dans la class carte?
+        mob_spawns = []
         for obj in tmx_data.objects:
             if obj.name == "door":
                 door = Door(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
-
                 doors.append(door)
+            else:
+                for i in range (1,6):
+                    if obj.name == f"mob_spawn{i}":
+                        mob_spawns.append((obj.x, obj.y))
 
         #liste des rectangles de collision
         walls = []
@@ -132,20 +177,26 @@ class MapManager:
                 #rectangle de la pièce
                 room_rect = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
 
-                #portes de la pièce
-                room_doors = []
+                #récupération des points de spawn des mobs de la pièce
+                room_mob_spawns = []
+                for mob_spawn in mob_spawns:
+                    if room_rect.collidepoint(mob_spawn):
+                        room_mob_spawns.append(mob_spawn)
 
                 #récupération des portes de la pièce
+                room_doors = []
                 for door in doors:
                     if door.rect.colliderect(room_rect):
-                        print(f"room: {room_rect}\ndoor: {door.rect}")
 
                         room_doors.append(door)
 
                 #récuprération des mobs de la pièce?
                 room_mobs = []
+                if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
+                    # if bool(random.getrandbits(1)): #une chance sur deux
+                        room_mobs.append(Mob("boss"))
 
-                rooms.append(Room(room_rect, room_doors, room_mobs))
+                rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, []))
 
 
         # dessiner le groupe de calques

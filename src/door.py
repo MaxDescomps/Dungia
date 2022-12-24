@@ -39,7 +39,7 @@ class Door(pygame.sprite.Sprite):
             self.close_animation()
 
     def open_animation(self):
-        """Animation de l'ouverture d'une porte"""
+        """Ouverture d'une porte avec animation"""
 
         if self.opening:
             images_len = len(self.images)
@@ -54,12 +54,13 @@ class Door(pygame.sprite.Sprite):
                     self.animation_index = images_len - 1
 
                     self.opening = False
+                    self.closing = False #empêche l'execution d'une fermeture demandée avant quand self.opened == False
                     self.opened = True
                 
                 self.clock = 0
 
     def close_animation(self):
-        """Animation de la fermeture d'une porte"""
+        """Fermeture d'une porte avec animation"""
 
         if self.closing:
             self.image = self.images[self.animation_index]
@@ -72,6 +73,7 @@ class Door(pygame.sprite.Sprite):
                     self.animation_index = 0
 
                     self.closing = False
+                    self.opening = False #empêche l'execution d'une ouverture demandée avant quand self.opened == True
                     self.opened = False
                 
                 self.clock = 0
