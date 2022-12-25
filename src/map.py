@@ -58,17 +58,16 @@ class MapManager:
     def check_collisions(self):
         """Gère les collisions sur la carte"""
 
-        #portails
+        #joueur - portails
         for portal in self.get_map().portals:
-            if portal.from_world == self.current_map: #verif optionnelle?
-                point = self.get_object(portal.origin_point)
-                rect = pygame.Rect(point.x, point.y, point.width, point.height)#recree a chaque appel?
+            point = self.get_object(portal.origin_point)
+            rect = pygame.Rect(point.x, point.y, point.width, point.height)#recree a chaque appel?
 
-                if self.player.feet.colliderect(rect):
-                    copy_portal = portal
-                    self.current_map = portal.target_world
-                    self.teleport_player(copy_portal.teleport_point)
-        #joueur
+            if self.player.feet.colliderect(rect):
+                copy_portal = portal
+                self.current_map = portal.target_world
+                self.teleport_player(copy_portal.teleport_point)
+
         #joueur - mur
         if self.player.feet.collidelist(self.get_walls()) > -1:
             self.player.move_back()
@@ -116,6 +115,12 @@ class MapManager:
             if shot.colliderect.collidelist(self.get_walls()) > -1:
                 shot.kill()#enlève le tir de tous les groupes d'affichage
                 self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+            elif self.current_room:
+                for mob in self.current_room.fighting_mobs:
+                    if shot.colliderect.colliderect(mob.feet):
+                        shot.kill()#enlève le tir de tous les groupes d'affichage
+                        self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                        mob.pdv -= shot.damage
 
     def manage_room_hostility(self):
         """

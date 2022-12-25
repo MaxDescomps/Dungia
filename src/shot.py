@@ -4,13 +4,13 @@ from animation import AnimateSprite
 class PlayerShot(AnimateSprite):
     """Classe d'un tir d'un joueur"""
 
-    def __init__(self, player, speed, name):
+    def __init__(self, player, speed, name, damage):
         """
         constructeur d'objet Playershot
 
         Args:
-            player (Player): le joueur qui tire
-            speed (int): la vitesse du tire
+            player (Player): le joueur qui tir
+            speed (int): la vitesse du tir
             name (str): le chemin du fichier image du tir à partir de ../image
         """
         super().__init__(name)
@@ -45,6 +45,9 @@ class PlayerShot(AnimateSprite):
         self.pos = [None, None]
         self.pos[0] = self.rect[0]
         self.pos[1] = self.rect[1]
+
+        #dommages infligés par le tir
+        self.damage = damage
 
     def update(self):
         """met la position du tir à jour"""

@@ -44,7 +44,7 @@ class Player(Entity):
         self.map_manager = None #gestionnaire de carte pour ajuster la position du crosshair en jeu, attribué dans Game.__init__()
 
     def shoot(self):
-        return PlayerShot(self, 3, "techpack/Projectiles/projectiles x1")
+        return PlayerShot(self, 3, "techpack/Projectiles/projectiles x1", 1)
 
 class NPC(Entity):
 
@@ -79,7 +79,6 @@ class Mob(Entity):
         if self.pdv:
             self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche
             self.feet.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
-            self.pdv -= 1 #?temporaire
         else:
             self.kill() #retire le sprite des groupes d'affichage
 
