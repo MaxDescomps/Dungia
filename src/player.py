@@ -39,12 +39,23 @@ class Player(Entity):
         super().__init__("player", 0, 0)
         self.max_pdv = 6 #pdv maximums
         self.pdv = self.max_pdv #pdv effectifs
+        self.damage_clock = 0 #laps de temps minimum entre deux dommages consécutifs
 
         self.crosshair = Crosshair("../image/crosshair.png")
         self.map_manager = None #gestionnaire de carte pour ajuster la position du crosshair en jeu, attribué dans Game.__init__()
 
     def shoot(self):
         return PlayerShot(self, 3, "techpack/Projectiles/projectiles x1", 1)
+
+    def update(self):
+        if self.pdv:
+            self.rect.topleft = self.position #la position du joueur avec [0,0] le coin superieur gauche
+            self.feet.midbottom = self.rect.midbottom #aligne les centres des rect player.feet et player.rect
+
+            if self.damage_clock:
+                self.damage_clock -= 1
+        else:
+            exit(0) #game over
 
 class NPC(Entity):
 
@@ -64,8 +75,10 @@ class Mob(Entity):
     on invoque les mobs d'une pièce quand on colliderect un pièce mais pas la porte (fermeture de la porte)
     pour les invoquer on les fait spawn avec teleport_spawn en donnant le nom du spawn (spawn_mob[1-5] dans chaque pièce hostile)
     """
-    def __init__(self, name, fighting_mobs):
+    def __init__(self, name, fighting_mobs, player, speed):
         super().__init__(name, 0, 0)
+        self.speed = speed
+        self.player = player #joueur à attaquer
         self.max_pdv = 6 #pdv maximums
         self.pdv = self.max_pdv #pdv effectifs
         self.name = name #nom du fichier image png
@@ -77,9 +90,20 @@ class Mob(Entity):
     
     def update(self):
         if self.pdv:
+            self.move_towards_player()
             self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche
             self.feet.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
         else:
             self.kill() #retire le sprite des groupes d'affichage
-
             self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce
+        
+    def move_towards_player(self):
+        if(self.position[0] < self.player.position[0]):
+            self.position[0] += self.speed
+        elif(self.position[0] > self.player.position[0]):
+            self.position[0] -= self.speed
+        
+        if(self.position[1] < self.player.position[1]):
+            self.position[1] += self.speed
+        elif(self.position[1] > self.player.position[1]):
+            self.position[1] -= self.speed

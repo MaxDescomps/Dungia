@@ -109,18 +109,31 @@ class MapManager:
                         else:
                             if not room.fighting_mobs: #attend que la vague de monstres soit vaincue
                                 self.manage_room_hostility()
-
         #tirs
         for shot in self.get_shots():
+
+            #tirs - murs
             if shot.colliderect.collidelist(self.get_walls()) > -1:
                 shot.kill()#enlève le tir de tous les groupes d'affichage
                 self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+
             elif self.current_room:
                 for mob in self.current_room.fighting_mobs:
+
+                    #tirs - monstres
                     if shot.colliderect.colliderect(mob.feet):
                         shot.kill()#enlève le tir de tous les groupes d'affichage
                         self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
                         mob.pdv -= shot.damage
+
+        #joueur - monstres
+        if self.current_room:
+            for mob in self.current_room.fighting_mobs:
+                if self.player.feet.colliderect(mob.feet):
+                    mob.move_back()
+                    if not self.player.damage_clock:
+                        self.player.damage_clock = 60
+                        self.player.pdv -= 1
 
     def manage_room_hostility(self):
         """
@@ -220,7 +233,7 @@ class MapManager:
                 room_mobs = []
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
                     # if bool(random.getrandbits(1)): #une chance sur deux
-                        room_mobs.append(Mob("boss", room_fighting_mobs))
+                        room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 1))
                         #?les mobs seront spawn aléatoirement plus tard
 
                 rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, room_fighting_mobs))

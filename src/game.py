@@ -104,7 +104,7 @@ class Game:
         # boucle de jeu
         while self.running:
 
-            self.player.save_location() #enregistre la position du joueur avant deplacement pour pouvoir move_back
+            self.player.save_location() #enregistre la position du joueur avant deplacement pour pouvoir revenir en arrière en cas de collision
             self.handle_real_time_input() #gestion entree clavier
             self.handle_input()
             self.update()
