@@ -14,6 +14,7 @@ class AnimateSprite(pygame.sprite.Sprite):
         self.sprite_sheet = pygame.image.load(f"../image/{name}.png").convert_alpha() #spritesheet avec paramètre de transparence alpha
         self.speed = 2
         self.clock = 0
+        self.direction = "down"
 
         self.animation_index = 0
 
@@ -24,21 +25,18 @@ class AnimateSprite(pygame.sprite.Sprite):
             "up": self.get_images(96),
         }
 
-    def change_animation(self, direction):
+    def change_animation(self):
         """
         Change l'animation du sprite avec le mouvement et la direction
-        
-        Args:
-            direction(str): direction prise par le sprite
         """
 
-        self.image = self.images[direction][self.animation_index]
+        self.image = self.images[self.direction][self.animation_index]
         self.clock += self.speed * 8
 
         if self.clock >= 100:
             self.animation_index += 1
 
-            if self.animation_index >= len(self.images[direction]):
+            if self.animation_index >= len(self.images[self.direction]):
                 self.animation_index = 0
             
             self.clock = 0

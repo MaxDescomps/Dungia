@@ -23,23 +23,27 @@ class Game:
 
     def handle_real_time_input(self):
         pressed = pygame.key.get_pressed()
-        direction = None
+        moved = False
 
         if pressed[pygame.K_z]:
             self.player.move_up()
-            direction = "up"
+            self.player.direction = "up"
+            moved = True
         if pressed[pygame.K_s]:
             self.player.move_down()
-            direction = "down"
+            self.player.direction = "down"
+            moved = True
         if pressed[pygame.K_q]:
             self.player.move_left()
-            direction = "left"
+            self.player.direction = "left"
+            moved = True
         if pressed[pygame.K_d]:
             self.player.move_right()
-            direction = "right"
+            self.player.direction = "right"
+            moved = True
         
-        if direction:
-            self.player.change_animation(direction)
+        if moved:
+            self.player.change_animation()
 
     def handle_input(self):
         for event in pygame.event.get():

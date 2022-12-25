@@ -98,12 +98,25 @@ class Mob(Entity):
             self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce
         
     def move_towards_player(self):
+        moved = False
+
         if(self.position[0] < self.player.position[0]):
             self.position[0] += self.speed
+            moved = True
+            self.direction = "right"
         elif(self.position[0] > self.player.position[0]):
             self.position[0] -= self.speed
+            moved = True
+            self.direction = "left"
         
         if(self.position[1] < self.player.position[1]):
             self.position[1] += self.speed
+            moved = True
+            self.direction = "down"
         elif(self.position[1] > self.player.position[1]):
             self.position[1] -= self.speed
+            moved = True
+            self.direction = "up"
+
+        if moved:
+            self.change_animation()
