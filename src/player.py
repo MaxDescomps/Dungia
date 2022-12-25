@@ -100,20 +100,20 @@ class Mob(Entity):
     def move_towards_player(self):
         moved = False
 
-        if(self.position[0] < self.player.position[0]):
+        if(self.position[0] - self.player.position[0] < -1):
             self.position[0] += self.speed
             moved = True
             self.direction = "right"
-        elif(self.position[0] > self.player.position[0]):
+        elif(self.position[0] - self.player.position[0] > 1):
             self.position[0] -= self.speed
             moved = True
             self.direction = "left"
         
-        if(self.position[1] < self.player.position[1]):
+        if(self.position[1] - self.player.position[1] < -1):
             self.position[1] += self.speed
             moved = True
             self.direction = "down"
-        elif(self.position[1] > self.player.position[1]):
+        elif(self.position[1] - self.player.position[1] > 1):
             self.position[1] -= self.speed
             moved = True
             self.direction = "up"

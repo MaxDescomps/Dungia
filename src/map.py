@@ -118,13 +118,24 @@ class MapManager:
                 self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
 
             elif self.current_room:
-                for mob in self.current_room.fighting_mobs:
+                if self.current_room.fighting_mobs:
+                    shot_destroyed = False
 
-                    #tirs - monstres
-                    if shot.colliderect.colliderect(mob.feet):
-                        shot.kill()#enlève le tir de tous les groupes d'affichage
-                        self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
-                        mob.pdv -= shot.damage
+                    for door in self.current_room.doors:
+                        if not door.opened:
+                            if shot.colliderect.colliderect(door.rect):
+                                shot.kill()#enlève le tir de tous les groupes d'affichage
+                                self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                                shot_destroyed = True
+
+                    if not shot_destroyed:
+                        for mob in self.current_room.fighting_mobs:
+
+                            #tirs - monstres
+                            if shot.colliderect.colliderect(mob.feet):
+                                shot.kill()#enlève le tir de tous les groupes d'affichage
+                                self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                                mob.pdv -= shot.damage
 
         #joueur - monstres
         if self.current_room:
@@ -233,7 +244,7 @@ class MapManager:
                 room_mobs = []
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
                     # if bool(random.getrandbits(1)): #une chance sur deux
-                        room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 1))
+                        room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 0.5))
                         #?les mobs seront spawn aléatoirement plus tard
 
                 rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, room_fighting_mobs))
