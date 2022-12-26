@@ -7,7 +7,7 @@ class Entity(AnimateSprite):
 
     def __init__(self, name, x, y):
         super().__init__(name)
-        self.image = self.get_image(0, 0)#sprite effectif de l'entité
+        self.image = self.get_image(self.sprite_sheet, 0, 0)#sprite effectif de l'entité
         self.rect = self.image.get_rect() #rectangle de l'image de l'entité
         self.position = [x, y]
         self.feet = pygame.Rect(0, 0, 28, 12) #zone de collision de l'entité
@@ -36,9 +36,15 @@ class Player(Entity):
 
     def __init__(self):
         super().__init__("player", 0, 0)
-        self.max_pdv = 6 #pdv maximums
+
+        self.ui_sprite_sheet = pygame.image.load(f"../image/techpack/UI/ui x1.png").convert_alpha() #spritesheet avec paramètre de transparence alpha
+
+        self.max_pdv = 9 #pdv maximums
         self.pdv = self.max_pdv #pdv effectifs
         self.damage_clock = 0 #laps de temps minimum entre deux dommages consécutifs
+
+        self.get_pdv_images()
+        self.get_pdv_image()
 
         self.crosshair = Crosshair("../image/crosshair.png")
         self.map_manager = None #gestionnaire de carte pour ajuster la position du crosshair en jeu, attribué dans Game.__init__()
@@ -55,6 +61,24 @@ class Player(Entity):
                 self.damage_clock -= 1
         else:
             exit(0) #game over
+
+    def render_ui(self, screen):
+        screen.blit(self.crosshair.image, self.crosshair.rect.topleft) #affichage du crosshair
+        screen.blit(self.pdv_image, (100,20)) #affichage de la bar de vie
+    
+    def get_pdv_image(self):
+        self.pdv_image = self.pdv_images[self.pdv] #image de la bar de vie
+
+    def get_pdv_images(self):
+        self.pdv_images = self.get_images(self.ui_sprite_sheet, 0, 1, 10)
+        for i in range(len(self.pdv_images)):
+            self.pdv_images[i] = pygame.transform.scale(self.pdv_images[i], (200,140)) #agrandit la bar de vie
+
+    def take_damage(self):
+        if not self.damage_clock:
+            self.damage_clock = 60
+            self.pdv -= 1
+            self.get_pdv_image()
 
 class NPC(Entity):
 

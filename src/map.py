@@ -152,9 +152,7 @@ class MapManager:
                 for mob in self.current_room.fighting_mobs:
                     if self.player.feet.colliderect(mob.feet):
                         mob.move_back()
-                        if not self.player.damage_clock:
-                            self.player.damage_clock = 60
-                            self.player.pdv -= 1
+                        self.player.take_damage()
                         break #collision trouvée, fin de la recherche
 
     def manage_room_hostility(self):
@@ -257,7 +255,7 @@ class MapManager:
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
                     for i in range(5):
                         if bool(random.getrandbits(1)): #une chance sur deux
-                            room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 0.5))
+                            room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 1))
 
                 rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, room_fighting_mobs))
 

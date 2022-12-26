@@ -89,8 +89,8 @@ class Game:
 
     def draw(self):
         self.map_manager.draw() #dessine et centre le monde
-        self.screen.blit(self.player.crosshair.image, self.player.crosshair.rect.topleft) #affichage du crosshair
-        self.dialog_box.render(self.screen)
+        self.dialog_box.render(self.screen) #affiche les boites de dialogue ouvertes
+        self.player.render_ui(self.screen) #affiche l'interface utilisateur du joueur
 
     def debug(self):
 

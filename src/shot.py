@@ -15,7 +15,7 @@ class PlayerShot(AnimateSprite):
         """
         super().__init__(name)
 
-        self.image = self.get_image(0,0)
+        self.image = self.get_image(self.sprite_sheet, 0,0)
         self.rect = self.image.get_rect()
 
         mouse_pos = [None, None]
