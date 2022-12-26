@@ -39,7 +39,7 @@ class MapManager:
         self.screen = screen
         self.player = player
         self.maps = dict()
-        self.current_map = "tech2"
+        self.current_map = "tech3"
         self.current_room = None
         self.zoom = 3
 
@@ -51,6 +51,7 @@ class MapManager:
         self.register_map("tech2", portals=[
             Portal(from_world="tech2", origin_point="enter_tech1", target_world="tech1", teleport_point="spawn_tech2")
         ])
+        self.register_map("tech3")
 
         self.teleport_player("player")
         self.teleport_npcs()
@@ -207,7 +208,9 @@ class MapManager:
             else:
                 for i in range (1,6):
                     if obj.name == f"mob_spawn{i}":
+                        print("ok")
                         mob_spawns.append((obj.x, obj.y))
+                        break
 
         #liste des rectangles de collision
         walls = []
