@@ -59,6 +59,8 @@ class MapManager:
     def check_collisions(self):
         """Gère les collisions sur la carte"""
 
+        player_collided = False
+
         #joueur - portails
         for portal in self.get_map().portals:
             point = self.get_object(portal.origin_point)
@@ -68,84 +70,92 @@ class MapManager:
                 copy_portal = portal
                 self.current_map = portal.target_world
                 self.teleport_player(copy_portal.teleport_point)
+                player_collided = True
+                break #collision trouvée
 
-        #joueur - mur
-        if self.player.feet.collidelist(self.get_walls()) > -1:
-            self.player.move_back()
-        else:
-            player_collided = False
-            
-            #joueur - npc
-            for npc in self.get_npcs():
-                if self.player.feet.colliderect(npc.feet):
-                    self.player.move_back()
-                    player_collided = True
+        if player_collided == False:
 
-            #joueur - porte
-            in_doorway = False #dit si le joueur est dans le passage d'une porte
+            #joueur - mur
+            if self.player.feet.collidelist(self.get_walls()) > -1:
+                self.player.move_back()
+            else:
 
-            if not player_collided:
-                for door in self.get_map().doors:
-                    if self.player.feet.colliderect(door.rect):
-                        in_doorway = True
+                #joueur - npc
+                for npc in self.get_npcs():
+                    if self.player.feet.colliderect(npc.feet):
+                        self.player.move_back()
+                        player_collided = True
+                        break #collision trouvée
 
-                        #collision sur porte fermée
-                        if not door.opened or door.blocked:
-                            self.player.move_back()
-                            player_collided = True
+                #joueur - porte
 
-            #joueur - pièce
-            if not player_collided:
-                self.current_room = None
+                if not player_collided:
+                    in_doorway = False #dit si le joueur est dans le passage d'une porte
+                    for door in self.get_map().doors:
+                        if self.player.feet.colliderect(door.rect):
+                            in_doorway = True
 
-                for room in self.get_map().rooms:
-                    if self.player.feet.colliderect(room.rect):
-                        self.current_room = room
+                            #collision sur porte fermée
+                            if not door.opened or door.blocked:
+                                self.player.move_back()
+                                player_collided = True
+                            break #collision trouvée
 
-                        #entrée dans une nouvelle pièce
-                        if not room.visited:
-                            if not in_doorway:
-                                room.visited = True
-                                self.manage_room_hostility()
-                        else:
-                            if not room.fighting_mobs: #attend que la vague de monstres soit vaincue
-                                self.manage_room_hostility()
-        #tirs
-        for shot in self.get_shots():
+                #joueur - pièce
+                if not player_collided:
+                    self.current_room = None
 
-            #tirs - murs
-            if shot.colliderect.collidelist(self.get_walls()) > -1:
-                shot.kill()#enlève le tir de tous les groupes d'affichage
-                self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                    for room in self.get_map().rooms:
+                        if self.player.feet.colliderect(room.rect):
+                            self.current_room = room
 
-            elif self.current_room:
-                if self.current_room.fighting_mobs:
-                    shot_destroyed = False
+                            #entrée dans une nouvelle pièce
+                            if not room.visited:
+                                if not in_doorway:
+                                    room.visited = True
+                                    self.manage_room_hostility()
+                            else:
+                                if not room.fighting_mobs: #attend que la vague de monstres soit vaincue
+                                    self.manage_room_hostility()
+                            break #current_room trouvée
+            #tirs
+            for shot in self.get_shots():
 
-                    for door in self.current_room.doors:
-                        if not door.opened:
-                            if shot.colliderect.colliderect(door.rect):
-                                shot.kill()#enlève le tir de tous les groupes d'affichage
-                                self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
-                                shot_destroyed = True
+                #tirs - murs
+                if shot.colliderect.collidelist(self.get_walls()) > -1:
+                    shot.kill()#enlève le tir de tous les groupes d'affichage
+                    self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
 
-                    if not shot_destroyed:
-                        for mob in self.current_room.fighting_mobs:
+                elif self.current_room:
+                    if self.current_room.fighting_mobs:
+                        shot_destroyed = False
 
-                            #tirs - monstres
-                            if shot.colliderect.colliderect(mob.feet):
-                                shot.kill()#enlève le tir de tous les groupes d'affichage
-                                self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
-                                mob.pdv -= shot.damage
+                        for door in self.current_room.doors:
+                            if not door.opened:
+                                if shot.colliderect.colliderect(door.rect):
+                                    shot.kill()#enlève le tir de tous les groupes d'affichage
+                                    self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                                    shot_destroyed = True
 
-        #joueur - monstres
-        if self.current_room:
-            for mob in self.current_room.fighting_mobs:
-                if self.player.feet.colliderect(mob.feet):
-                    mob.move_back()
-                    if not self.player.damage_clock:
-                        self.player.damage_clock = 60
-                        self.player.pdv -= 1
+                        if not shot_destroyed:
+                            for mob in self.current_room.fighting_mobs:
+
+                                #tirs - monstres
+                                if shot.colliderect.colliderect(mob.feet):
+                                    shot.kill()#enlève le tir de tous les groupes d'affichage
+                                    self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                                    mob.pdv -= shot.damage
+                                    break #tir détruit, fin de la recherche de collision
+
+            #joueur - monstres
+            if self.current_room:
+                for mob in self.current_room.fighting_mobs:
+                    if self.player.feet.colliderect(mob.feet):
+                        mob.move_back()
+                        if not self.player.damage_clock:
+                            self.player.damage_clock = 60
+                            self.player.pdv -= 1
+                        break #collision trouvée, fin de la recherche
 
     def manage_room_hostility(self):
         """
@@ -208,7 +218,6 @@ class MapManager:
             else:
                 for i in range (1,6):
                     if obj.name == f"mob_spawn{i}":
-                        print("ok")
                         mob_spawns.append((obj.x, obj.y))
                         break
 
@@ -246,9 +255,9 @@ class MapManager:
                 #récuprération des mobs de la pièce?
                 room_mobs = []
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
-                    # if bool(random.getrandbits(1)): #une chance sur deux
-                        room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 0.5))
-                        #?les mobs seront spawn aléatoirement plus tard
+                    for i in range(5):
+                        if bool(random.getrandbits(1)): #une chance sur deux
+                            room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 0.5))
 
                 rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, room_fighting_mobs))
 

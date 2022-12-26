@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="90" height="90" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="95">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="90" height="90" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="100">
  <tileset firstgid="1" source="tech.tsx"/>
  <tileset firstgid="852" source="techprops.tsx"/>
  <layer id="1" name="background" width="90" height="90">
@@ -196,8 +196,12 @@
   <object id="94" name="mob_spawn5" x="2161" y="487">
    <point/>
   </object>
+  <object id="95" name="acid" x="1984" y="1568" width="128" height="64"/>
+  <object id="96" name="acid" x="2176" y="1600" width="64" height="64"/>
+  <object id="97" name="acid" x="2304" y="1504" width="64" height="96"/>
+  <object id="99" name="acid" x="2272" y="1536" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="8" name="Rooms">
+ <objectgroup id="8" name="Rooms" visible="0">
   <object id="76" name="room" x="1920" y="1888" width="320" height="384"/>
   <object id="77" name="room" x="1920" y="1408" width="576" height="320"/>
   <object id="78" name="room" x="1888" y="992" width="576" height="320"/>

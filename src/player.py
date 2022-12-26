@@ -27,9 +27,8 @@ class Entity(AnimateSprite):
         self.rect.topleft = self.position #la position du joueur avec [0,0] le coin superieur gauche
         self.feet.midbottom = self.rect.midbottom #aligne les centres des rect player.feet et player.rect
 
-    def move_back(self):#remplacer par une vérif de collision avant de bouger?
+    def move_back(self):
         self.position = self.old_position
-        #remplacer en bas par update?
         self.rect.topleft = self.position #la position du joueur avec [0,0] le coin superieur gauche
         self.feet.midbottom = self.rect.midbottom #aligne les centres des rect player.feet et player.rect
 
@@ -90,6 +89,7 @@ class Mob(Entity):
     
     def update(self):
         if self.pdv:
+            self.save_location() #enregistre la position du mob avant deplacement pour pouvoir revenir en arrière en cas de collision
             self.move_towards_player()
             self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche
             self.feet.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
@@ -101,20 +101,20 @@ class Mob(Entity):
         moved = False
 
         if(self.position[0] - self.player.position[0] < -1):
-            self.position[0] += self.speed
+            self.move_right()
             moved = True
             self.direction = "right"
         elif(self.position[0] - self.player.position[0] > 1):
-            self.position[0] -= self.speed
+            self.move_left()
             moved = True
             self.direction = "left"
         
         if(self.position[1] - self.player.position[1] < -1):
-            self.position[1] += self.speed
+            self.move_down()
             moved = True
             self.direction = "down"
         elif(self.position[1] - self.player.position[1] > 1):
-            self.position[1] -= self.speed
+            self.move_up()
             moved = True
             self.direction = "up"
 
