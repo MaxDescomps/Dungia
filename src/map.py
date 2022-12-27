@@ -42,7 +42,7 @@ class MapManager:
         self.screen = screen
         self.player = player
         self.maps = dict()
-        self.current_map = "tech3"
+        self.current_map = "home"
         self.current_room = None
         self.zoom = 3
 
@@ -55,6 +55,11 @@ class MapManager:
             Portal(from_world="tech2", origin_point="enter_tech1", target_world="tech1", teleport_point="spawn_tech2")
         ])
         self.register_map("tech3")
+        self.register_map("home", portals=[
+            Portal(from_world="home", origin_point="portal_home", target_world="tech3", teleport_point="spawn_tech3")
+        ], npcs=[
+            NPC("paul", dialog=["Cet endroit ne devrait pas exister...", "Vous voyez la grande pierre de l'autre coté?", "C'est un portail traversez-le!", "Vous ferez peut-être revivre l'esprit linux..."])
+        ])
 
         self.teleport_player("player")
         self.teleport_npcs()
@@ -322,9 +327,13 @@ class MapManager:
                 #récuprération des mobs de la pièce?
                 room_mobs = []
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
-                    for i in range(1):
+                    for i in range(5):
                         if bool(random.getrandbits(1)): #une chance sur deux
                             room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 1))
+                    if bool(random.getrandbits(1)): #une chance sur deux
+                        for i in range(5):
+                            if bool(random.getrandbits(1)): #une chance sur deux
+                                room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 1))
 
                 rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, room_fighting_mobs, room_walls, room_acids))
 
