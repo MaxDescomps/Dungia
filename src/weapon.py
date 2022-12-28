@@ -59,3 +59,10 @@ class Weapon(pygame.sprite.Sprite):
         self.rect = rotated_image.get_rect(center = self.rect.center) #on corrige la modification du centre de l'image causé par le changement de son rectangle après rotation
 
         self.image = rotated_image
+
+weapons = dict()
+
+def list_weapons():
+    global weapons
+    weapons["ak-47"] = Weapon(None, 10, 1, 3, "1_1")
+    weapons["sniper"] = Weapon(None, 80, 10, 6, "6_1")

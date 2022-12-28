@@ -2,6 +2,7 @@ import pygame, pytmx, pyscroll
 from player import *
 from map import MapManager
 from dialog import DialogBox
+from weapon import list_weapons
 
 class Game:
 
@@ -9,6 +10,9 @@ class Game:
         # fenetre de jeu
         self.screen = pygame.display.set_mode((1920,1080), pygame.FULLSCREEN)
         pygame.display.set_caption("esieageon")
+
+        #établit le catalogue des armes
+        list_weapons()
 
         #generer un joueur
         self.player = Player() #création joueur
@@ -56,18 +60,17 @@ class Game:
             #évènement souris click
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
+                    pass
                     # print("left mouse button")
-                    self.player.shoot()
-
                 elif event.button == 3:
                     # print("right mouse button")
                     pass
                 elif event.button == 4:
                     # print("mouse wheel up")
-                    pass
+                    self.player.previous_weapon()
                 elif event.button == 5:
                     # print("mouse wheel down")
-                    pass
+                    self.player.next_weapon()
             
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:

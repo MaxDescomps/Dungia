@@ -1,19 +1,19 @@
-import pygame
+import pygame, copy
 from animation import AnimateSprite
 from crosshair import Crosshair
 from shot import *
-from weapon import Weapon
+from weapon import weapons
 
 class Entity(AnimateSprite):
 
     def __init__(self, name, x, y):
         super().__init__(name)
-        self.image = self.get_image(self.sprite_sheet, 0, 0)#sprite effectif de l'entité
+
+        self.image = self.get_image(self.sprite_sheet, 0, 0).convert_alpha() #sprite effectif de l'entité
         self.rect = self.image.get_rect() #rectangle de l'image de l'entité
         self.position = [x, y]
         self.feet = pygame.Rect(0, 0, 28, 12) #zone de collision de l'entité
         self.old_position = self.position.copy()
-        self.weapon = Weapon(self, 10, 1, 3, "1_1")
 
     def save_location(self): self.old_position = self.position.copy()
 
@@ -50,6 +50,40 @@ class Player(Entity):
 
         self.crosshair = Crosshair("../image/crosshair.png")
         self.map_manager = None #gestionnaire de carte pour ajuster la position du crosshair en jeu, attribué dans Game.__init__()
+
+        self.weapon_index = 0
+        self.weapons = []
+        self.take_weapon("ak-47")
+        self.take_weapon("sniper")
+        self.weapon = self.weapons[self.weapon_index]
+
+    def take_weapon(self, name):
+        """ramassage d'une arme"""
+
+        weapon = copy.copy(weapons[name]) #copie pour ne pas modifier le catalogue d'armes
+        weapon.player = self
+
+        self.weapons.append(weapon)
+
+    def next_weapon(self):
+        if self.weapon_index < len(weapons) - 1:
+            self.weapon_index += 1
+        else:
+            self.weapon_index = 0
+
+        self.weapon.kill() #retire l'ancienne arme des groupes d'affichage
+        self.weapon = self.weapons[self.weapon_index]
+        self.map_manager.get_group().add(self.weapon) #ajoute la nouvelle arme au groupe d'affichage
+
+    def previous_weapon(self):
+        if self.weapon_index > 0:
+            self.weapon_index -= 1
+        else:
+            self.weapon_index = len(weapons) - 1
+
+        self.weapon.kill() #retire l'ancienne arme des groupes d'affichage
+        self.weapon = self.weapons[self.weapon_index]
+        self.map_manager.get_group().add(self.weapon) #ajoute la nouvelle arme au groupe d'affichage
 
     def shoot(self):
         if not self.weapon.rate_clock:
