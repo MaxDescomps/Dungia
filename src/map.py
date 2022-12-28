@@ -32,7 +32,8 @@ class Map:
     tmx_data: pytmx.TiledMap
     portals: list[Portal]
     npcs: list[NPC]
-    shots: list[PlayerShot]
+    player_shots: list[PlayerShot]
+    mob_shots: list[MobShot]
     doors: list[Door] #liste des portes de la carte pour calcul plus rapide des portes de chaque pièce
     rooms: list[Room]
 
@@ -120,8 +121,6 @@ class MapManager:
                                 player_collided = True
                             break #collision trouvée
 
-                
-
                 #entrée dans une nouvelle pièce
                 if self.current_room:
                     if not self.current_room.visited:
@@ -132,34 +131,63 @@ class MapManager:
                         if not self.current_room.fighting_mobs: #attend que la vague de monstres soit vaincue
                             self.manage_room_hostility()
 
-            #tirs
-            for shot in self.get_shots():
+            #tirs du joueur
+            for shot in self.get_player_shots():
 
-                #tirs - murs
-                if shot.colliderect.collidelist(self.get_walls()) > -1:
+                #tirs joueur - murs
+                if shot.colliderect.collidelist(self.get_walls()) > -1: #pas uniquement les murs de la pièce car les tirs peuvent en sortir
                     shot.kill()#enlève le tir de tous les groupes d'affichage
-                    self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                    self.get_player_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
 
-                elif self.current_room:
-                    if self.current_room.fighting_mobs:
+                else:
+                    if self.current_room.fighting_mobs: #si la pièce est hostile
                         shot_destroyed = False
 
+                        #tirs joueur - portes
                         for door in self.current_room.doors:
-                            if not door.opened:
-                                if shot.colliderect.colliderect(door.rect):
-                                    shot.kill()#enlève le tir de tous les groupes d'affichage
-                                    self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
-                                    shot_destroyed = True
+                            if shot.colliderect.colliderect(door.rect):
+                                shot.kill()#enlève le tir de tous les groupes d'affichage
+                                self.get_player_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                                shot_destroyed = True
+                                break
 
                         if not shot_destroyed:
                             for mob in self.current_room.fighting_mobs:
 
-                                #tirs - monstres
+                                #tirs joueur - monstres
                                 if shot.colliderect.colliderect(mob.feet):
                                     shot.kill()#enlève le tir de tous les groupes d'affichage
-                                    self.get_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                                    self.get_player_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
                                     mob.pdv -= shot.damage
                                     break #tir détruit, fin de la recherche de collision
+
+            #tirs des monstres
+            for shot in self.get_mob_shots():
+
+                #tirs monstre - murs
+                if shot.colliderect.collidelist(self.get_walls()) > -1: #pas uniquement les murs de la pièce car les tirs peuvent en sortir
+                    shot.kill()#enlève le tir de tous les groupes d'affichage
+                    self.get_mob_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+
+                else:
+                    if self.current_room.fighting_mobs: #si la pièce est hostile
+                        shot_destroyed = False
+
+                        #tirs monstre - portes
+                        for door in self.current_room.doors:
+                            if shot.colliderect.colliderect(door.rect):
+                                shot.kill()#enlève le tir de tous les groupes d'affichage
+                                self.get_mob_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                                shot_destroyed = True
+                                break
+
+                        if not shot_destroyed:
+                            #tirs monstre - joueur
+                            if shot.colliderect.colliderect(self.player.feet):
+                                shot.kill()#enlève le tir de tous les groupes d'affichage
+                                self.get_mob_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                                self.player.take_damage()
+                                break #tir détruit, fin de la recherche de collision
 
             #monstres
             if self.current_room:
@@ -271,7 +299,8 @@ class MapManager:
         self.map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size()) #gère le déplacement de la carte (quand le joueur est au centre de l'écran)
         self.map_layer.zoom = self.zoom #zoom sur la carte
 
-        shots = [] #liste des tirs
+        player_shots = [] #liste des tirs du joueur
+        mob_shots = [] #liste des tirs des monstres
         doors = [] #liste des portes de la carte
         mob_spawns = [] #liste des points de spawn pour mob dans la carte
         walls = [] #liste des rectangles de collision bloquants
@@ -360,7 +389,7 @@ class MapManager:
             group.add(door, layer=7)
 
         #creer un objet map
-        self.maps[name] = Map(name, walls, acids, group, tmx_data, portals, npcs, shots, doors, rooms)
+        self.maps[name] = Map(name, walls, acids, group, tmx_data, portals, npcs, player_shots, mob_shots, doors, rooms)
 
     def get_map(self):
         return self.maps[self.current_map]
@@ -374,8 +403,11 @@ class MapManager:
     def get_npcs(self) -> list[NPC]:
         return self.get_map().npcs
 
-    def get_shots(self):
-        return self.get_map().shots
+    def get_player_shots(self):
+        return self.get_map().player_shots
+
+    def get_mob_shots(self):
+        return self.get_map().mob_shots
 
     def draw(self):
         """Affiche le groupe de calques centré sur le joueur"""

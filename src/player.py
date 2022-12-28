@@ -96,7 +96,7 @@ class Player(Entity):
     def shoot(self):
         if not self.weapon.rate_clock:
             shot = PlayerShot(self, self.weapon.bullet_speed, "techpack/Projectiles/projectiles x1", self.weapon.damage, self.weapon.name)
-            self.map_manager.get_shots().append(shot)
+            self.map_manager.get_player_shots().append(shot)
             self.map_manager.get_group().add(shot)
             self.weapon.rate_clock = self.weapon.max_rate_clock
 
@@ -205,4 +205,6 @@ class Mob(Entity):
             self.change_animation()
         
     def shoot(self):
-        self.player.map_manager.get_group().add(MobShot(self.player, self, 5, "techpack/Projectiles/projectiles x1", 1))
+        shot = MobShot(self.player, self, 5, "techpack/Projectiles/projectiles x1", 1)
+        self.player.map_manager.get_group().add(shot)
+        self.player.map_manager.get_mob_shots().append(shot)
