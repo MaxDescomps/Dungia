@@ -51,10 +51,36 @@ class Weapon(pygame.sprite.Sprite):
         #maj du rectangle d'affichage
         self.rect.topleft = self.pos
 
+        #arme et joueur visent dans le bon sens
+        if (self.angle > math.pi / 2) or (self.angle < -math.pi / 2): #côté gauche
+            self.image = pygame.transform.flip(self.image, False, True)
+
+            if (self.angle > math.pi * (3/4)) or (self.angle < -math.pi * (3/4)):
+                self.player.change_animation_list("left")
+
+            elif (self.angle < -math.pi/4) and (self.angle > -math.pi * (3/4)):
+                self.player.change_animation_list("up")
+
+            else:
+                self.player.change_animation_list("down")
+
+        else: #côté droit
+            if (self.angle < math.pi/4) and (self.angle > -math.pi/4):
+                self.player.change_animation_list("right")
+
+            elif (self.angle < -math.pi/4) and (self.angle > -math.pi * (3/4)):
+                self.player.change_animation_list("up")
+
+            else:
+                self.player.change_animation_list("down")
+
     def rotate_img(self):
         """fait une rotation d'une image en fonction de son angle"""
 
-        rotated_image = pygame.transform.rotate(self.first_image, -math.degrees(self.angle)).convert_alpha() #rotation de l'image
+        if (self.angle > math.pi / 2) or (self.angle < -math.pi / 2):
+            rotated_image = pygame.transform.rotate(self.first_image, math.degrees(self.angle)).convert_alpha() #rotation de l'image
+        else:
+            rotated_image = pygame.transform.rotate(self.first_image, -math.degrees(self.angle)).convert_alpha() #rotation de l'image
 
         self.rect = rotated_image.get_rect(center = self.rect.center) #on corrige la modification du centre de l'image causé par le changement de son rectangle après rotation
 

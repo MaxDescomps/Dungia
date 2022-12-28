@@ -25,12 +25,20 @@ class AnimateSprite(pygame.sprite.Sprite):
             "up": self.get_images(self.sprite_sheet, 96, 0, 3),
         }
 
-    def change_animation(self):
+    def change_animation_list(self, direction):
         """
-        Change l'animation du sprite avec le mouvement et la direction
+        Change la liste de sprites utilisés
         """
 
+        self.direction = direction
         self.image = self.images[self.direction][self.animation_index]
+
+
+    def change_animation(self):
+        """
+        Change l'animation du sprite avec le mouvement
+        """
+
         self.clock += self.speed * 8
 
         if self.clock >= 100:
