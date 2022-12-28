@@ -66,7 +66,6 @@ class MapManager:
 
     def check_collisions(self):
         """Gère les collisions sur la carte"""
-        #? tout découper en pièces!
 
         #joueur - pièce
         self.current_room = None
@@ -85,7 +84,7 @@ class MapManager:
         #joueur - portails
         for portal in self.get_map().portals:
             point = self.get_object(portal.origin_point)
-            rect = pygame.Rect(point.x, point.y, point.width, point.height)#recree a chaque appel?
+            rect = pygame.Rect(point.x, point.y, point.width, point.height)#recree a chaque appel? + toute la map au lieu de room
 
             if self.player.feet.colliderect(rect):
                 copy_portal = portal
@@ -102,7 +101,7 @@ class MapManager:
             else:
 
                 #joueur - npc
-                for npc in self.get_npcs():
+                for npc in self.get_npcs(): #?toute la map
                     if self.player.feet.colliderect(npc.feet):
                         self.player.move_back()
                         player_collided = True
@@ -165,9 +164,12 @@ class MapManager:
             #monstres
             if self.current_room:
                 for mob in self.current_room.fighting_mobs:
+                    #monstre - joueur
                     if mob.feet.colliderect(self.player.feet):
                         mob.move_back()
                         self.player.take_damage()
+                    
+                    #monstre - mur
                     elif mob.feet.collidelist(self.current_room.walls) > -1:
                         mob.move_back()
 
@@ -211,7 +213,7 @@ class MapManager:
 
     def manage_room_hostility(self):
         """
-        Fais apparaitre les monstres d'une pièce (maximum 5 apparitions)
+        Fais apparaitre les monstres d'une pièce (maximum 5 apparitions par vague)
         Cause la fermeture des portes d'une pièce hostile
         """
         room = self.current_room
@@ -237,14 +239,26 @@ class MapManager:
                     self.get_group().add(mob)
 
                     spawn_index += 1
+
+        #si pièce neutre
         else:
             for door in room.doors:
                 door.opening = True
 
     def teleport_player(self, name):
+        """
+        Téléporte le joueur sur un point de spawn dans une carte
+        
+        Args:
+            name (str): nom du point de spawn
+        """
+        self.player.weapon.kill() #supprime l'arme du joueur du groupe de calques
+
         point = self.get_object(name) #l'objet du tmx sur lequel on se teleporte
         self.player.position = [point.x, point.y]
         self.player.save_location() #permet de ne pas se tp en boucle sur une collision?
+
+        self.get_map().group.add(self.player.weapon, layer = 5) #ajout de l'arme du joueur au groupe de calques
 
     def register_map(self, name, portals=[], npcs=[]):
         """
@@ -257,15 +271,10 @@ class MapManager:
         self.map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size()) #gère le déplacement de la carte (quand le joueur est au centre de l'écran)
         self.map_layer.zoom = self.zoom #zoom sur la carte
 
-        #liste des tirs
-        shots = []
-
-        #liste des portes et des points de spawn pour mob dans la carte
-        doors = [] #pas besoin de stocker dans la class carte?
-        mob_spawns = []
-        
+        shots = [] #liste des tirs
+        doors = [] #liste des portes de la carte
+        mob_spawns = [] #liste des points de spawn pour mob dans la carte
         walls = [] #liste des rectangles de collision bloquants
-        
         acids = [] #liste des cases acides
 
         for obj in tmx_data.objects:
@@ -288,7 +297,7 @@ class MapManager:
         #liste des pièces
         rooms = []
 
-        #récupère les murs et pièces du tmx
+        #récupère les pièces du tmx et leurs informations après enregistrement des autres éléments
         for obj in tmx_data.objects:
             if obj.name == "room":
                 #rectangle de la pièce
@@ -340,8 +349,7 @@ class MapManager:
 
         # dessiner le groupe de calques
         group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=2) #groupe de calques
-        group.add(self.player, layer = 3) #ajout du joueur au groupe de calques
-        group.add(self.player.weapon, layer = 4) #ajout de l'arme du joueur au groupe de calques
+        group.add(self.player, layer = 6) #ajout du joueur au groupe de calques
 
         #ajout des npc au groupe
         for npc in npcs:
@@ -349,7 +357,7 @@ class MapManager:
 
         #ajout des portes au groupe
         for door in doors:
-            group.add(door, layer=4)
+            group.add(door, layer=7)
 
         #creer un objet map
         self.maps[name] = Map(name, walls, acids, group, tmx_data, portals, npcs, shots, doors, rooms)
@@ -370,19 +378,26 @@ class MapManager:
         return self.get_map().shots
 
     def draw(self):
-        self.get_group().draw(self.screen)
+        """Affiche le groupe de calques centré sur le joueur"""
+
+        self.get_group().draw(self.screen) #affiche le groupe de calques
         self.get_group().center(self.player.rect.center) #centre le groupe de calques sur l'image du joueur
 
     def update(self):
+        """Met à jour le groupe de calques ses collisions"""
+
         self.get_group().update() #appel la méthode update de tous les sprites du groupe
-        self.check_collisions()
+        self.check_collisions() #gère les collisions sur la carte
 
     def get_object(self, name):
+        """Récupère les informations d'un objet du fichier tmx de la carte"""
+
         return self.get_map().tmx_data.get_object_by_name(name)
 
     def check_npc_collisions(self, dialog_box):
+        """Active le dialogue d'un un NPC en collision avec le joueur"""
 
-        npcs = self.get_npcs()
+        npcs = self.get_npcs()#?toute la carte au lieu de la pièce
 
         if npcs:
             for npc in npcs:
@@ -394,6 +409,8 @@ class MapManager:
             dialog_box.reading = 0
     
     def teleport_npcs(self):
+        """Place les NPC sur leurs points d'apparition"""
+
         for map in self.maps:
             map_data = self.maps[map]
 

@@ -73,7 +73,7 @@ class Player(Entity):
 
         self.weapon.kill() #retire l'ancienne arme des groupes d'affichage
         self.weapon = self.weapons[self.weapon_index]
-        self.map_manager.get_group().add(self.weapon) #ajoute la nouvelle arme au groupe d'affichage
+        self.map_manager.get_group().add(self.weapon, layer=5) #ajoute la nouvelle arme au groupe d'affichage
 
     def previous_weapon(self):
         if self.weapon_index > 0:
@@ -83,7 +83,7 @@ class Player(Entity):
 
         self.weapon.kill() #retire l'ancienne arme des groupes d'affichage
         self.weapon = self.weapons[self.weapon_index]
-        self.map_manager.get_group().add(self.weapon) #ajoute la nouvelle arme au groupe d'affichage
+        self.map_manager.get_group().add(self.weapon, layer=5) #ajoute la nouvelle arme au groupe d'affichage
 
     def shoot(self):
         if not self.weapon.rate_clock:
