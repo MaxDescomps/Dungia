@@ -85,9 +85,9 @@ class MapManager:
         #joueur - portails
         for portal in self.get_map().portals:
             point = self.get_object(portal.origin_point)
-            rect = pygame.Rect(point.x, point.y, point.width, point.height)#recree a chaque appel? + toute la map au lieu de room
+            portal_rect = pygame.Rect(point.x, point.y, point.width, point.height)#recree a chaque appel? + toute la map au lieu de room
 
-            if self.player.feet.colliderect(rect):
+            if self.player.feet.colliderect(portal_rect):
                 copy_portal = portal
                 self.current_map = portal.target_world
                 self.teleport_player(copy_portal.teleport_point)

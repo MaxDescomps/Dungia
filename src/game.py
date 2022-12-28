@@ -129,6 +129,7 @@ class Game:
             self.update() #met les sprites et les collisions à jour
 
             self.draw() #modifie l'affichage des sprites du jeu
+            # self.debug()
 
             pygame.display.flip() #rafraîchit l'affichage
 
