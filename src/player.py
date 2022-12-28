@@ -146,8 +146,12 @@ class Mob(Entity):
     on invoque les mobs d'une pièce quand on colliderect un pièce mais pas la porte (fermeture de la porte)
     pour les invoquer on les fait spawn avec teleport_spawn en donnant le nom du spawn (spawn_mob[1-5] dans chaque pièce hostile)
     """
-    def __init__(self, name, fighting_mobs, player, speed):
+    def __init__(self, name, fighting_mobs, player, speed, damage):
         super().__init__(name, 0, 0)
+
+        self.damage = damage
+        self.max_shot_clock = 60
+        self.shot_clock = self.max_shot_clock
         self.speed = speed
         self.player = player #joueur à attaquer
         self.max_pdv = 6 #pdv maximums
@@ -161,6 +165,13 @@ class Mob(Entity):
     
     def update(self):
         if self.pdv > 0:
+            #tire sur le joueur
+            if self.shot_clock > 0:
+                self.shot_clock -= 1
+            else:
+                self.shoot()
+                self.shot_clock = self.max_shot_clock
+
             self.save_location() #enregistre la position du mob avant deplacement pour pouvoir revenir en arrière en cas de collision
             self.move_towards_player()
             self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche
@@ -192,3 +203,6 @@ class Mob(Entity):
 
         if moved:
             self.change_animation()
+        
+    def shoot(self):
+        self.player.map_manager.get_group().add(MobShot(self.player, self, 5, "techpack/Projectiles/projectiles x1", 1))

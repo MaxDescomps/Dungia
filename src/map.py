@@ -338,11 +338,11 @@ class MapManager:
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
                     for i in range(5):
                         if bool(random.getrandbits(1)): #une chance sur deux
-                            room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 1))
+                            room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 1, 1))
                     if bool(random.getrandbits(1)): #une chance sur deux
                         for i in range(5):
                             if bool(random.getrandbits(1)): #une chance sur deux
-                                room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 1))
+                                room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 1, 1))
 
                 rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, room_fighting_mobs, room_walls, room_acids))
 
