@@ -2,6 +2,7 @@ import pygame
 from animation import AnimateSprite
 from crosshair import Crosshair
 from shot import *
+from weapon import Weapon
 
 class Entity(AnimateSprite):
 
@@ -12,6 +13,7 @@ class Entity(AnimateSprite):
         self.position = [x, y]
         self.feet = pygame.Rect(0, 0, 28, 12) #zone de collision de l'entité
         self.old_position = self.position.copy()
+        self.weapon = Weapon(self, 10, 1, 3, "1_1")
 
     def save_location(self): self.old_position = self.position.copy()
 
@@ -50,10 +52,14 @@ class Player(Entity):
         self.map_manager = None #gestionnaire de carte pour ajuster la position du crosshair en jeu, attribué dans Game.__init__()
 
     def shoot(self):
-        return PlayerShot(self, 3, "techpack/Projectiles/projectiles x1", 1)
+        if not self.weapon.rate_clock:
+            shot = PlayerShot(self, self.weapon.bullet_speed, "techpack/Projectiles/projectiles x1", self.weapon.damage)
+            self.map_manager.get_shots().append(shot)
+            self.map_manager.get_group().add(shot)
+            self.weapon.rate_clock = self.weapon.max_rate_clock
 
     def update(self):
-        if self.pdv:
+        if self.pdv > 0:
             self.rect.topleft = self.position #la position du joueur avec [0,0] le coin superieur gauche
             self.feet.midbottom = self.rect.midbottom #aligne les centres des rect player.feet et player.rect
 
@@ -112,7 +118,7 @@ class Mob(Entity):
         self.save_location() #permet de ne pas se tp en boucle sur une collision?
     
     def update(self):
-        if self.pdv:
+        if self.pdv > 0:
             self.save_location() #enregistre la position du mob avant deplacement pour pouvoir revenir en arrière en cas de collision
             self.move_towards_player()
             self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche

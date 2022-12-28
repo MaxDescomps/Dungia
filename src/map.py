@@ -341,6 +341,7 @@ class MapManager:
         # dessiner le groupe de calques
         group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=2) #groupe de calques
         group.add(self.player, layer = 3) #ajout du joueur au groupe de calques
+        group.add(self.player.weapon, layer = 4) #ajout de l'arme du joueur au groupe de calques
 
         #ajout des npc au groupe
         for npc in npcs:

@@ -5,6 +5,7 @@ class Crosshair(pygame.sprite.Sprite):
 
     def __init__(self, image_path):
         super().__init__()
+        
         self.image = pygame.image.load(image_path)
         self.size = self.image.get_size()
         self.image = pygame.transform.scale(self.image, (int(self.size[0] << 1), int(self.size[1] << 1))) #double le diamètre du viseur

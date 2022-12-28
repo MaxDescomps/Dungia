@@ -24,7 +24,7 @@ class PlayerShot(AnimateSprite):
 
         #centre la position de départ du tir sur le joueur
         player_center = pygame.Vector2(player.rect.center)
-        self.rect.center = player_center
+        self.rect.center = player.weapon.rect.center
 
         #calcul de l'angle de tir
         distance = mouse_pos - player_center

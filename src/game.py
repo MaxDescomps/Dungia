@@ -45,6 +45,11 @@ class Game:
         if moved:
             self.player.change_animation()
 
+        pressed = pygame.mouse.get_pressed()
+
+        if pressed[0]: #mouse left
+            self.player.shoot()
+
     def handle_input(self):
         for event in pygame.event.get():
 
@@ -52,9 +57,7 @@ class Game:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     # print("left mouse button")
-                    shot = self.player.shoot()
-                    self.map_manager.get_shots().append(shot)
-                    self.map_manager.get_group().add(shot)
+                    self.player.shoot()
 
                 elif event.button == 3:
                     # print("right mouse button")
