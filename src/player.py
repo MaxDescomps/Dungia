@@ -87,7 +87,7 @@ class Player(Entity):
 
     def shoot(self):
         if not self.weapon.rate_clock:
-            shot = PlayerShot(self, self.weapon.bullet_speed, "techpack/Projectiles/projectiles x1", self.weapon.damage)
+            shot = PlayerShot(self, self.weapon.bullet_speed, "techpack/Projectiles/projectiles x1", self.weapon.damage, self.weapon.bullet_y)
             self.map_manager.get_shots().append(shot)
             self.map_manager.get_group().add(shot)
             self.weapon.rate_clock = self.weapon.max_rate_clock

@@ -1,7 +1,7 @@
 import pygame, math, copy
 
 class Weapon(pygame.sprite.Sprite):
-    def __init__(self, player, max_rate_clock, damage, bullet_speed, name):
+    def __init__(self, player, max_rate_clock, damage, bullet_speed, name, bullet_y):
         super().__init__()
 
         self.player = player #le joueur qui tient l'arme
@@ -10,6 +10,7 @@ class Weapon(pygame.sprite.Sprite):
         self.rate_clock = 0 #le compteur de cadence de tir
         self.damage = damage #les dégats des tirs
         self.name = name #le nom de l'arme
+        self.bullet_y = bullet_y #le numéro de ligne de la balle sur le spritesheet
         self.first_image = pygame.image.load(f"../image/guns/{name}.png").convert_alpha() #l'image initiale de l'arme, sur laquelle on applique la rotation
         self.image = copy.copy(self.first_image) #l'image de l'arme après rotation
         self.rect = self.image.get_rect() #le rectangle d'affichage de l'arme
@@ -90,5 +91,5 @@ weapons = dict()
 
 def list_weapons():
     global weapons
-    weapons["ak-47"] = Weapon(None, 10, 1, 3, "1_1")
-    weapons["sniper"] = Weapon(None, 80, 10, 6, "6_1")
+    weapons["ak-47"] = Weapon(None, 10, 1, 3, "1_1", 0)
+    weapons["sniper"] = Weapon(None, 80, 10, 6, "6_1", 32)
