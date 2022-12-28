@@ -4,7 +4,7 @@ from animation import AnimateSprite
 class PlayerShot(AnimateSprite):
     """Classe d'un tir d'un joueur"""
 
-    def __init__(self, player, speed, name, damage, bullet_y):
+    def __init__(self, player, speed, name, damage, weapon_name):
         """
         constructeur d'objet Playershot
 
@@ -15,7 +15,8 @@ class PlayerShot(AnimateSprite):
         """
         super().__init__(name)
 
-        self.image = self.get_image(self.sprite_sheet, 0, bullet_y)
+        self.image = pygame.image.load(f"../image/bullets/{weapon_name}.png").convert_alpha()
+        # self.image = self.get_image(self.sprite_sheet, 0, 0) #balles du spritesheet
         self.rect = self.image.get_rect()
 
         mouse_pos = [None, None]
@@ -35,8 +36,7 @@ class PlayerShot(AnimateSprite):
         self.speed_y = speed * math.sin(self.angle)
 
         #rotation de l'image du tir en fonction de l'angle (optionnel si balle circulaire)
-        if bullet_y <= 32:
-            self.rotate_img()
+        self.rotate_img()
 
         #calcul du rectangle de collision plus précis
         self.colliderect = pygame.Rect(0, 0, 8, 8)

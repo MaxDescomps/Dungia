@@ -54,7 +54,15 @@ class Player(Entity):
         self.weapon_index = 0
         self.weapons = []
         self.take_weapon("ak-47")
+        self.take_weapon("ksg")
+        self.take_weapon("remington")
+        self.take_weapon("pp-bizon")
+        self.take_weapon("rocket-launcher")
         self.take_weapon("sniper")
+        self.take_weapon("shadow")
+        self.take_weapon("x-tech")
+        self.take_weapon("ray-gun")
+        self.take_weapon("atomus")
         self.weapon = self.weapons[self.weapon_index]
 
     def take_weapon(self, name):
@@ -87,7 +95,7 @@ class Player(Entity):
 
     def shoot(self):
         if not self.weapon.rate_clock:
-            shot = PlayerShot(self, self.weapon.bullet_speed, "techpack/Projectiles/projectiles x1", self.weapon.damage, self.weapon.bullet_y)
+            shot = PlayerShot(self, self.weapon.bullet_speed, "techpack/Projectiles/projectiles x1", self.weapon.damage, self.weapon.name)
             self.map_manager.get_shots().append(shot)
             self.map_manager.get_group().add(shot)
             self.weapon.rate_clock = self.weapon.max_rate_clock
