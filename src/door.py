@@ -81,13 +81,13 @@ class Door(pygame.sprite.Sprite):
 
 class HDoor(Door):
     """
-    Classe des portes en jeu. Les portes sont toutes initialement ouvertes.
+    Classe des portes horizontales en jeu (haut - bas). Les portes sont toutes initialement ouvertes.
     Les portes d'une pièce hostile se ferment et se réouvrent quand elle ne l'est plus.
     """
     
     def __init__(self, rect):
         """
-        Constructeur de la classe Door
+        Constructeur de la classe HDoor
 
         Args:
             rect(pygame.Rect): rectangle de la porte (le même pour la collision et l'affichage)
@@ -128,13 +128,13 @@ class HDoor(Door):
 
 class VRDoor(Door):
     """
-    Classe des portes verticales droites en jeu. Les portes sont toutes initialement ouvertes.
+    Classe des portes verticales à droite en jeu. Les portes sont toutes initialement ouvertes.
     Les portes d'une pièce hostile se ferment et se réouvrent quand elle ne l'est plus.
     """
     
     def __init__(self, rect):
         """
-        Constructeur de la classe Door
+        Constructeur de la classe VRDoor
 
         Args:
             rect(pygame.Rect): rectangle de la porte (le même pour la collision et l'affichage)
@@ -177,13 +177,13 @@ class VRDoor(Door):
 
 class VLDoor(Door):
     """
-    Classe des portes verticales droites en jeu. Les portes sont toutes initialement ouvertes.
+    Classe des portes verticales à gauche en jeu. Les portes sont toutes initialement ouvertes.
     Les portes d'une pièce hostile se ferment et se réouvrent quand elle ne l'est plus.
     """
     
     def __init__(self, rect):
         """
-        Constructeur de la classe Door
+        Constructeur de la classe VLDoor
 
         Args:
             rect(pygame.Rect): rectangle de la porte (le même pour la collision et l'affichage)
