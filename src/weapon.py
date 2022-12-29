@@ -99,4 +99,4 @@ def list_weapons():
     weapons["shadow"] = Weapon(None, 20, 10, 6, "7")
     weapons["x-tech"] = Weapon(None, 20, 10, 6, "8")
     weapons["ray-gun"] = Weapon(None, 20, 10, 6, "9")
-    weapons["atomus"] = Weapon(None, 20, 10, 6, "10")
+    weapons["atomus"] = Weapon(None, 1, 10, 10, "10")

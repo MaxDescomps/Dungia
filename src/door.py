@@ -15,7 +15,6 @@ class Door(pygame.sprite.Sprite):
         """
 
         super().__init__()
-        self.sprite_sheet = pygame.image.load("../image/techpack/Props and Items/props and items x1.png").convert_alpha() #spritesheet avec paramètre de transparence alpha
         self.speed = 2
         self.clock = 0
 
@@ -27,9 +26,6 @@ class Door(pygame.sprite.Sprite):
 
         self.animation_index = 0
         self.rect = rect
-
-        self.images = self.get_images(16)
-        self.image = self.images[0]
 
     def update(self):
         """Gère l'animation d'ouverture et fermeture d'une porte"""
@@ -83,6 +79,26 @@ class Door(pygame.sprite.Sprite):
                 
                 self.clock = 0
 
+class HDoor(Door):
+    """
+    Classe des portes en jeu. Les portes sont toutes initialement ouvertes.
+    Les portes d'une pièce hostile se ferment et se réouvrent quand elle ne l'est plus.
+    """
+    
+    def __init__(self, rect):
+        """
+        Constructeur de la classe Door
+
+        Args:
+            rect(pygame.Rect): rectangle de la porte (le même pour la collision et l'affichage)
+        """
+
+        super().__init__(rect)
+        self.sprite_sheet = pygame.image.load("../image/techpack/Props and Items/props and items x1.png").convert_alpha() #spritesheet avec paramètre de transparence alpha
+        
+        self.images = self.get_images(16)
+        self.image = self.images[0]
+
     def get_images(self, y):
         """
         Récupère les sprites d'une ligne d'un spritesheet 32x64
@@ -108,4 +124,102 @@ class Door(pygame.sprite.Sprite):
 
         image = pygame.Surface([64, 32], pygame.SRCALPHA)#surface avec un parametre de transparence (alpha = 0)
         image.blit(self.sprite_sheet, (0, 0), (x, y, 64, 32)) #canvas.blit (ajout, (coord sur canvas), (rect de l'ajout sur l'image source))
+        return image.convert_alpha()
+
+class VRDoor(Door):
+    """
+    Classe des portes verticales droites en jeu. Les portes sont toutes initialement ouvertes.
+    Les portes d'une pièce hostile se ferment et se réouvrent quand elle ne l'est plus.
+    """
+    
+    def __init__(self, rect):
+        """
+        Constructeur de la classe Door
+
+        Args:
+            rect(pygame.Rect): rectangle de la porte (le même pour la collision et l'affichage)
+        """
+
+        super().__init__(rect)
+
+        self.speed = 1
+
+        self.sprite_sheet = pygame.image.load("../image/techpack/tileset x1.png").convert_alpha() #spritesheet avec paramètre de transparence alpha
+
+        self.images = self.get_images(26, 11)
+        self.image = self.images[0]
+
+    def get_images(self, x, y):
+        """
+        Récupère des sprites d'une ligne d'un spritesheet 64x32
+        
+        Args:
+            y(int): numéro de ligne sur le spritesheet
+
+        Returns:
+            images(list): une liste d'images
+        """
+
+        images = []
+        
+        for i in range(0,4):
+            image = self.get_image(x*32 + i*32, y*32)
+            images.append(image)
+        
+        return images
+
+    def get_image(self, x, y):
+        """Récupère un sprite 64x32 aux coordonnées x et y"""
+
+        image = pygame.Surface([32, 64], pygame.SRCALPHA)#surface avec un parametre de transparence (alpha = 0)
+        image.blit(self.sprite_sheet, (0, 0), (x, y, 32, 64)) #canvas.blit (ajout, (coord sur canvas), (rect de l'ajout sur l'image source))
+        return image.convert_alpha()
+
+class VLDoor(Door):
+    """
+    Classe des portes verticales droites en jeu. Les portes sont toutes initialement ouvertes.
+    Les portes d'une pièce hostile se ferment et se réouvrent quand elle ne l'est plus.
+    """
+    
+    def __init__(self, rect):
+        """
+        Constructeur de la classe Door
+
+        Args:
+            rect(pygame.Rect): rectangle de la porte (le même pour la collision et l'affichage)
+        """
+
+        super().__init__(rect)
+
+        self.speed /= 3
+
+        self.sprite_sheet = pygame.image.load("../image/techpack/tileset x1.png").convert_alpha() #spritesheet avec paramètre de transparence alpha
+
+        self.images = self.get_images(26, 9)
+        self.image = self.images[0]
+
+    def get_images(self, x, y):
+        """
+        Récupère des sprites d'une ligne d'un spritesheet 64x32
+        
+        Args:
+            y(int): numéro de ligne sur le spritesheet
+
+        Returns:
+            images(list): une liste d'images
+        """
+
+        images = []
+        
+        for i in range(0,4):
+            image = self.get_image(x*32 + i*32, y*32)
+            images.append(image)
+        
+        return images
+
+    def get_image(self, x, y):
+        """Récupère un sprite 64x32 aux coordonnées x et y"""
+
+        image = pygame.Surface([32, 64], pygame.SRCALPHA)#surface avec un parametre de transparence (alpha = 0)
+        image.blit(self.sprite_sheet, (0, 0), (x, y, 32, 64)) #canvas.blit (ajout, (coord sur canvas), (rect de l'ajout sur l'image source))
         return image.convert_alpha()

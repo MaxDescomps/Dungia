@@ -3,7 +3,7 @@ import pygame.sprite
 from dataclasses import dataclass
 from player import *
 from shot import PlayerShot
-from door import Door
+from door import *
 
 @dataclass
 class Room:
@@ -308,7 +308,15 @@ class MapManager:
 
         for obj in tmx_data.objects:
             if obj.name == "door":
-                door = Door(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+                door = HDoor(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+                doors.append(door)
+
+            elif obj.name == "v_r_door":
+                door = VRDoor(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+                doors.append(door)
+
+            elif obj.name == "v_l_door":
+                door = VLDoor(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
                 doors.append(door)
 
             elif obj.name == "collision":
