@@ -11,7 +11,7 @@ class Door(pygame.sprite.Sprite):
         Constructeur de la classe Door
 
         Args:
-            rect(pygame.Rect): rectangle de la porte (le même pour la collision et l'affichage)
+            rect(pygame.Rect): rectangle d'affichage de la porte
         """
 
         super().__init__()
@@ -90,14 +90,17 @@ class HDoor(Door):
         Constructeur de la classe HDoor
 
         Args:
-            rect(pygame.Rect): rectangle de la porte (le même pour la collision et l'affichage)
+            rect(pygame.Rect): rectangle d'affichage de la porte
         """
 
         super().__init__(rect)
+
         self.sprite_sheet = pygame.image.load("../image/techpack/Props and Items/props and items x1.png").convert_alpha() #spritesheet avec paramètre de transparence alpha
         
         self.images = self.get_images(16)
         self.image = self.images[0]
+
+        self.collision_rect = rect
 
     def get_images(self, y):
         """
@@ -137,12 +140,13 @@ class VRDoor(Door):
         Constructeur de la classe VRDoor
 
         Args:
-            rect(pygame.Rect): rectangle de la porte (le même pour la collision et l'affichage)
+            rect(pygame.Rect): rectangle d'affichage de la porte
         """
 
         super().__init__(rect)
 
         self.speed = 1
+        self.collision_rect = pygame.Rect(self.rect.x + 24, self.rect.y, 8, self.rect.height)
 
         self.sprite_sheet = pygame.image.load("../image/techpack/tileset x1.png").convert_alpha() #spritesheet avec paramètre de transparence alpha
 
@@ -186,12 +190,13 @@ class VLDoor(Door):
         Constructeur de la classe VLDoor
 
         Args:
-            rect(pygame.Rect): rectangle de la porte (le même pour la collision et l'affichage)
+            rect(pygame.Rect): rectangle d'affichage de la porte
         """
 
         super().__init__(rect)
 
-        self.speed /= 3
+        self.collision_rect = pygame.Rect(self.rect.x, self.rect.y, 8, self.rect.height)
+        self.speed = 1
 
         self.sprite_sheet = pygame.image.load("../image/techpack/tileset x1.png").convert_alpha() #spritesheet avec paramètre de transparence alpha
 

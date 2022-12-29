@@ -112,7 +112,7 @@ class MapManager:
                 if not player_collided:
                     in_doorway = False #dit si le joueur est dans le passage d'une porte
                     for door in self.current_room.doors:
-                        if self.player.feet.colliderect(door.rect):
+                        if self.player.feet.colliderect(door.collision_rect):
                             in_doorway = True
 
                             #collision sur porte fermée
@@ -145,7 +145,7 @@ class MapManager:
 
                         #tirs joueur - portes
                         for door in self.current_room.doors:
-                            if shot.colliderect.colliderect(door.rect):
+                            if shot.colliderect.colliderect(door.collision_rect):
                                 shot.kill()#enlève le tir de tous les groupes d'affichage
                                 self.get_player_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
                                 shot_destroyed = True
@@ -175,7 +175,7 @@ class MapManager:
 
                         #tirs monstre - portes
                         for door in self.current_room.doors:
-                            if shot.colliderect.colliderect(door.rect):
+                            if shot.colliderect.colliderect(door.collision_rect):
                                 shot.kill()#enlève le tir de tous les groupes d'affichage
                                 self.get_mob_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
                                 shot_destroyed = True
