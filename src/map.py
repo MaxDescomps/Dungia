@@ -1,9 +1,10 @@
 import pygame, pytmx, pyscroll, random, copy
 import pygame.sprite
 from dataclasses import dataclass
-from player import *
+from npc import *
 from shot import PlayerShot
 from door import *
+from mob import *
 
 @dataclass
 class Room:
@@ -375,7 +376,7 @@ class MapManager:
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
                     for i in range(5):
                         if bool(random.getrandbits(1)): #une chance sur deux
-                            room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 1, 1))
+                            room_mobs.append(Mob("mobot", room_fighting_mobs, self.player, 1, 1))
                     if bool(random.getrandbits(1)): #une chance sur deux
                         for i in range(5):
                             if bool(random.getrandbits(1)): #une chance sur deux
