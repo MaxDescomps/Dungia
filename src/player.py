@@ -94,9 +94,6 @@ class Player(Entity):
         if self.pdv > 0:
             self.rect.topleft = self.position #la position du joueur avec [0,0] le coin superieur gauche
             self.feet.midbottom = self.rect.midbottom #aligne les centres des rect player.feet et player.rect
-
-            if self.damage_clock:
-                self.damage_clock -= 1
         else:
             exit(0) #game over
 
@@ -117,3 +114,17 @@ class Player(Entity):
             self.damage_clock = 60
             self.pdv -= 1
             self.get_pdv_image()
+
+    def handle_damage(self):
+        """Effet visuel des dégats et gestion du compteur d'invincibilité temporaire"""
+
+        if self.damage_clock:
+                self.damage_clock -= 1
+
+                if self.damage_clock > 40:
+                    self.damage_effect(0.35 * ((self.damage_clock - 40)/10))
+                
+    
+    def damage_effect(self, scale):
+        GB = min(255, max(0, round(255 * (1-scale))))
+        self.map_manager.screen.fill((255, GB, GB), special_flags = pygame.BLEND_MULT)

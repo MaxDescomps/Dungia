@@ -129,7 +129,9 @@ class Game:
             self.update() #met les sprites et les collisions à jour
 
             self.draw() #modifie l'affichage des sprites du jeu
+            self.player.handle_damage() #effet visuel des dégats et gestion du compteur d'invincibilité temporaire
             # self.debug()
+
 
             pygame.display.flip() #rafraîchit l'affichage
 
