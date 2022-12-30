@@ -65,6 +65,30 @@ class Player(Entity):
         self.take_weapon("atomus")
         self.weapon = self.weapons[self.weapon_index]
 
+    def change_animation_list(self, direction):
+        """
+        Change la liste de sprites utilisés en fonction de la direction
+        """
+
+        self.direction = direction
+        self.image = self.images[self.direction][self.animation_index]
+
+
+    def change_animation(self):
+        """
+        Change l'animation du sprite avec le mouvement
+        """
+
+        self.clock += self.speed * 8
+
+        if self.clock >= 100:
+            self.animation_index += 1
+
+            if self.animation_index >= len(self.images[self.direction]):
+                self.animation_index = 0
+            
+            self.clock = 0
+
     def take_weapon(self, name):
         """ramassage d'une arme"""
 
