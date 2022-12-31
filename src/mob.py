@@ -71,7 +71,7 @@ class Mob(Entity):
             self.change_animation()
         
     def shoot(self):
-        shot = MobShot(self.player, self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(self, self.player))
+        shot = MobShot(self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)))
         self.player.map_manager.get_group().add(shot)
         self.player.map_manager.get_mob_shots().append(shot)
 
@@ -100,6 +100,15 @@ class Drone(Mob):
         else:
             self.kill() #retire le sprite des groupes d'affichage
             self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce
+    
+    def get_image(self, sprite_sheet, x, y):
+        """Récupère un sprite 32*32 aux coordonnées x et y et en fait un sprite 48*48"""
+
+        image = pygame.Surface([32, 32], pygame.SRCALPHA).convert_alpha()#surface avec un parametre de transparence (alpha = 0)
+        image.blit(sprite_sheet, (0, 0), (x, y, 32, 32)) #canvas.blit (ajout, (coord sur canvas), (rect de l'ajout sur l'image source))
+        image = pygame.transform.scale(image, (48, 48))
+
+        return image
 
 class Android(Mob):
 
@@ -107,6 +116,26 @@ class Android(Mob):
         super().__init__("android", fighting_mobs, player, speed, damage)
 
         self.speed = 0.5
+        self.collision = copy.copy(self.feet)
+        self.collision.height += 12
+
+    def update(self):
+        if self.pdv > 0:
+            #tire sur le joueur
+            if self.shot_clock > 0:
+                self.shot_clock -= 1
+            else:
+                self.shoot()
+                self.shot_clock = self.max_shot_clock
+
+            self.save_location() #enregistre la position du mob avant deplacement pour pouvoir revenir en arrière en cas de collision
+            self.move_towards_player()
+            self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche
+            self.feet.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
+            self.collision.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
+        else:
+            self.kill() #retire le sprite des groupes d'affichage
+            self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce
 
     def get_image(self, sprite_sheet, x, y):
         """Récupère un sprite 32*32 aux coordonnées x et y et en fait un sprite 48*48"""
@@ -118,9 +147,9 @@ class Android(Mob):
         return image
 
     def shoot(self):
-        shots = [MobShot(self.player, self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(self, self.player)),
-        MobShot(self.player, self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(self, self.player) - 0.3),
-        MobShot(self.player, self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(self, self.player) + 0.3),
+        shots = [MobShot(self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center))),
+        MobShot(self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)) - 0.3),
+        MobShot(self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)) + 0.3),
         ]
 
         for shot in shots:

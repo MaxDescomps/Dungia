@@ -242,7 +242,7 @@ class MapManager:
 
     def manage_room_hostility(self):
         """
-        Fais apparaitre les monstres d'une pièce (maximum 5 apparitions par vague)
+        Fais apparaitre les monstres d'une pièce par vagues de 4 (maximum 5 apparitions par vague)
         Cause la fermeture des portes d'une pièce hostile
         """
         room = self.current_room
@@ -256,7 +256,7 @@ class MapManager:
             #spawn des mobs
             spawn_index = 0
 
-            for i in range(5):
+            for i in range(4):
                 try:
                     mob = room.mobs.pop(0)
                 except:

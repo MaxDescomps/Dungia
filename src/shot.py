@@ -1,26 +1,11 @@
 import pygame, math
 from animation import AnimateSprite
 
-def calc_angle(mob, player) -> float:
-    #point d'arrivée du tir
-    player_pos = pygame.Vector2(player.feet.center)
+def calc_angle(src_pos, dest_pos) -> float:
+    """Calcule l'angle entre deux points"""
 
-    #vise les pieds du joueur
-    mob_center = pygame.Vector2(mob.rect.center)
-
-    #calcul de l'angle de tir
-    distance = player_pos - mob_center
-    return math.atan2(distance.y, distance.x)
-
-def angle_to_mouse(player) -> float:
-
-    mouse_pos = [None, None]
-    mouse_pos[0] = player.crosshair.rect.center[0] / player.map_manager.zoom + player.map_manager.get_group().view.x
-    mouse_pos[1] = player.crosshair.rect.center[1] / player.map_manager.zoom + player.map_manager.get_group().view.y
-
-    weapon_center = pygame.Vector2(player.weapon.rect.center)
-    distance = mouse_pos - weapon_center
-
+    distance = dest_pos - src_pos
+    
     return math.atan2(distance.y, distance.x)
 
 class PlayerShot(AnimateSprite):
@@ -91,12 +76,11 @@ class PlayerShot(AnimateSprite):
 class MobShot(AnimateSprite):
     """Classe d'un tir d'un monstre"""
 
-    def __init__(self, player, mob, speed, name, damage, angle):
+    def __init__(self, mob, speed, name, damage, angle):
         """
         constructeur d'objet MobShot
 
         Args:
-            player (Player): le joueur visé par le monstre
             mob (Mob): le monstre qui tir
             speed (int): la vitesse du tir
             name (str): le chemin du fichier image du tir à partir de ../image

@@ -19,6 +19,8 @@ class Player(Entity):
 
         self.weapon_index = 0
         self.weapons = []
+        self.weapon_rate_clocks = [] #temps d'attente entre deux tirs de chaque arme
+
         self.take_weapon("ak-47")
         self.take_weapon("ksg")
         self.take_weapon("remington")
@@ -29,7 +31,16 @@ class Player(Entity):
         self.take_weapon("x-tech")
         self.take_weapon("ray-gun")
         self.take_weapon("atomus")
+
+        #raccourcis
         self.weapon = self.weapons[self.weapon_index]
+
+    def crosshair_pos(self):
+        crosshair_pos = [None, None]
+        crosshair_pos[0] = self.crosshair.rect.center[0] / self.map_manager.zoom + self.map_manager.get_group().view.x
+        crosshair_pos[1] = self.crosshair.rect.center[1] / self.map_manager.zoom + self.map_manager.get_group().view.y
+
+        return crosshair_pos
 
     def change_animation_list(self, direction):
         """
@@ -62,6 +73,7 @@ class Player(Entity):
         weapon.player = self
 
         self.weapons.append(weapon)
+        self.weapon_rate_clocks.append(0)
 
     def next_weapon(self):
         if self.weapon_index < len(weapons) - 1:
@@ -84,19 +96,71 @@ class Player(Entity):
         self.map_manager.get_group().add(self.weapon, layer=5) #ajoute la nouvelle arme au groupe d'affichage
 
     def shoot(self):
-        if not self.weapon.rate_clock:
-            shots = self.weapon.shot()
+        if not self.weapon_rate_clocks[self.weapon_index]:
+            self.weapon_rate_clocks[self.weapon_index] = self.weapon.max_rate_clock
+            shots = self.weapon.shoot(self)
             for shot in shots:
                 self.map_manager.get_player_shots().append(shot)
                 self.map_manager.get_group().add(shot)
-                self.weapon.rate_clock = self.weapon.max_rate_clock
 
     def update(self):
         if self.pdv > 0:
+            self.manage_weapon()
+
             self.rect.topleft = self.position #la position du joueur avec [0,0] le coin superieur gauche
             self.feet.midbottom = self.rect.midbottom #aligne les centres des rect player.feet et player.rect
         else:
             exit(0) #game over
+
+    def manage_weapon(self):
+        #décrémentation du compteur de cadence de tir de l'arme en main
+        if self.weapon_rate_clocks[self.weapon_index]:
+            self.weapon_rate_clocks[self.weapon_index] -= 1
+
+        self.weapon.angle = calc_angle(pygame.Vector2(self.rect.center), self.crosshair_pos()) #position en jeu du crosshair
+        self.weapon.rect.center = self.rect.center
+
+        #coefficients du vecteur de déplacement de l'arme par rapport au joueur
+        self.weapon.speed_x = math.cos(self.weapon.angle)
+        self.weapon.speed_y = math.sin(self.weapon.angle)
+
+        #rotation de l'image de l'arme en fonction de l'angle
+        self.weapon.rotate_img()
+
+        #copie de la position pour pouvoir faire des calculs sur nombres flottants
+        self.weapon.pos = [None, None]
+        self.weapon.pos[0] = self.weapon.rect[0]
+        self.weapon.pos[1] = self.weapon.rect[1]
+
+        #met la position du tir à jour
+        self.weapon.pos[0] += 18 * self.weapon.speed_x
+        self.weapon.pos[1] += 18 * self.weapon.speed_y
+
+        #maj du rectangle d'affichage
+        self.weapon.rect.topleft = self.weapon.pos
+
+        #arme et joueur visent dans le bon sens
+        if (self.weapon.angle > math.pi / 2) or (self.weapon.angle < -math.pi / 2): #côté gauche
+            self.weapon.image = pygame.transform.flip(self.weapon.image, False, True)
+
+            if (self.weapon.angle > math.pi * (3/4)) or (self.weapon.angle < -math.pi * (3/4)):
+                self.change_animation_list("left")
+
+            elif (self.weapon.angle < -math.pi/4) and (self.weapon.angle > -math.pi * (3/4)):
+                self.change_animation_list("up")
+
+            else:
+                self.change_animation_list("down")
+
+        else: #côté droit
+            if (self.weapon.angle < math.pi/4) and (self.weapon.angle > -math.pi/4):
+                self.change_animation_list("right")
+
+            elif (self.weapon.angle < -math.pi/4) and (self.weapon.angle > -math.pi * (3/4)):
+                self.change_animation_list("up")
+
+            else:
+                self.change_animation_list("down")
 
     def render_ui(self, screen):
         screen.blit(self.crosshair.image, self.crosshair.rect.topleft) #affichage du crosshair
