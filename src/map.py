@@ -268,7 +268,7 @@ class MapManager:
                     self.get_group().add(mob)
 
                     if mob.weapon:
-                        self.get_group().add(mob.weapon, layer = 5) #ajout de l'arme du mob au groupe de calques
+                        self.get_group().add(mob.weapon, layer=1) #ajout de l'arme du mob au groupe de calques
 
                     spawn_index += 1
 
@@ -378,12 +378,13 @@ class MapManager:
                 room_mobs = []
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
                     for i in range(5):
-                        if bool(random.getrandbits(1)): #une chance sur deux
+                        rand = random.randint(0,100)
+                        if rand < 33:
                             room_mobs.append(Drone(room_fighting_mobs, self.player, 1, 1))
-                    if bool(random.getrandbits(1)): #une chance sur deux
-                        for i in range(5):
-                            if bool(random.getrandbits(1)): #une chance sur deux
-                                room_mobs.append(Android(room_fighting_mobs, self.player, 1, 1))
+                        elif rand >= 33 and rand <= 66:
+                            room_mobs.append(Mobot(room_fighting_mobs, self.player, 1, 1))
+                        else:
+                            room_mobs.append(Android(room_fighting_mobs, self.player, 1, 1))
 
                 rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, room_fighting_mobs, room_walls, room_acids))
 

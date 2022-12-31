@@ -87,7 +87,7 @@ class MobShot(AnimateSprite):
         """
         super().__init__(name)
 
-        self.image = self.get_image(self.sprite_sheet, 0, 64) #balles du spritesheet
+        self.image = self.get_image(self.sprite_sheet, 0, 192) #balles du spritesheet
         self.rect = self.image.get_rect()
 
         self.rect.center = mob.rect.center
@@ -97,6 +97,9 @@ class MobShot(AnimateSprite):
         #vitesse de déplacement du tir
         self.speed_x = speed * math.cos(self.angle)
         self.speed_y = speed * math.sin(self.angle)
+
+        #rotation de l'image du tir en fonction de l'angle (optionnel si balle circulaire)
+        self.rotate_img()
 
         #calcul du rectangle de collision plus précis
         self.colliderect = pygame.Rect(0, 0, 8, 8)
@@ -121,3 +124,12 @@ class MobShot(AnimateSprite):
         
         #maj du rectangle de collision
         self.colliderect.center = self.rect.center
+
+    def rotate_img(self):
+        """fait une rotation de l'image du tir en fonction de son angle"""
+
+        rotated_image = pygame.transform.rotate(self.image, -math.degrees(self.angle)).convert_alpha() #rotation de l'image
+
+        self.rect = rotated_image.get_rect(center = self.rect.center) #on corrige la modification du centre de l'image causé par le changement de son rectangle après rotation
+
+        self.image = rotated_image
