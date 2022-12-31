@@ -74,3 +74,58 @@ class Mob(Entity):
         shot = MobShot(self.player, self, 5, "techpack/Projectiles/projectiles x1", 1)
         self.player.map_manager.get_group().add(shot)
         self.player.map_manager.get_mob_shots().append(shot)
+
+class Drone(Mob):
+
+    def __init__(self, fighting_mobs, player, speed, damage):
+        super().__init__("drone", fighting_mobs, player, speed, damage)
+
+        self.feet.width = 15
+        self.collision = copy.copy(self.feet)
+
+    def update(self):
+        if self.pdv > 0:
+            #tire sur le joueur
+            if self.shot_clock > 0:
+                self.shot_clock -= 1
+            else:
+                self.shoot()
+                self.shot_clock = self.max_shot_clock
+
+            self.save_location() #enregistre la position du mob avant deplacement pour pouvoir revenir en arrière en cas de collision
+            self.move_towards_player()
+            self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche
+            self.feet.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
+            self.collision.midbottom = self.rect.center #aligne les centres des rect mob.feet et mob.rect
+        else:
+            self.kill() #retire le sprite des groupes d'affichage
+            self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce
+
+class Android(Mob):
+
+    def __init__(self, fighting_mobs, player, speed, damage):
+        super().__init__("android", fighting_mobs, player, speed, damage)
+
+        self.speed = 0.5
+
+    def get_image(self, sprite_sheet, x, y):
+        """Récupère un sprite 32*32 aux coordonnées x et y et en fait un sprite 48*48"""
+
+        image = pygame.Surface([32, 32], pygame.SRCALPHA).convert_alpha()#surface avec un parametre de transparence (alpha = 0)
+        image.blit(sprite_sheet, (0, 0), (x, y, 32, 32)) #canvas.blit (ajout, (coord sur canvas), (rect de l'ajout sur l'image source))
+        image = pygame.transform.scale(image, (48, 48))
+
+        return image
+
+    # def shoot(self):
+
+
+class Mobot(Mob):
+
+    def __init__(self, fighting_mobs, player, speed, damage):
+        super().__init__("mobot", fighting_mobs, player, speed, damage)
+
+class Boss(Mob):
+
+    def __init__(self, fighting_mobs, player, speed, damage):
+        super().__init__("boss", fighting_mobs, player, speed, damage)

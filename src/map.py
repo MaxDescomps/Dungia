@@ -156,7 +156,7 @@ class MapManager:
                             for mob in self.current_room.fighting_mobs:
 
                                 #tirs joueur - monstres
-                                if shot.colliderect.colliderect(mob.feet):
+                                if shot.colliderect.colliderect(mob.collision):
                                     shot.kill()#enlève le tir de tous les groupes d'affichage
                                     self.get_player_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
                                     mob.pdv -= shot.damage
@@ -184,7 +184,7 @@ class MapManager:
 
                         if not shot_destroyed:
                             #tirs monstre - joueur
-                            if shot.colliderect.colliderect(self.player.feet):
+                            if shot.colliderect.colliderect(self.player.collision):
                                 shot.kill()#enlève le tir de tous les groupes d'affichage
                                 self.get_mob_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
                                 self.player.take_damage()
@@ -376,11 +376,11 @@ class MapManager:
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
                     for i in range(5):
                         if bool(random.getrandbits(1)): #une chance sur deux
-                            room_mobs.append(Mob("mobot", room_fighting_mobs, self.player, 1, 1))
+                            room_mobs.append(Drone(room_fighting_mobs, self.player, 1, 1))
                     if bool(random.getrandbits(1)): #une chance sur deux
                         for i in range(5):
                             if bool(random.getrandbits(1)): #une chance sur deux
-                                room_mobs.append(Mob("boss", room_fighting_mobs, self.player, 1, 1))
+                                room_mobs.append(Android(room_fighting_mobs, self.player, 1, 1))
 
                 rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, room_fighting_mobs, room_walls, room_acids))
 

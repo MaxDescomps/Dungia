@@ -64,6 +64,6 @@ class AnimateSprite(pygame.sprite.Sprite):
     def get_image(self, sprite_sheet, x, y):
         """Récupère un sprite 32*32 aux coordonnées x et y"""
 
-        image = pygame.Surface([32, 32], pygame.SRCALPHA)#surface avec un parametre de transparence (alpha = 0)
+        image = pygame.Surface([32, 32], pygame.SRCALPHA).convert_alpha() #surface avec un parametre de transparence (alpha = 0)
         image.blit(sprite_sheet, (0, 0), (x, y, 32, 32)) #canvas.blit (ajout, (coord sur canvas), (rect de l'ajout sur l'image source))
-        return image.convert_alpha()
+        return image

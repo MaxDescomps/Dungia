@@ -12,7 +12,8 @@ class Entity(AnimateSprite):
         self.image = self.get_image(self.sprite_sheet, 0, 0).convert_alpha() #sprite effectif de l'entité
         self.rect = self.image.get_rect() #rectangle de l'image de l'entité
         self.position = [x, y]
-        self.feet = pygame.Rect(0, 0, 28, 12) #zone de collision de l'entité
+        self.feet = pygame.Rect(0, 0, 28, 12) #zone de collision de l'entité avec des obstacles
+        self.collision = self.feet #zone de collision de l'entité avec des projectiles (parfois différente)
         self.old_position = self.position.copy()
 
     def save_location(self): self.old_position = self.position.copy()
@@ -26,10 +27,10 @@ class Entity(AnimateSprite):
     def move_down(self): self.position[1] += self.speed
     
     def update(self):
-        self.rect.topleft = self.position #la position du joueur avec [0,0] le coin superieur gauche
-        self.feet.midbottom = self.rect.midbottom #aligne les centres des rect player.feet et player.rect
+        self.rect.topleft = self.position #la position de l'entité avec [0,0] le coin superieur gauche
+        self.feet.midbottom = self.rect.midbottom #aligne les centres des rect entity.feet et entity.rect
 
     def move_back(self):
         self.position = self.old_position
-        self.rect.topleft = self.position #la position du joueur avec [0,0] le coin superieur gauche
-        self.feet.midbottom = self.rect.midbottom #aligne les centres des rect player.feet et player.rect
+        self.rect.topleft = self.position #la position de l'entité avec [0,0] le coin superieur gauche
+        self.feet.midbottom = self.rect.midbottom #aligne les centres des rect entity.feet et entity.rect

@@ -1,4 +1,5 @@
 import pygame, math, copy
+from shot import *
 
 class Weapon(pygame.sprite.Sprite):
     def __init__(self, player, max_rate_clock, damage, bullet_speed, name):
@@ -14,6 +15,9 @@ class Weapon(pygame.sprite.Sprite):
         self.image = copy.copy(self.first_image) #l'image de l'arme après rotation
         self.rect = self.image.get_rect() #le rectangle d'affichage de l'arme
         self.position = self.rect.topleft #la position de l'arme
+
+    def shot(self):
+        return PlayerShot(self.player, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name)
 
     def update(self):
 
