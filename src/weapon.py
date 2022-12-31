@@ -17,7 +17,7 @@ class Weapon(pygame.sprite.Sprite):
         self.position = self.rect.topleft #la position de l'arme
 
     def shot(self):
-        return PlayerShot(self.player, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name)
+        return [PlayerShot(self.player, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, angle_to_mouse(self.player))]
 
     def update(self):
 
@@ -90,13 +90,25 @@ class Weapon(pygame.sprite.Sprite):
 
         self.image = rotated_image
 
+class Shotgun(Weapon):
+    def __init__(self, player, max_rate_clock, damage, bullet_speed, name):
+
+        super().__init__(player, max_rate_clock, damage, bullet_speed, name)
+
+    def shot(self):
+        return [
+        PlayerShot(self.player, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, angle_to_mouse(self.player)),
+        PlayerShot(self.player, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, angle_to_mouse(self.player) - 0.2),
+        PlayerShot(self.player, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, angle_to_mouse(self.player) + 0.2)
+        ]
+
 weapons = dict()
 
 def list_weapons():
     global weapons
     weapons["ak-47"] = Weapon(None, 10, 1, 3, "1")
     weapons["ksg"] = Weapon(None, 30, 1, 4, "2")
-    weapons["remington"] = Weapon(None, 10, 1, 3, "3")
+    weapons["remington"] = Shotgun(None, 10, 1, 3, "3")
     weapons["pp-bizon"] = Weapon(None, 10, 1, 3, "4")
     weapons["rocket-launcher"] = Weapon(None, 10, 1, 3, "5")
     weapons["sniper"] = Weapon(None, 80, 10, 6, "6")

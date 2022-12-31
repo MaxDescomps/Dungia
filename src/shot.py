@@ -1,10 +1,32 @@
 import pygame, math
 from animation import AnimateSprite
 
+def calc_angle(mob, player) -> float:
+    #point d'arrivée du tir
+    player_pos = pygame.Vector2(player.feet.center)
+
+    #vise les pieds du joueur
+    mob_center = pygame.Vector2(mob.rect.center)
+
+    #calcul de l'angle de tir
+    distance = player_pos - mob_center
+    return math.atan2(distance.y, distance.x)
+
+def angle_to_mouse(player) -> float:
+
+    mouse_pos = [None, None]
+    mouse_pos[0] = player.crosshair.rect.center[0] / player.map_manager.zoom + player.map_manager.get_group().view.x
+    mouse_pos[1] = player.crosshair.rect.center[1] / player.map_manager.zoom + player.map_manager.get_group().view.y
+
+    weapon_center = pygame.Vector2(player.weapon.rect.center)
+    distance = mouse_pos - weapon_center
+
+    return math.atan2(distance.y, distance.x)
+
 class PlayerShot(AnimateSprite):
     """Classe d'un tir d'un joueur"""
 
-    def __init__(self, player, speed, name, damage, weapon_name):
+    def __init__(self, player, speed, name, damage, weapon_name, angle):
         """
         constructeur d'objet Playershot
 
@@ -16,20 +38,15 @@ class PlayerShot(AnimateSprite):
         super().__init__(name)
 
         self.image = pygame.image.load(f"../image/bullets/{weapon_name}.png").convert_alpha()
+
         # self.image = self.get_image(self.sprite_sheet, 0, 0) #balles du spritesheet
         self.rect = self.image.get_rect()
 
-        mouse_pos = [None, None]
-        mouse_pos[0] = player.crosshair.rect.center[0] / player.map_manager.zoom + player.map_manager.get_group().view.x
-        mouse_pos[1] = player.crosshair.rect.center[1] / player.map_manager.zoom + player.map_manager.get_group().view.y
-
-        #centre la position de départ du tir sur le joueur
-        player_center = pygame.Vector2(player.rect.center)
+        #centre la position de départ du tir sur l'arme du joueur
         self.rect.center = player.weapon.rect.center
 
         #calcul de l'angle de tir
-        distance = mouse_pos - player_center
-        self.angle = math.atan2(distance.y, distance.x)
+        self.angle = angle
         
         #vitesse de déplacement du tir
         self.speed_x = speed * math.cos(self.angle)
@@ -74,7 +91,7 @@ class PlayerShot(AnimateSprite):
 class MobShot(AnimateSprite):
     """Classe d'un tir d'un monstre"""
 
-    def __init__(self, player, mob, speed, name, damage):
+    def __init__(self, player, mob, speed, name, damage, angle):
         """
         constructeur d'objet MobShot
 
@@ -89,16 +106,9 @@ class MobShot(AnimateSprite):
         self.image = self.get_image(self.sprite_sheet, 0, 64) #balles du spritesheet
         self.rect = self.image.get_rect()
 
-        #point d'arrivée du tir
-        player_pos = pygame.Vector2(player.feet.center)
-
-        #vise les pieds du joueur
-        mob_center = pygame.Vector2(mob.rect.center)
         self.rect.center = mob.rect.center
         
-        #calcul de l'angle de tir
-        distance = player_pos - mob_center
-        self.angle = math.atan2(distance.y, distance.x)
+        self.angle = angle
         
         #vitesse de déplacement du tir
         self.speed_x = speed * math.cos(self.angle)

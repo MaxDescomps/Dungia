@@ -71,7 +71,7 @@ class Mob(Entity):
             self.change_animation()
         
     def shoot(self):
-        shot = MobShot(self.player, self, 5, "techpack/Projectiles/projectiles x1", 1)
+        shot = MobShot(self.player, self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(self, self.player))
         self.player.map_manager.get_group().add(shot)
         self.player.map_manager.get_mob_shots().append(shot)
 
@@ -117,8 +117,15 @@ class Android(Mob):
 
         return image
 
-    # def shoot(self):
+    def shoot(self):
+        shots = [MobShot(self.player, self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(self, self.player)),
+        MobShot(self.player, self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(self, self.player) - 0.3),
+        MobShot(self.player, self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(self, self.player) + 0.3),
+        ]
 
+        for shot in shots:
+            self.player.map_manager.get_group().add(shot)
+            self.player.map_manager.get_mob_shots().append(shot)
 
 class Mobot(Mob):
 
