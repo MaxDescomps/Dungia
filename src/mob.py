@@ -9,6 +9,7 @@ class Mob(Entity):
         super().__init__(name, 0, 0)
 
         self.damage = damage
+        self.weapon = None
         self.max_weapon_rate_clock = 60
         self.weapon_rate_clock = self.max_weapon_rate_clock
         self.speed = speed
@@ -138,6 +139,7 @@ class Android(Mob):
             self.feet.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
             self.collision.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
         else:
+            self.weapon.kill()
             self.kill() #retire le sprite des groupes d'affichage
             self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce
 

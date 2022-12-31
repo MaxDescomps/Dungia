@@ -267,6 +267,9 @@ class MapManager:
                     room.fighting_mobs.append(mob)
                     self.get_group().add(mob)
 
+                    if mob.weapon:
+                        self.get_group().add(mob.weapon, layer = 5) #ajout de l'arme du mob au groupe de calques
+
                     spawn_index += 1
 
         #si pièce neutre
