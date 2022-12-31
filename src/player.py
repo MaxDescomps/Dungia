@@ -70,13 +70,12 @@ class Player(Entity):
         """ramassage d'une arme"""
 
         weapon = copy.copy(weapons[name]) #copie pour ne pas modifier le catalogue d'armes
-        weapon.player = self
 
         self.weapons.append(weapon)
         self.weapon_rate_clocks.append(0)
 
     def next_weapon(self):
-        if self.weapon_index < len(weapons) - 1:
+        if self.weapon_index < len(self.weapons) - 1:
             self.weapon_index += 1
         else:
             self.weapon_index = 0
@@ -89,7 +88,7 @@ class Player(Entity):
         if self.weapon_index > 0:
             self.weapon_index -= 1
         else:
-            self.weapon_index = len(weapons) - 1
+            self.weapon_index = len(self.weapons) - 1
 
         self.weapon.kill() #retire l'ancienne arme des groupes d'affichage
         self.weapon = self.weapons[self.weapon_index]

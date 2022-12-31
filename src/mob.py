@@ -9,8 +9,8 @@ class Mob(Entity):
         super().__init__(name, 0, 0)
 
         self.damage = damage
-        self.max_shot_clock = 60
-        self.shot_clock = self.max_shot_clock
+        self.max_weapon_rate_clock = 60
+        self.weapon_rate_clock = self.max_weapon_rate_clock
         self.speed = speed
         self.player = player #joueur à attaquer
         self.max_pdv = 6 #pdv maximums
@@ -25,11 +25,11 @@ class Mob(Entity):
     def update(self):
         if self.pdv > 0:
             #tire sur le joueur
-            if self.shot_clock > 0:
-                self.shot_clock -= 1
+            if self.weapon_rate_clock > 0:
+                self.weapon_rate_clock -= 1
             else:
                 self.shoot()
-                self.shot_clock = self.max_shot_clock
+                self.weapon_rate_clock = self.max_weapon_rate_clock
 
             self.save_location() #enregistre la position du mob avant deplacement pour pouvoir revenir en arrière en cas de collision
             self.move_towards_player()
@@ -86,11 +86,11 @@ class Drone(Mob):
     def update(self):
         if self.pdv > 0:
             #tire sur le joueur
-            if self.shot_clock > 0:
-                self.shot_clock -= 1
+            if self.weapon_rate_clock > 0:
+                self.weapon_rate_clock -= 1
             else:
                 self.shoot()
-                self.shot_clock = self.max_shot_clock
+                self.weapon_rate_clock = self.max_weapon_rate_clock
 
             self.save_location() #enregistre la position du mob avant deplacement pour pouvoir revenir en arrière en cas de collision
             self.move_towards_player()
@@ -118,15 +118,19 @@ class Android(Mob):
         self.speed = 0.5
         self.collision = copy.copy(self.feet)
         self.collision.height += 12
+        self.weapon = copy.copy(weapons["android_remington"]) #copie pour ne pas modifier le catalogue d'armes
+        self.weapon_rate_clock = 0
 
     def update(self):
         if self.pdv > 0:
+            self.manage_weapon()
+
             #tire sur le joueur
-            if self.shot_clock > 0:
-                self.shot_clock -= 1
+            if self.weapon_rate_clock > 0:
+                self.weapon_rate_clock -= 1
             else:
                 self.shoot()
-                self.shot_clock = self.max_shot_clock
+                self.weapon_rate_clock = self.weapon.max_rate_clock
 
             self.save_location() #enregistre la position du mob avant deplacement pour pouvoir revenir en arrière en cas de collision
             self.move_towards_player()
@@ -136,6 +140,76 @@ class Android(Mob):
         else:
             self.kill() #retire le sprite des groupes d'affichage
             self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce
+
+    def manage_weapon(self):
+        self.weapon.angle = calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)) #position en jeu du crosshair
+        self.weapon.rect.center = self.rect.center
+
+        #coefficients du vecteur de déplacement de l'arme par rapport au joueur
+        self.weapon.speed_x = math.cos(self.weapon.angle)
+        self.weapon.speed_y = math.sin(self.weapon.angle)
+
+        #rotation de l'image de l'arme en fonction de l'angle
+        self.weapon.rotate_img()
+
+        #copie de la position pour pouvoir faire des calculs sur nombres flottants
+        self.weapon.pos = [None, None]
+        self.weapon.pos[0] = self.weapon.rect[0]
+        self.weapon.pos[1] = self.weapon.rect[1]
+
+        #met la position du tir à jour
+        self.weapon.pos[0] += 18 * self.weapon.speed_x
+        self.weapon.pos[1] += 18 * self.weapon.speed_y
+
+        #maj du rectangle d'affichage
+        self.weapon.rect.topleft = self.weapon.pos
+
+        #arme et joueur visent dans le bon sens
+        if (self.weapon.angle > math.pi / 2) or (self.weapon.angle < -math.pi / 2): #côté gauche
+            self.weapon.image = pygame.transform.flip(self.weapon.image, False, True)
+
+            if (self.weapon.angle > math.pi * (3/4)) or (self.weapon.angle < -math.pi * (3/4)):
+                self.change_animation_list("left")
+
+            elif (self.weapon.angle < -math.pi/4) and (self.weapon.angle > -math.pi * (3/4)):
+                self.change_animation_list("up")
+
+            else:
+                self.change_animation_list("down")
+
+        else: #côté droit
+            if (self.weapon.angle < math.pi/4) and (self.weapon.angle > -math.pi/4):
+                self.change_animation_list("right")
+
+            elif (self.weapon.angle < -math.pi/4) and (self.weapon.angle > -math.pi * (3/4)):
+                self.change_animation_list("up")
+
+            else:
+                self.change_animation_list("down")
+
+    def change_animation_list(self, direction):
+        """
+        Change la liste de sprites utilisés en fonction de la direction
+        """
+
+        self.direction = direction
+        self.image = self.images[self.direction][self.animation_index]
+
+
+    def change_animation(self):
+        """
+        Change l'animation du sprite avec le mouvement
+        """
+
+        self.clock += self.speed * 8
+
+        if self.clock >= 100:
+            self.animation_index += 1
+
+            if self.animation_index >= len(self.images[self.direction]):
+                self.animation_index = 0
+            
+            self.clock = 0
 
     def get_image(self, sprite_sheet, x, y):
         """Récupère un sprite 32*32 aux coordonnées x et y et en fait un sprite 48*48"""
@@ -147,10 +221,7 @@ class Android(Mob):
         return image
 
     def shoot(self):
-        shots = [MobShot(self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center))),
-        MobShot(self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)) - 0.3),
-        MobShot(self, 5, "techpack/Projectiles/projectiles x1", 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)) + 0.3),
-        ]
+        shots = self.weapon.shoot(self)
 
         for shot in shots:
             self.player.map_manager.get_group().add(shot)

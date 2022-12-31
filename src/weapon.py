@@ -2,7 +2,7 @@ import pygame, math, copy
 from shot import *
 
 class Weapon(pygame.sprite.Sprite):
-    def __init__(self, player, max_rate_clock, damage, bullet_speed, name):
+    def __init__(self, max_rate_clock, damage, bullet_speed, name):
         super().__init__()
 
         self.bullet_speed = bullet_speed #la vitesse des balles de l'arme
@@ -12,7 +12,6 @@ class Weapon(pygame.sprite.Sprite):
         self.first_image = pygame.image.load(f"../image/guns/{name}_1.png").convert_alpha() #l'image initiale de l'arme, sur laquelle on applique la rotation
         self.image = copy.copy(self.first_image) #l'image de l'arme après rotation
         self.rect = self.image.get_rect() #le rectangle d'affichage de l'arme
-        self.position = self.rect.topleft #la position de l'arme
 
     def shoot(self, owner):
         return [PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, self.angle)]
@@ -30,28 +29,29 @@ class Weapon(pygame.sprite.Sprite):
         self.image = rotated_image
 
 class Shotgun(Weapon):
-    def __init__(self, player, max_rate_clock, damage, bullet_speed, name):
+    def __init__(self, max_rate_clock, damage, bullet_speed, name):
 
-        super().__init__(player, max_rate_clock, damage, bullet_speed, name)
+        super().__init__(max_rate_clock, damage, bullet_speed, name)
 
     def shoot(self, owner):
         return [
-        PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, calc_angle(pygame.Vector2(self.player.rect.center), self.player.crosshair_pos())),
-        PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, calc_angle(pygame.Vector2(self.player.rect.center), self.player.crosshair_pos()) - 0.2),
-        PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, calc_angle(pygame.Vector2(self.player.rect.center), self.player.crosshair_pos()) + 0.2)
+        PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, self.angle),
+        PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, self.angle - 0.4),
+        PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, self.angle + 0.4)
         ]
 
 weapons = dict()
 
 def list_weapons():
     global weapons
-    weapons["ak-47"] = Weapon(None, 10, 1, 3, "1")
-    weapons["ksg"] = Weapon(None, 30, 1, 4, "2")
-    weapons["remington"] = Shotgun(None, 10, 1, 3, "3")
-    weapons["pp-bizon"] = Weapon(None, 10, 1, 3, "4")
-    weapons["rocket-launcher"] = Weapon(None, 10, 1, 3, "5")
-    weapons["sniper"] = Weapon(None, 80, 10, 6, "6")
-    weapons["shadow"] = Weapon(None, 20, 10, 6, "7")
-    weapons["x-tech"] = Weapon(None, 20, 10, 6, "8")
-    weapons["ray-gun"] = Weapon(None, 20, 10, 6, "9")
-    weapons["atomus"] = Weapon(None, 1, 10, 10, "10")
+    weapons["ak-47"] = Weapon(10, 1, 3, "1")
+    weapons["ksg"] = Weapon(30, 1, 4, "2")
+    weapons["remington"] = Shotgun(10, 1, 3, "3")
+    weapons["android_remington"] = Shotgun(50, 1, 2, "3")
+    weapons["pp-bizon"] = Weapon(10, 1, 3, "4")
+    weapons["rocket-launcher"] = Weapon(10, 1, 3, "5")
+    weapons["sniper"] = Weapon(80, 10, 6, "6")
+    weapons["shadow"] = Weapon(20, 10, 6, "7")
+    weapons["x-tech"] = Weapon(20, 10, 6, "8")
+    weapons["ray-gun"] = Weapon(20, 10, 6, "9")
+    weapons["atomus"] = Weapon(1, 10, 10, "10")
