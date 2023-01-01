@@ -75,7 +75,7 @@ class Mob(Entity):
             self.change_animation()
         
     def shoot(self):
-        shot = MobShot(self, 3, "techpack/Projectiles/projectiles x1", 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)))
+        shot = Shot(self, 3, "techpack/Projectiles/projectiles x1", 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)))
         self.player.map_manager.get_group().add(shot)
         self.player.map_manager.get_mob_shots().append(shot)
 

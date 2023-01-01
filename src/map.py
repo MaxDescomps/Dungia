@@ -2,7 +2,7 @@ import pygame, pytmx, pyscroll, random, copy
 import pygame.sprite
 from dataclasses import dataclass
 from npc import *
-from shot import PlayerShot
+from shot import Shot
 from door import *
 from mob import *
 
@@ -33,8 +33,8 @@ class Map:
     tmx_data: pytmx.TiledMap
     portals: list[Portal]
     npcs: list[NPC]
-    player_shots: list[PlayerShot]
-    mob_shots: list[MobShot]
+    player_shots: list[Shot]
+    mob_shots: list[Shot]
     doors: list[Door] #liste des portes de la carte pour calcul plus rapide des portes de chaque pièce
     rooms: list[Room]
 

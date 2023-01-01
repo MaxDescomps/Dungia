@@ -15,7 +15,7 @@ class Weapon(pygame.sprite.Sprite):
         self.rect = self.image.get_rect() #le rectangle d'affichage de l'arme
 
     def shoot(self, owner, angle_modif=0):
-        return [PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, self.angle + angle_modif)]
+        return [Shot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.angle + angle_modif, self.name)]
 
     def rotate_img(self):
         """fait une rotation d'une image en fonction de son angle"""
@@ -30,16 +30,16 @@ class Weapon(pygame.sprite.Sprite):
         self.image = rotated_image
 
 class Remington(Weapon):
-    def __init__(self, max_rate_clock, damage, bullet_speed, name, var):
+    def __init__(self, max_rate_clock, damage, bullet_speed, name, angle_modif):
 
         super().__init__(max_rate_clock, damage, bullet_speed, name)
-        self.var = var
+        self.angle_modif = angle_modif
 
     def shoot(self, owner):
         shots = []
 
         for i in range(5):
-            shots.append(PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, self.angle + random.uniform(-self.var, self.var)))
+            shots.append(Shot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.angle + random.uniform(-self.angle_modif, self.angle_modif), self.name))
         return shots
 
 class KSG(Weapon):
@@ -49,9 +49,9 @@ class KSG(Weapon):
 
     def shoot(self, owner):
         return [
-        PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, self.angle),
-        PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, self.angle + 0.2),
-        PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, self.angle - 0.2)
+        Shot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.angle, self.name),
+        Shot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.angle + 0.2, self.name),
+        Shot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.angle - 0.2, self.name)
         ]
 
 class PPBizon(Weapon):
@@ -61,7 +61,7 @@ class PPBizon(Weapon):
 
     def shoot(self, owner):
         return [
-        PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, self.angle + random.uniform(-0.2, 0.2))
+        Shot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.angle + random.uniform(-0.2, 0.2), self.name)
         ]
     
 class Gun(Weapon):
@@ -71,7 +71,7 @@ class Gun(Weapon):
 
     def shoot(self, owner):
         return [
-        PlayerShot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.name, self.angle + random.uniform(-0.1, 0.1))
+        Shot(owner, self.bullet_speed, "techpack/Projectiles/projectiles x1", self.damage, self.angle + random.uniform(-0.1, 0.1), self.name)
         ]
 
 weapons = dict()
