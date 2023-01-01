@@ -2,7 +2,7 @@ import pygame, copy
 from animation import AnimateSprite
 from crosshair import Crosshair
 from shot import *
-from weapon import weapons
+from weapon import *
 
 class Entity(AnimateSprite):
 
@@ -12,7 +12,7 @@ class Entity(AnimateSprite):
         self.image = self.get_image(self.sprite_sheet, 0, 0).convert_alpha() #sprite effectif de l'entité
         self.rect = self.image.get_rect() #rectangle de l'image de l'entité
         self.position = [x, y]
-        self.feet = pygame.Rect(0, 0, 28, 12) #zone de collision de l'entité avec des obstacles
+        self.feet = pygame.Rect(0, 0, 22, 12) #zone de collision de l'entité avec des obstacles
         self.collision = self.feet #zone de collision de l'entité avec des projectiles (parfois différente)
         self.old_position = self.position.copy()
 

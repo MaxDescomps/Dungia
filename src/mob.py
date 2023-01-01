@@ -122,7 +122,7 @@ class Android(Mob):
         self.speed = 0.5
         self.collision = copy.copy(self.feet)
         self.collision.height += 12
-        self.weapon = Remington(50, 1, 2, "3")
+        self.weapon = Remington(50, 1, 2, "3", 0.5)
         self.weapon_rate_clock = 0
 
     def update(self):
@@ -229,7 +229,7 @@ class Android(Mob):
         shots = self.weapon.shoot(self)
 
         for shot in shots:
-            self.player.map_manager.get_group().add(shot)
+            self.player.map_manager.get_group().add(shot, layer=4)
             self.player.map_manager.get_mob_shots().append(shot)
 
 class Mobot(Mob):
@@ -350,7 +350,7 @@ class Mobot(Mob):
             shots = self.weapon.shoot(self, i/4 * math.pi +self.angle_modif)
 
             for shot in shots:
-                self.player.map_manager.get_group().add(shot)
+                self.player.map_manager.get_group().add(shot, layer=4)
                 self.player.map_manager.get_mob_shots().append(shot)
         
         self.angle_modif += 0.2

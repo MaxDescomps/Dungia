@@ -31,6 +31,7 @@ class Player(Entity):
         self.take_weapon("x-tech")
         self.take_weapon("ray-gun")
         self.take_weapon("atomus")
+        self.take_weapon("gun")
 
         #raccourcis
         self.weapon = self.weapons[self.weapon_index]
@@ -100,7 +101,7 @@ class Player(Entity):
             shots = self.weapon.shoot(self)
             for shot in shots:
                 self.map_manager.get_player_shots().append(shot)
-                self.map_manager.get_group().add(shot)
+                self.map_manager.get_group().add(shot, layer = 4)
 
     def update(self):
         if self.pdv > 0:
@@ -132,8 +133,12 @@ class Player(Entity):
         self.weapon.pos[1] = self.weapon.rect[1]
 
         #met la position du tir à jour
-        self.weapon.pos[0] += 18 * self.weapon.speed_x
-        self.weapon.pos[1] += 18 * self.weapon.speed_y
+        mult = 18 #distance entre le corps et l'arme
+        if isinstance(self.weapon, Gun):
+            mult -= 4
+
+        self.weapon.pos[0] += mult * self.weapon.speed_x
+        self.weapon.pos[1] += mult * self.weapon.speed_y
 
         #maj du rectangle d'affichage
         self.weapon.rect.topleft = self.weapon.pos
