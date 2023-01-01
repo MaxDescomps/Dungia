@@ -88,4 +88,5 @@ def list_weapons():
     weapons["x-tech"] = Weapon(20, 1, 3, "8")
     weapons["ray-gun"] = Weapon(20, 1, 3, "9")
     weapons["atomus"] = Weapon(4, 0.5, 3, "10")
+    # weapons["atomus"] = Weapon(4, 10, 10, "10")
     weapons["gun"] = Gun(16, 2, 3, "11")

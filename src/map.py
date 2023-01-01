@@ -12,6 +12,8 @@ class Room:
     doors: list[Door]
     mobs: list[Mob]
     mob_spawns: list[(int, int)]
+    boss: list[Mob]
+    boss_spawns: list[(int, int)]
     fighting_mobs: list[Mob]
     walls: list[pygame.Rect]
     acids: list[pygame.Rect]
@@ -248,19 +250,33 @@ class MapManager:
         room = self.current_room
 
         #si pièce hostile
-        if room.mobs:
+        if room.mobs or room.boss:
             #fermeture des portes
             for door in room.doors:
                 door.closing = True
 
+            #spawn des boss
+            try:
+                boss = room.boss.pop(0)
+            except:
+                #plus de boss à faire apparaître
+                pass
+            else:
+                boss.teleport_spawn(room.boss_spawns[0])
+                room.fighting_mobs.append(boss)
+                self.get_group().add(boss)
+
+                if boss.weapon:
+                    self.get_group().add(boss.weapon, layer=1) #ajout de l'arme du mob au groupe de calques
+
             #spawn des mobs
             spawn_index = 0
 
-            for i in range(4):
+            while len(room.fighting_mobs) <= 4:
                 try:
                     mob = room.mobs.pop(0)
                 except:
-                    #plus de mobs à faire apparaitre
+                    #plus de mobs à faire apparaître
                     break
                 else:
                     mob.teleport_spawn(room.mob_spawns[spawn_index])
@@ -307,6 +323,7 @@ class MapManager:
         mob_shots = [] #liste des tirs des monstres
         doors = [] #liste des portes de la carte
         mob_spawns = [] #liste des points de spawn pour mob dans la carte
+        boss_spawns = [] #liste des points de spawn pour boss dans la carte
         walls = [] #liste des rectangles de collision bloquants
         acids = [] #liste des cases acides
 
@@ -329,6 +346,9 @@ class MapManager:
             elif obj.name == "acid":
                 acids.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
 
+            elif obj.name == "boss_spawn":
+                boss_spawns.append((obj.x, obj.y))
+
             else:
                 for i in range (1,6):
                     if obj.name == f"mob_spawn{i}":
@@ -343,6 +363,12 @@ class MapManager:
             if obj.name == "room":
                 #rectangle de la pièce
                 room_rect = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
+
+                #récupération des points de spawn des boss de la pièce
+                room_boss_spawns = []
+                for boss_spawn in boss_spawns:
+                    if room_rect.collidepoint(boss_spawn):
+                        room_boss_spawns.append(boss_spawn)
 
                 #récupération des points de spawn des mobs de la pièce
                 room_mob_spawns = []
@@ -374,7 +400,7 @@ class MapManager:
                 #mobs combattants dans la pièce
                 room_fighting_mobs = []
 
-                #récuprération des mobs de la pièce?
+                #récuprération des mobs de la pièce
                 room_mobs = []
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
                     for i in range(5):
@@ -386,7 +412,12 @@ class MapManager:
                         else:
                             room_mobs.append(Android(room_fighting_mobs, self.player, 1, 1))
 
-                rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, room_fighting_mobs, room_walls, room_acids))
+                #récuprération des boss de la pièce
+                room_boss = []
+                if room_boss_spawns: #si la pièce est prévue pour faire spawn de boss
+                    room_boss.append(Boss(room_fighting_mobs, self.player, 1, 2))
+
+                rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, room_boss, room_boss_spawns, room_fighting_mobs, room_walls, room_acids))
 
 
         # dessiner le groupe de calques

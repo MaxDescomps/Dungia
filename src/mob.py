@@ -38,7 +38,8 @@ class Mob(Entity):
             self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche
             self.feet.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
         else:
-            self.weapon.kill()
+            if self.weapon:
+                self.weapon.kill()
 
             self.kill() #retire le sprite des groupes d'affichage
             self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce
@@ -347,7 +348,7 @@ class Mobot(Mob):
     def shoot(self):
 
         for i in range(-4, 4, 2):
-            shots = self.weapon.shoot(self, i/4 * math.pi +self.angle_modif)
+            shots = self.weapon.shoot(self, i/4 * math.pi + self.angle_modif)
 
             for shot in shots:
                 self.player.map_manager.get_group().add(shot, layer=4)
@@ -359,3 +360,34 @@ class Boss(Mob):
 
     def __init__(self, fighting_mobs, player, speed, damage):
         super().__init__("boss", fighting_mobs, player, speed, damage)
+
+        self.angle_modif = 0
+        self.max_weapon_rate_clock = 15
+        self.pdv = 100
+
+    def shoot(self):
+        shots = []
+
+        for i in range(-4, 4, 2):
+            shots.append(CurveShot(0.1, math.pi/2, 1, self, 2, "techpack/Projectiles/projectiles x1", 1, i/4 * math.pi + self.angle_modif))
+
+        for shot in shots:
+            self.player.map_manager.get_group().add(shot, layer=4)
+            self.player.map_manager.get_mob_shots().append(shot)
+        
+        self.angle_modif += 0.2
+
+    def update(self):
+        if self.pdv > 0:
+            #tire sur le joueur
+            if self.weapon_rate_clock > 0:
+                self.weapon_rate_clock -= 1
+            else:
+                self.shoot()
+                self.weapon_rate_clock = self.max_weapon_rate_clock
+
+            self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche
+            self.feet.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
+        else:
+            self.kill() #retire le sprite des groupes d'affichage
+            self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce

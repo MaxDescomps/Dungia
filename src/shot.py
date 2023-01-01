@@ -22,6 +22,8 @@ class Shot(AnimateSprite):
         """
         super().__init__(name)
 
+        self.speed = speed
+
         self.image = pygame.image.load(f"../image/bullets/{weapon_name}.png").convert_alpha()
 
         # self.image = self.get_image(self.sprite_sheet, 0, 0) #balles du spritesheet
@@ -37,8 +39,8 @@ class Shot(AnimateSprite):
         self.angle = angle
         
         #vitesse de déplacement du tir
-        self.speed_x = speed * math.cos(self.angle)
-        self.speed_y = speed * math.sin(self.angle)
+        self.speed_x = self.speed * math.cos(self.angle)
+        self.speed_y = self.speed * math.sin(self.angle)
 
         #rotation de l'image du tir en fonction de l'angle (optionnel si balle circulaire)
         self.rotate_img()
@@ -75,3 +77,42 @@ class Shot(AnimateSprite):
         self.rect = rotated_image.get_rect(center = self.rect.center) #on corrige la modification du centre de l'image causé par le changement de son rectangle après rotation
 
         self.image = rotated_image
+
+class CurveShot(Shot):
+    def __init__(self, modif_angle, max_angle, max_modif_clock, entity, speed, name, damage, angle, weapon_name=0):
+        super().__init__(entity, speed, name, damage, angle, weapon_name)
+
+        self.base_angle = angle
+        self.max_angle = max_angle #valeur maximum de l'angle modifié
+        self.modif_angle = modif_angle #valeur ajoutée à l'angle du tir à chaque modification
+        self.added_angle = 0 #somme des modifications sur l'angle
+        self.max_modif_clock = max_modif_clock
+        self.modif_clock = self.max_modif_clock
+    
+    def update(self):
+        """met la position du tir à jour"""
+
+        if self.added_angle < self.max_angle and self.modif_clock <= 0:
+
+            self.added_angle += self.modif_angle
+            
+            #vitesse de déplacement du tir
+            self.speed_x = self.speed * math.cos(self.angle + self.added_angle)
+            self.speed_y = self.speed * math.sin(self.angle + self.added_angle)
+
+            #calcul du rectangle de collision plus précis
+            self.colliderect.center = self.rect.center
+
+            #remise en route du compteur
+            self.modif_clock += self.max_modif_clock
+        else:
+            self.modif_clock -= 1
+        
+        self.pos[0] += self.speed_x
+        self.pos[1] += self.speed_y
+
+        #maj du rectangle d'affichage
+        self.rect.topleft = self.pos
+        
+        #maj du rectangle de collision
+        self.colliderect.center = self.rect.center
