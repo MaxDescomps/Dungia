@@ -11,7 +11,7 @@ def calc_angle(src_pos, dest_pos) -> float:
 class Shot(AnimateSprite):
     """Classe d'un tir"""
 
-    def __init__(self, entity, speed, name, damage, angle, weapon_name=0):
+    def __init__(self, entity, speed, name, damage, angle, weapon_name=9, oriented=False):
         """
         constructeur d'objet Playershot
 
@@ -43,7 +43,8 @@ class Shot(AnimateSprite):
         self.speed_y = self.speed * math.sin(self.angle)
 
         #rotation de l'image du tir en fonction de l'angle (optionnel si balle circulaire)
-        self.rotate_img()
+        if oriented:
+            self.rotate_img()
 
         #calcul du rectangle de collision plus précis
         self.colliderect = pygame.Rect(0, 0, 8, 8)
@@ -79,8 +80,8 @@ class Shot(AnimateSprite):
         self.image = rotated_image
 
 class CurveShot(Shot):
-    def __init__(self, modif_angle, max_angle, max_modif_clock, entity, speed, name, damage, angle, weapon_name=0):
-        super().__init__(entity, speed, name, damage, angle, weapon_name)
+    def __init__(self, modif_angle, max_angle, max_modif_clock, entity, speed, name, damage, angle, weapon_name=0, oriented=False):
+        super().__init__(entity, speed, name, damage, angle, weapon_name, oriented)
 
         self.base_angle = angle
         self.max_angle = max_angle #valeur maximum de l'angle modifié

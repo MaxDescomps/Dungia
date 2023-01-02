@@ -76,7 +76,7 @@ class Mob(Entity):
             self.change_animation()
         
     def shoot(self):
-        shot = Shot(self, 3, "techpack/Projectiles/projectiles x1", 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)))
+        shot = Shot(self, 3, "techpack/Projectiles/projectiles x1", 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)), oriented=True)
         self.player.map_manager.get_group().add(shot)
         self.player.map_manager.get_mob_shots().append(shot)
 
@@ -368,8 +368,8 @@ class Boss(Mob):
     def shoot(self):
         shots = []
 
-        for i in range(-4, 4, 2):
-            shots.append(CurveShot(0.1, math.pi/2, 1, self, 2, "techpack/Projectiles/projectiles x1", 1, i/4 * math.pi + self.angle_modif))
+        for i in range(-8, 8, 1):
+            shots.append(CurveShot(0.1, math.pi/2, 1, self, 2, "techpack/Projectiles/projectiles x1", 1, i/8 * math.pi + self.angle_modif))
 
         for shot in shots:
             self.player.map_manager.get_group().add(shot, layer=4)

@@ -199,6 +199,10 @@ class MapManager:
                     if mob.feet.colliderect(self.player.feet):
                         mob.move_back()
                         self.player.take_damage()
+
+                    #monstre - porte
+                    elif mob.feet.collidelist(self.current_room.doors) > -1:
+                        mob.move_back()
                     
                     #monstre - mur
                     elif mob.feet.collidelist(self.current_room.walls) > -1:
