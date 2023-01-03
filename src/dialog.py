@@ -25,7 +25,7 @@ class DialogBox:
             #close dialog
             self.reading = False
 
-    def execute(self, dialog=[]):
+    def execute(self, map_level, dialog=[]):
         if self.reading:
             self.next_text()
         else:

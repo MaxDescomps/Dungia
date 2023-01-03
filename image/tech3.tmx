@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="180" height="180" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="264">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="180" height="180" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="268">
  <tileset firstgid="1" source="tech.tsx"/>
  <tileset firstgid="852" source="techprops.tsx"/>
  <tileset firstgid="1380" source="TX Tileset Wall.tsx"/>
@@ -441,6 +441,15 @@
   <object id="256" name="collision" x="3008" y="3102.73" width="8.18182" height="97.2727"/>
   <object id="257" name="collision" x="3159.25" y="3103.5" width="8.75" height="96.5"/>
   <object id="258" name="portal_tech3" x="3072" y="3136" width="32" height="32"/>
+  <object id="264" name="boss_spawn" x="3581.67" y="3271">
+   <point/>
+  </object>
+  <object id="266" name="spawn_tech3" x="4994" y="4951.5">
+   <point/>
+  </object>
+  <object id="267" name="paul" x="3005" y="3259">
+   <point/>
+  </object>
  </objectgroup>
  <objectgroup id="8" name="Rooms">
   <object id="76" name="room" x="4800" y="4768" width="320" height="384"/>
@@ -449,9 +458,6 @@
   <object id="100" name="room" x="4928" y="4608" width="128" height="160"/>
   <object id="101" name="room" x="5088" y="4192" width="128" height="96"/>
   <object id="102" name="room" x="4800" y="3808" width="128" height="64"/>
-  <object id="103" name="spawn_tech3" x="4950.18" y="4938.91">
-   <point/>
-  </object>
   <object id="112" name="room" x="4768" y="4288" width="608" height="320"/>
   <object id="113" name="room" x="4672" y="4608" width="256" height="128"/>
   <object id="114" name="room" x="4064" y="4416" width="608" height="512"/>
@@ -466,9 +472,6 @@
   <object id="260" name="room" x="3328" y="2976" width="512" height="576"/>
   <object id="261" name="room" x="3232" y="3200" width="96" height="128"/>
   <object id="262" name="room" x="2944" y="3072" width="288" height="288"/>
-  <object id="263" name="boss_spawn" x="3584.67" y="3271">
-   <point/>
-  </object>
  </objectgroup>
  <layer id="2" name="walls" width="180" height="180">
   <data encoding="csv">

@@ -238,10 +238,10 @@ class Mobot(Mob):
     def __init__(self, fighting_mobs, player, speed, damage):
         super().__init__("mobot", fighting_mobs, player, speed, damage)
 
-        self.speed = 0.7
+        self.speed = 0.6
         self.collision = copy.copy(self.feet)
         self.collision.height += 12
-        self.weapon = Weapon(15, 1, 2, "10")
+        self.weapon = Weapon(25, 1, 2, "10")
         self.weapon_rate_clock = 0
         self.angle_modif = 0
 

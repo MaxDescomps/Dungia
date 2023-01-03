@@ -49,18 +49,13 @@ class MapManager:
         self.current_map = "home"
         self.current_room = None
         self.zoom = 3
+        self.map_names = ["tech3", "tech4"]
+        self.map_level = 0 #le numéro de l'étage actuel
 
-        self.register_map("tech1", portals=[
-            Portal(from_world="tech1", origin_point="enter_tech1", target_world="tech2", teleport_point="spawn_tech2")
-        ], npcs=[
-            NPC("paul", dialog=["Salut c'est Julien je vous souhaite la bienvenue!", "Je vais vous expliquer comment gagner de l'argent!"])
-        ])
-        self.register_map("tech2", portals=[
-            Portal(from_world="tech2", origin_point="enter_tech1", target_world="tech1", teleport_point="spawn_tech2")
-        ])
-        self.register_map("tech3")
+        next_level = random.choice(self.map_names)
+
         self.register_map("home", portals=[
-            Portal(from_world="home", origin_point="portal_home", target_world="tech3", teleport_point="spawn_tech3")
+            Portal(from_world="home", origin_point="portal_home", target_world=next_level, teleport_point=f"spawn_{next_level}")
         ], npcs=[
             NPC("paul", dialog=["Cet endroit ne devrait pas exister...", "Vous voyez la grande pierre de l'autre coté?", "C'est un portail traversez-le!", "Vous ferez peut-être revivre l'esprit linux..."])
         ])
@@ -91,9 +86,20 @@ class MapManager:
             portal_rect = pygame.Rect(point.x, point.y, point.width, point.height)#recree a chaque appel? + toute la map au lieu de room
 
             if self.player.feet.colliderect(portal_rect):
-                copy_portal = portal
+                self.map_level += 1 #étage suivant
+
+                next_map_portal = random.choice(self.map_names)
+
+                self.register_map(portal.target_world, portals=[
+                    Portal(from_world=portal.target_world, origin_point=f"portal_{portal.target_world}", target_world=next_map_portal, teleport_point=f"spawn_{next_map_portal}")
+                ], npcs=[
+                    NPC("paul", dialog=[f"Vous êtes à l'étage {self.map_level}"])
+                ])
+
                 self.current_map = portal.target_world
-                self.teleport_player(copy_portal.teleport_point)
+                self.teleport_player(portal.teleport_point)
+                self.teleport_npcs()
+
                 player_collided = True
                 break #collision trouvée
 
@@ -302,7 +308,7 @@ class MapManager:
         Téléporte le joueur sur un point de spawn dans une carte
         
         Args:
-            name (str): nom du point de spawn
+            name (str): nom du tmx de la carte à charger
         """
         self.player.weapon.kill() #supprime l'arme du joueur du groupe de calques
 
@@ -409,9 +415,9 @@ class MapManager:
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
                     for i in range(5):
                         rand = random.randint(0,100)
-                        if rand < 33:
+                        if rand < 43:
                             room_mobs.append(Drone(room_fighting_mobs, self.player, 1, 1))
-                        elif rand >= 33 and rand <= 66:
+                        elif rand >= 33 and rand <= 86:
                             room_mobs.append(Mobot(room_fighting_mobs, self.player, 1, 1))
                         else:
                             room_mobs.append(Android(room_fighting_mobs, self.player, 1, 1))
@@ -482,7 +488,7 @@ class MapManager:
         if npcs:
             for npc in npcs:
                 if npc.feet.colliderect(self.player.rect):
-                    dialog_box.execute(npc.dialog)
+                    dialog_box.execute(self.map_level, npc.dialog)
                 else:
                     dialog_box.reading = 0
         else:
@@ -491,10 +497,9 @@ class MapManager:
     def teleport_npcs(self):
         """Place les NPC sur leurs points d'apparition"""
 
-        for map in self.maps:
-            map_data = self.maps[map]
+        map_data = self.maps[self.current_map]
 
-            npcs = map_data.npcs
+        npcs = map_data.npcs
 
-            for npc in npcs:
-                npc.teleport_spawn(map_data)
+        for npc in npcs:
+            npc.teleport_spawn(map_data)
