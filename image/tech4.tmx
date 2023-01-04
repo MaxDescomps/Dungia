@@ -295,7 +295,7 @@
   <object id="221" name="spawn_tech4" x="496.5" y="2593">
    <point/>
   </object>
-  <object id="222" name="mob_spawn1" x="322.91" y="2093.42">
+  <object id="222" name="mob_spawn1" x="172.243" y="2216.75">
    <point/>
   </object>
   <object id="223" name="mob_spawn2" x="127.5" y="2162.26">
@@ -304,10 +304,10 @@
   <object id="224" name="mob_spawn3" x="117.5" y="2090.67">
    <point/>
   </object>
-  <object id="225" name="mob_spawn4" x="463.66" y="2157.01">
+  <object id="225" name="mob_spawn4" x="607.66" y="2073.01">
    <point/>
   </object>
-  <object id="226" name="mob_spawn5" x="460" y="2068.67">
+  <object id="226" name="mob_spawn5" x="470.667" y="2049.34">
    <point/>
   </object>
   <object id="227" name="mob_spawn1" x="1296.58" y="2340.92">
@@ -325,64 +325,64 @@
   <object id="231" name="mob_spawn5" x="1104.33" y="2194.83">
    <point/>
   </object>
-  <object id="232" name="mob_spawn1" x="1264.92" y="1723.3">
+  <object id="232" name="mob_spawn1" x="1041.59" y="1547.3">
    <point/>
   </object>
-  <object id="233" name="mob_spawn2" x="1224.17" y="1825.47">
+  <object id="233" name="mob_spawn2" x="1372.84" y="1453.47">
    <point/>
   </object>
-  <object id="234" name="mob_spawn3" x="1188.84" y="1608.55">
+  <object id="234" name="mob_spawn3" x="1052.51" y="1908.05">
    <point/>
   </object>
-  <object id="235" name="mob_spawn4" x="1333.66" y="1605.55">
+  <object id="235" name="mob_spawn4" x="1413.66" y="1487.55">
    <point/>
   </object>
-  <object id="236" name="mob_spawn5" x="1072.67" y="1577.21">
+  <object id="236" name="mob_spawn5" x="1051.34" y="1472.54">
    <point/>
   </object>
   <object id="237" name="mob_spawn1" x="2207.25" y="2195.09">
    <point/>
   </object>
-  <object id="238" name="mob_spawn2" x="2030.17" y="2030.59">
+  <object id="238" name="mob_spawn2" x="1901.17" y="2046.59">
    <point/>
   </object>
-  <object id="239" name="mob_spawn3" x="1946.17" y="2129">
+  <object id="239" name="mob_spawn3" x="1920.17" y="2105">
    <point/>
   </object>
   <object id="240" name="mob_spawn4" x="2205.66" y="2118.34">
    <point/>
   </object>
-  <object id="241" name="mob_spawn5" x="1951" y="2049">
+  <object id="241" name="mob_spawn5" x="1957" y="2053">
    <point/>
   </object>
-  <object id="242" name="mob_spawn1" x="2073.25" y="1733.09">
+  <object id="242" name="mob_spawn1" x="2104.25" y="1621.09">
    <point/>
   </object>
-  <object id="243" name="mob_spawn2" x="2262.17" y="1662.59">
+  <object id="243" name="mob_spawn2" x="2271.17" y="1636.59">
    <point/>
   </object>
-  <object id="244" name="mob_spawn3" x="2169.17" y="1718">
+  <object id="244" name="mob_spawn3" x="1925.17" y="1814">
    <point/>
   </object>
-  <object id="245" name="mob_spawn4" x="1893.66" y="1773.34">
+  <object id="245" name="mob_spawn4" x="1931.66" y="1605.34">
    <point/>
   </object>
-  <object id="246" name="mob_spawn5" x="1980" y="1688">
+  <object id="246" name="mob_spawn5" x="2061" y="1659">
    <point/>
   </object>
-  <object id="247" name="mob_spawn1" x="530.917" y="1702.76">
+  <object id="247" name="mob_spawn1" x="572.25" y="1784.76">
    <point/>
   </object>
-  <object id="248" name="mob_spawn2" x="330.837" y="1659.59">
+  <object id="248" name="mob_spawn2" x="158.17" y="1608.26">
    <point/>
   </object>
-  <object id="249" name="mob_spawn3" x="285.503" y="1716">
+  <object id="249" name="mob_spawn3" x="153.503" y="1660.67">
    <point/>
   </object>
   <object id="250" name="mob_spawn4" x="180.993" y="1763.01">
    <point/>
   </object>
-  <object id="251" name="mob_spawn5" x="242" y="1647.33">
+  <object id="251" name="mob_spawn5" x="515.333" y="1812.66">
    <point/>
   </object>
   <object id="252" name="mob_spawn1" x="584.917" y="1200.09">
@@ -397,10 +397,10 @@
   <object id="255" name="mob_spawn4" x="254.993" y="1205.67">
    <point/>
   </object>
-  <object id="256" name="mob_spawn5" x="367.333" y="1154">
+  <object id="256" name="mob_spawn5" x="197.333" y="1202">
    <point/>
   </object>
-  <object id="257" name="mob_spawn1" x="1206.25" y="960.09">
+  <object id="257" name="mob_spawn1" x="1197.16" y="860.09">
    <point/>
   </object>
   <object id="258" name="mob_spawn2" x="1016.17" y="991.59">
@@ -420,7 +420,7 @@
   </object>
   <object id="263" name="door" x="256" y="1824" width="64" height="32"/>
  </objectgroup>
- <objectgroup id="15" name="Rooms">
+ <objectgroup id="15" name="Rooms" visible="0">
   <object id="1" name="room" x="2208" y="736" width="288" height="288"/>
   <object id="2" name="room" x="2112" y="864" width="96" height="128"/>
   <object id="3" name="room" x="1600" y="640" width="512" height="576"/>
