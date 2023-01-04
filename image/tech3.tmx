@@ -251,9 +251,6 @@
   <object id="83" name="mob_spawn4" x="5303.83" y="4515.67">
    <point/>
   </object>
-  <object id="84" name="mob_spawn5" x="4903.5" y="4384">
-   <point/>
-  </object>
   <object id="85" name="mob_spawn1" x="5112.91" y="3962.75">
    <point/>
   </object>
@@ -266,22 +263,16 @@
   <object id="88" name="mob_spawn4" x="4944.33" y="4142.34">
    <point/>
   </object>
-  <object id="89" name="mob_spawn5" x="5264.67" y="3983.33">
+  <object id="90" name="mob_spawn1" x="4989.25" y="3431.08">
    <point/>
   </object>
-  <object id="90" name="mob_spawn1" x="4975.25" y="3567.75">
+  <object id="91" name="mob_spawn2" x="4964.5" y="3519.25">
    <point/>
   </object>
-  <object id="91" name="mob_spawn2" x="5015.17" y="3620.58">
+  <object id="92" name="mob_spawn3" x="4879.83" y="3536.33">
    <point/>
   </object>
-  <object id="92" name="mob_spawn3" x="5045.83" y="3530.33">
-   <point/>
-  </object>
-  <object id="93" name="mob_spawn4" x="5141.33" y="3520.67">
-   <point/>
-  </object>
-  <object id="94" name="mob_spawn5" x="5041" y="3367">
+  <object id="93" name="mob_spawn4" x="5174.66" y="3515.34">
    <point/>
   </object>
   <object id="95" name="acid" x="4864" y="4448" width="128" height="64"/>
@@ -336,7 +327,7 @@
   <object id="165" name="mob_spawn1" x="4191.25" y="4060.75">
    <point/>
   </object>
-  <object id="166" name="mob_spawn2" x="4533.5" y="4126.25">
+  <object id="166" name="mob_spawn2" x="4534.83" y="4135.58">
    <point/>
   </object>
   <object id="167" name="mob_spawn3" x="4372" y="4021">
@@ -451,7 +442,7 @@
    <point/>
   </object>
  </objectgroup>
- <objectgroup id="8" name="Rooms" visible="0">
+ <objectgroup id="8" name="Rooms">
   <object id="76" name="room" x="4800" y="4768" width="320" height="384"/>
   <object id="78" name="room" x="4768" y="3872" width="576" height="320"/>
   <object id="79" name="room" x="4768" y="3264" width="544" height="544"/>

@@ -49,7 +49,7 @@ class MapManager:
         self.current_map = "home"
         self.current_room = None
         self.zoom = 3
-        self.map_names = ["tech5"]
+        self.map_names = ["tech3", "tech4", "tech5"]
         self.map_level = 0 #le numéro de l'étage actuel
 
         next_level = random.choice(self.map_names)
