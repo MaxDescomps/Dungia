@@ -362,14 +362,15 @@ class Boss(Mob):
         super().__init__("boss", fighting_mobs, player, speed, damage)
 
         self.angle_modif = 0
-        self.max_weapon_rate_clock = 15
+        self.max_weapon_rate_clock = 40
         self.pdv = 100
 
     def shoot(self):
         shots = []
 
-        for i in range(-8, 8, 1):
-            shots.append(CurveShot(0.1, math.pi/2, 1, self, 2, "techpack/Projectiles/projectiles x1", 1, i/8 * math.pi + self.angle_modif))
+        for i in range(-6, 6, 1):
+            shots.append(CurveShot(0.01, math.pi, 1, self, 2, "techpack/Projectiles/projectiles x1", 1, i/6 * math.pi + self.angle_modif))
+            shots.append(CurveShot(-0.01, math.pi, 1, self, 2, "techpack/Projectiles/projectiles x1", 1, i/6 * math.pi + self.angle_modif))
 
         for shot in shots:
             self.player.map_manager.get_group().add(shot, layer=4)

@@ -87,13 +87,18 @@ class CurveShot(Shot):
         self.max_angle = max_angle #valeur maximum de l'angle modifié
         self.modif_angle = modif_angle #valeur ajoutée à l'angle du tir à chaque modification
         self.added_angle = 0 #somme des modifications sur l'angle
-        self.max_modif_clock = max_modif_clock
+        self.max_modif_clock = max_modif_clock #décompte avant chaque modification de l'angle
         self.modif_clock = self.max_modif_clock
+
+        if self.modif_angle < 0:
+            self.angle_sign = -1
+        else:
+            self.angle_sign = 1
     
     def update(self):
         """met la position du tir à jour"""
 
-        if self.added_angle < self.max_angle and self.modif_clock <= 0:
+        if self.added_angle * self.angle_sign < self.max_angle and self.modif_clock <= 0:
 
             self.added_angle += self.modif_angle
             
