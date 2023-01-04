@@ -49,7 +49,7 @@ class MapManager:
         self.current_map = "home"
         self.current_room = None
         self.zoom = 3
-        self.map_names = ["tech3", "tech4"]
+        self.map_names = ["tech5"]
         self.map_level = 0 #le numéro de l'étage actuel
 
         next_level = random.choice(self.map_names)
@@ -282,7 +282,12 @@ class MapManager:
             #spawn des mobs
             spawn_index = 0
 
-            while len(room.fighting_mobs) <= 4:
+            if 4 <= len(room.fighting_mobs):
+                spawn_limit = 4
+            else:
+                spawn_limit = len(room.mob_spawns)
+            
+            while len(room.fighting_mobs) < spawn_limit:
                 try:
                     mob = room.mobs.pop(0)
                 except:
@@ -413,13 +418,13 @@ class MapManager:
                 #récuprération des mobs de la pièce
                 room_mobs = []
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
-                    for i in range(5):
+                    for i in range(8):
                         rand = random.randint(0,100)
-                        if rand < 43:
+                        if rand < 1/6 * 100:
                             room_mobs.append(Drone(room_fighting_mobs, self.player, 1, 1))
-                        elif rand >= 33 and rand <= 86:
+                        elif rand < 2/6 * 100:
                             room_mobs.append(Mobot(room_fighting_mobs, self.player, 1, 1))
-                        else:
+                        elif rand < 3/6 * 100:
                             room_mobs.append(Android(room_fighting_mobs, self.player, 1, 1))
 
                 #récuprération des boss de la pièce
