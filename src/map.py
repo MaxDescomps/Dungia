@@ -282,7 +282,7 @@ class MapManager:
             #spawn des mobs
             spawn_index = 0
 
-            if 4 <= len(room.fighting_mobs):
+            if 4 <= len(room.mob_spawns):
                 spawn_limit = 4
             else:
                 spawn_limit = len(room.mob_spawns)
@@ -418,7 +418,7 @@ class MapManager:
                 #récuprération des mobs de la pièce
                 room_mobs = []
                 if room_mob_spawns: #si la pièce est prévue pour faire spawn des mobs
-                    for i in range(8):
+                    for i in range(len(room_mob_spawns) * 2):
                         rand = random.randint(0,100)
                         if rand < 1/6 * 100:
                             room_mobs.append(Drone(room_fighting_mobs, self.player, 1, 1))
