@@ -79,10 +79,10 @@ class Menu():
         pygame.mixer.music.load("../music/intro.wav")
         pygame.mixer.music.play(-1) #répète la musique à indéfiniment
 
-        run = True
+        running = True
 
         #boucle principale du menu de démarrage
-        while run:
+        while running:
 
             self.clock.tick(self.FPS) #limite de FPS
             current_time = pygame.time.get_ticks()
@@ -108,16 +108,19 @@ class Menu():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         pygame.mixer.music.stop()
-                        game = Game(self.screen)
+                        game = Game(self.screen, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
                         game.run()
 
                         #redémarre le menu si on quitte le jeu
-                        pygame.mixer.music.load("../music/intro.wav")
+                        pygame.mixer.music.load("../music/intro_low.wav")
                         pygame.mixer.music.play(-1)
                         self.scroll = 0
+                    
+                    elif event.key == pygame.K_ESCAPE:
+                        running = False
 
-                if event.type == pygame.QUIT:
-                    run = False
+                elif event.type == pygame.QUIT:
+                    running = False
 
 
     def draw_all(self, player_frame):

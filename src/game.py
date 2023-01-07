@@ -3,12 +3,17 @@ from player import *
 from map import MapManager
 from dialog import DialogBox
 from weapon import list_weapons
+from pause_menu import *
 
 class Game:
 
-    def __init__(self, screen):
+    def __init__(self, screen, SCREEN_WIDTH, SCREEN_HEIGHT):
 
         self.screen = screen
+        self.SCREEN_WIDTH = SCREEN_WIDTH
+        self.SCREEN_HEIGHT = SCREEN_HEIGHT
+
+        self.pause_menu = PauseMenu(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
         
         #initialise le catalogue des armes après la fenetre de jeu
         list_weapons()
@@ -81,6 +86,9 @@ class Game:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     self.map_manager.check_npc_collisions(self.dialog_box)
+                
+                elif event.key == pygame.K_ESCAPE:
+                        self.running = self.pause_menu.deploy()
             
             #évènement souris fin de click
             # elif event.type == pygame.MOUSEBUTTONUP:
