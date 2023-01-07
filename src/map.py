@@ -51,6 +51,7 @@ class MapManager:
         self.zoom = 3
         self.map_names = ["tech3", "tech4", "tech5"]
         self.map_level = 0 #le numéro de l'étage actuel
+        self.boss_fight = False
 
         next_level = random.choice(self.map_names)
 
@@ -98,6 +99,14 @@ class MapManager:
 
                 self.current_map = portal.target_world
                 self.teleport_player(portal.teleport_point)
+
+                if self.map_level > 0:
+                    pygame.mixer.music.load("../music/battle_low.wav")
+                    pygame.mixer.music.play(-1) #répète la musique à indéfiniment
+                else:
+                    pygame.mixer.music.load("../music/mysterious.wav")
+                    pygame.mixer.music.play(-1) #répète la musique à indéfiniment
+
                 self.teleport_npcs()
 
                 player_collided = True
@@ -278,6 +287,10 @@ class MapManager:
                 #plus de boss à faire apparaître
                 pass
             else:
+                pygame.mixer.music.load("../music/boss_low.wav")
+                pygame.mixer.music.play(-1) #répète la musique à indéfiniment
+                self.boss_fight = True
+
                 boss.teleport_spawn(room.boss_spawns[0])
                 room.fighting_mobs.append(boss)
                 self.get_group().add(boss)
@@ -311,6 +324,11 @@ class MapManager:
 
         #si pièce neutre
         else:
+            if self.boss_fight:
+                pygame.mixer.music.load("../music/win_low.wav")
+                pygame.mixer.music.play(-1) #répète la musique à indéfiniment
+                self.boss_fight = False
+
             for door in room.doors:
                 door.opening = True
 

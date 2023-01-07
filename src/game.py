@@ -118,6 +118,9 @@ class Game:
     def run(self):
 
         clock = pygame.time.Clock() #pour limiter les fps
+        
+        pygame.mixer.music.load("../music/mysterious.wav")
+        pygame.mixer.music.play(-1) #répète la musique à indéfiniment
 
         # boucle de jeu
         while self.player.pdv > 0 and self.running:
