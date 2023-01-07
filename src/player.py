@@ -109,8 +109,6 @@ class Player(Entity):
 
             self.rect.topleft = self.position #la position du joueur avec [0,0] le coin superieur gauche
             self.feet.midbottom = self.rect.midbottom #aligne les centres des rect player.feet et player.rect
-        else:
-            exit(0) #game over
 
     def manage_weapon(self):
         #décrémentation du compteur de cadence de tir de l'arme en main

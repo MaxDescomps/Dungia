@@ -13,4 +13,6 @@ def main():
     menu = Menu()
     menu.play()
 
+    pygame.quit() #ferme pygame
+
 main()

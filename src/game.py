@@ -120,7 +120,7 @@ class Game:
         clock = pygame.time.Clock() #pour limiter les fps
 
         # boucle de jeu
-        while self.running:
+        while self.player.pdv > 0 and self.running:
 
             self.player.save_location() #enregistre la position du joueur avant deplacement pour pouvoir revenir en arrière en cas de collision
             self.handle_real_time_input() #gestion input à chaque frame
@@ -131,9 +131,6 @@ class Game:
             self.player.handle_damage() #effet visuel des dégats et gestion du compteur d'invincibilité temporaire
             # self.debug()
 
-
             pygame.display.flip() #rafraîchit l'affichage
 
             clock.tick(60) #60 fps
-
-        pygame.quit() #ferme pygame

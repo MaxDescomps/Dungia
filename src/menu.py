@@ -76,11 +76,8 @@ class Menu():
         player_frame = 0 #numéro de sprite du personnage affiché
 
         # music
-        music = pygame.mixer.music.load("../music/intro.wav")
+        pygame.mixer.music.load("../music/intro.wav")
         pygame.mixer.music.play()
-
-        # define games variables
-        game_pause = False
 
         run = True
 
@@ -97,9 +94,7 @@ class Menu():
                     player_frame = 0
 
             #affichage
-            self.draw_bg()
-            self.draw_ground()
-            self.draw_character(player_frame)
+            self.draw_all(player_frame)
 
             #renouvellement de l'affichage une fois fini
             if self.scroll > 3000:
@@ -107,23 +102,31 @@ class Menu():
             else:
                 self.scroll += 1
 
-            # vérirife si le jeu est en pause
-            if game_pause == True:
-                self.draw_text("Pause", self.font, self.TEXT_COL, 160, 160)
-                # menu d'affichage
-            else:
-                self.draw_text("Press Space Button", self.font, self.TEXT_COL, 100, self.font_size)
+            pygame.display.update()
 
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        game_pause=True
                         pygame.mixer.music.stop()
                         game = Game(self.screen)
                         game.run()
+
+                        #redémarre le menu si on quitte le jeu
+                        pygame.mixer.music.load("../music/intro.wav")
+                        pygame.mixer.music.play()
+                        self.scroll = 0
+
                 if event.type == pygame.QUIT:
                     run = False
-            pygame.display.update()
+
+
+    def draw_all(self, player_frame):
+        """Affichage complet du menu de démarrage"""
+
+        self.draw_bg()
+        self.draw_ground()
+        self.draw_character(player_frame)
+        self.draw_text("Press Space Button", self.font, self.TEXT_COL, 100, self.font_size)
 
     def draw_character(self, player_frame):
         """Affichage du personnage"""
