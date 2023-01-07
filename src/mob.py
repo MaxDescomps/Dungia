@@ -79,6 +79,7 @@ class Mob(Entity):
         shot = Shot(self, 3, "techpack/Projectiles/projectiles x1", 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)), oriented=True)
         self.player.map_manager.get_group().add(shot)
         self.player.map_manager.get_mob_shots().append(shot)
+        pygame.mixer.Channel(2).play(pygame.mixer.Sound("../music/mobshot.wav"))
 
 class Drone(Mob):
 
@@ -227,6 +228,7 @@ class Android(Mob):
         return image
 
     def shoot(self):
+        pygame.mixer.Channel(2).play(pygame.mixer.Sound("../music/mobshot.wav"))
         shots = self.weapon.shoot(self)
 
         for shot in shots:
@@ -347,6 +349,7 @@ class Mobot(Mob):
 
     def shoot(self):
 
+        pygame.mixer.Channel(2).play(pygame.mixer.Sound("../music/mobshot.wav"))
         for i in range(-4, 4, 2):
             shots = self.weapon.shoot(self, i/4 * math.pi + self.angle_modif)
 

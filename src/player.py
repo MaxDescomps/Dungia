@@ -99,6 +99,7 @@ class Player(Entity):
         if not self.weapon_rate_clocks[self.weapon_index]:
             self.weapon_rate_clocks[self.weapon_index] = self.weapon.max_rate_clock
             shots = self.weapon.shoot(self)
+            pygame.mixer.Channel(0).play(pygame.mixer.Sound("../music/gunshot_lowerer.wav"))
             for shot in shots:
                 self.map_manager.get_player_shots().append(shot)
                 self.map_manager.get_group().add(shot, layer = 4)
@@ -178,6 +179,7 @@ class Player(Entity):
 
     def take_damage(self):
         if not self.damage_clock:
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound("../music/player_hurt.wav"))
             self.damage_clock = 60
             self.pdv -= 1
             self.get_pdv_image()

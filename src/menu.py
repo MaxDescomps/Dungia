@@ -77,7 +77,7 @@ class Menu():
 
         # music
         pygame.mixer.music.load("../music/intro.wav")
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(-1) #répète la musique à indéfiniment
 
         run = True
 
@@ -113,7 +113,7 @@ class Menu():
 
                         #redémarre le menu si on quitte le jeu
                         pygame.mixer.music.load("../music/intro.wav")
-                        pygame.mixer.music.play()
+                        pygame.mixer.music.play(-1)
                         self.scroll = 0
 
                 if event.type == pygame.QUIT:
