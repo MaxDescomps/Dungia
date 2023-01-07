@@ -9,7 +9,7 @@ class Game:
     def __init__(self):
         # fenetre de jeu
         self.screen = pygame.display.set_mode((1920,1080), pygame.FULLSCREEN)
-        pygame.display.set_caption("esieageon")
+        pygame.display.set_caption("Dungia")
 
         #initialise le catalogue des armes après la fenetre de jeu
         list_weapons()

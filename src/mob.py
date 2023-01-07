@@ -358,9 +358,10 @@ class Mobot(Mob):
 
 class Boss(Mob):
 
-    def __init__(self, fighting_mobs, player, speed, damage):
+    def __init__(self, fighting_mobs, player, speed, damage, map_level):
         super().__init__("boss", fighting_mobs, player, speed, damage)
 
+        self.speed = 0.2 * map_level
         self.angle_modif = 0
         self.max_weapon_rate_clock = 80
         self.max_pdv = 100
@@ -370,8 +371,8 @@ class Boss(Mob):
         shots = []
 
         for i in range(-6, 6, 1):
-            shots.append(CurveShot(0.005 + ((self.max_pdv - self.pdv) / self.max_pdv) * 0.02, math.pi, 1, self, 1 + (self.max_pdv - self.pdv) / self.max_pdv * 2, "techpack/Projectiles/projectiles x1", 1, i/6 * math.pi + self.angle_modif))
-            shots.append(CurveShot(-0.005 - ((self.max_pdv - self.pdv) / self.max_pdv) * 0.02, math.pi, 1, self, 1 + (self.max_pdv - self.pdv) / self.max_pdv * 2, "techpack/Projectiles/projectiles x1", 1, i/6 * math.pi + self.angle_modif))
+            shots.append(CurveShot(0.005 + ((self.max_pdv - self.pdv) / self.max_pdv) * 0.005 * 3, math.pi, 1, self, 1 + (self.max_pdv - self.pdv) / self.max_pdv * 3, "techpack/Projectiles/projectiles x1", 1, i/6 * math.pi + self.angle_modif))
+            shots.append(CurveShot(-0.005 - ((self.max_pdv - self.pdv) / self.max_pdv) * 0.005 * 3, math.pi, 1, self, 1 + (self.max_pdv - self.pdv) / self.max_pdv * 3, "techpack/Projectiles/projectiles x1", 1, i/6 * math.pi + self.angle_modif))
 
         for shot in shots:
             self.player.map_manager.get_group().add(shot, layer=4)
@@ -388,6 +389,8 @@ class Boss(Mob):
                 self.shoot()
                 self.weapon_rate_clock = self.max_weapon_rate_clock
 
+            self.save_location() #enregistre la position du mob avant deplacement pour pouvoir revenir en arrière en cas de collision
+            self.move_towards_player()
             self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche
             self.feet.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
         else:

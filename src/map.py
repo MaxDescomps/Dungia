@@ -88,7 +88,7 @@ class MapManager:
             if self.player.feet.colliderect(portal_rect):
                 self.map_level += 1 #étage suivant
 
-                next_map_portal = random.choice(self.map_names)
+                next_map_portal = self.select_new_map()
 
                 self.register_map(portal.target_world, portals=[
                     Portal(from_world=portal.target_world, origin_point=f"portal_{portal.target_world}", target_world=next_map_portal, teleport_point=f"spawn_{next_map_portal}")
@@ -250,7 +250,13 @@ class MapManager:
                                                 if mob_rect.collidelist(self.current_room.walls) > -1:
                                                     mob.move_right()
 
+    def select_new_map(self):
+        new_map = random.choice(self.map_names)
 
+        while(new_map == self.current_map):
+            new_map = random.choice(self.map_names)
+        
+        return new_map
 
     def manage_room_hostility(self):
         """
@@ -430,7 +436,7 @@ class MapManager:
                 #récuprération des boss de la pièce
                 room_boss = []
                 if room_boss_spawns: #si la pièce est prévue pour faire spawn de boss
-                    room_boss.append(Boss(room_fighting_mobs, self.player, 1, 2))
+                    room_boss.append(Boss(room_fighting_mobs, self.player, 1, 2, self.map_level))
 
                 rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, room_boss, room_boss_spawns, room_fighting_mobs, room_walls, room_acids))
 
