@@ -1,15 +1,16 @@
 import pygame
-from game import Game
+from menu import Menu
 
 def main():
     #initialisation de pygame
     pygame.init()
+    pygame.mixer.init()
 
     #cache la souris
     pygame.mouse.set_visible(False)
 
-    #lancement du jeu
-    game = Game()
-    game.run()
+    #menu de démarrage du jeu
+    menu = Menu()
+    menu.play()
 
 main()

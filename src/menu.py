@@ -1,121 +1,152 @@
 import pygame
-import spritesheet
-from player import *
-import animation
 from game import Game
 
-pygame.init()
-pygame.mixer.init()
+class Character():
+    def __init__(self, name):
+        self.sheet = pygame.image.load(f'../image/{name}.png').convert_alpha()
 
-clock = pygame.time.Clock()
-FPS = 60
+    def get_image(self, player_frame, width, height, scale):
+        image = pygame.Surface([width, height], pygame.SRCALPHA).convert_alpha()
+        image.blit(self.sheet, (0, 0), ((player_frame * width), 64, width, height))
+        image = pygame.transform.scale(image, (width * scale, height * scale))
+        return image
 
-SCREEN_WIDTH = 1920
-SCREEN_HEIGHT = 1080
+    def get_images(self, animation_steps, player_height, player_scale):
+        player_images = []
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
-pygame.display.set_caption("Main Menu")
+        for x in range(animation_steps):
+            player_images.append(self.get_image(x, 32, player_height, player_scale))
 
-scroll = 0
+        return player_images
 
-sprite_sheet_image = pygame.image.load('../image/player.png').convert_alpha()
-sprite_sheet = spritesheet.SpriteSheet(sprite_sheet_image)
+class Menu():
 
-# create animation list
-animation_list = []
-animation_steps = 3
-last_update = pygame.time.get_ticks()
-animation_cooldown = 150 #vitesse animation personnage
-frame = 0
-player_height = 32
-player_scale = 7 / (1920/SCREEN_WIDTH)
-grass_height = 10
-font_size = int(40 / (800/SCREEN_WIDTH))
+    def __init__(self) -> None:
+        self.clock = pygame.time.Clock()
+        self.FPS = 60
 
-for x in range(animation_steps):
-    animation_list.append(sprite_sheet.get_image(x, 32, player_height, player_scale))
+        # fenêtre de jeu
+        self.SCREEN_WIDTH = 1920
+        self.SCREEN_HEIGHT = 1080
+        self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN)
+        pygame.display.set_caption("Dungia")
 
-# music
-pygame.mixer.music.load("../music/intro.wav")
-pygame.mixer.music.play()
+        #personnage annimé
+        self.player_height = 32 #hauteur du sprite du personnage
+        self.player_scale = 7 / (1920/self.SCREEN_WIDTH) #multiplicateur du sprite du personnage
+        self.player = Character("player")
+        self.animation_steps = 3
+        self.player_images = self.player.get_images(self.animation_steps, self.player_height, self.player_scale)
+        self.player_animation_cooldown = 150 #décompte avant animation du personnage
 
-# image du sol
-ground_image = pygame.image.load(f"../image/paralax/ground.png").convert_alpha()
-ground_image = pygame.transform.scale(ground_image, (SCREEN_WIDTH/2.5, SCREEN_HEIGHT/8))
-ground_width = ground_image.get_width()
-ground_height = ground_image.get_height()
+        #décor
+        self.grass_height = 10 #taille de l'herbe
+        self.get_ground_image()
+        self.get_bg_image()
 
-# image des arbres
-bg_images = []
-for i in range(1, 6):
-    bg_image = pygame.image.load(f"../image/paralax/plx-{i}.png").convert_alpha()
-    bg_image = pygame.transform.scale(bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT - ground_height + grass_height))
-    bg_images.append(bg_image)
-    bg_height = bg_image.get_height()
+        #écritures
+        self.font_size = int(40 / (800/self.SCREEN_WIDTH)) #taille
+        self.font = pygame.font.SysFont("arialblack", self.font_size) #police
+        self.TEXT_COL = (255, 255, 255) #couleur
 
-bg_width = bg_images[0].get_width()
+    def get_ground_image(self):
+        """Image du sol du menu"""
 
-def draw_bg():
-    for x in range(10):
-        speed = 1
-        for i in bg_images:
-            screen.blit(i, ((x * bg_width) - scroll * speed, SCREEN_HEIGHT - ground_height - bg_height + grass_height))
-            speed += 0.2
+        self.ground_image = pygame.image.load(f"../image/paralax/ground.png").convert_alpha()
+        self.ground_image = pygame.transform.scale(self.ground_image, (self.SCREEN_WIDTH/2.5, self.SCREEN_HEIGHT/8))
+        self.ground_width = self.ground_image.get_width()
+        self.ground_height = self.ground_image.get_height()
 
-def draw_ground():
-    for x in range(30):
-        screen.blit(ground_image, ((x * ground_width) - scroll * 2.2, SCREEN_HEIGHT - ground_height))
+    def get_bg_image(self):
+        """Image des arbres du menu"""
 
-# define police
-font = pygame.font.SysFont("arialblack", font_size)
+        self.bg_images = []
+        for i in range(1, 6):
+            bg_image = pygame.image.load(f"../image/paralax/plx-{i}.png").convert_alpha()
+            bg_image = pygame.transform.scale(bg_image, (self.SCREEN_WIDTH, self.SCREEN_HEIGHT - self.ground_height + self.grass_height))
+            self.bg_images.append(bg_image)
+            self.bg_height = bg_image.get_height()
 
-# define colors
-TEXT_COL = (255, 255, 255)
+        self.bg_width = self.bg_images[0].get_width()
 
-# define games variables
-game_pause = False
+    def play(self):
 
-def draw_text(text, font, text_col, x, y):
-    img = font.render(text, True, text_col).convert_alpha()
-    screen.blit(img, (x, y))
+        self.scroll = 0
+        last_player_update = pygame.time.get_ticks() #heure de la dernière animation du personnage
+        player_frame = 0 #numéro de sprite du personnage affiché
 
-run = True
-while run:
+        # music
+        music = pygame.mixer.music.load("../music/intro.wav")
+        pygame.mixer.music.play()
 
-    clock.tick(FPS)
+        # define games variables
+        game_pause = False
 
-    draw_bg()
-    draw_ground()
+        run = True
 
-    current_time = pygame.time.get_ticks()
+        #boucle principale du menu de démarrage
+        while run:
 
-    if current_time - last_update >= animation_cooldown:
-        frame += 1
-        last_update = current_time
-        if frame >= len(animation_list):
-            frame = 0
+            self.clock.tick(self.FPS) #limite de FPS
+            current_time = pygame.time.get_ticks()
 
-    #affichage du personnage
-    screen.blit(animation_list[frame], (100, SCREEN_HEIGHT - ground_height + grass_height - player_height * player_scale))
+            if current_time - last_player_update >= self.player_animation_cooldown:
+                player_frame += 1
+                last_player_update = current_time
+                if player_frame >= len(self.player_images):
+                    player_frame = 0
 
-    # get keypressed
-    if scroll < 3000:
-        scroll += 1
+            #affichage
+            self.draw_bg()
+            self.draw_ground()
+            self.draw_character(player_frame)
 
-    # check if game is paused
-    if game_pause == True:
-        draw_text("Test", font, TEXT_COL, 160, 160)
-        # display menu
-    else:
-        draw_text("Press Space Button", font, TEXT_COL, 100, font_size)
+            #renouvellement de l'affichage une fois fini
+            if self.scroll > 3000:
+                self.scroll = 0
+            else:
+                self.scroll += 1
 
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                game_pause=True
-                pygame.mixer.music.stop()
-                game = Game()
-                game.run()
-        if event.type == pygame.QUIT:
-            run = False
-    pygame.display.update()
+            # vérirife si le jeu est en pause
+            if game_pause == True:
+                self.draw_text("Pause", self.font, self.TEXT_COL, 160, 160)
+                # menu d'affichage
+            else:
+                self.draw_text("Press Space Button", self.font, self.TEXT_COL, 100, self.font_size)
+
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        game_pause=True
+                        pygame.mixer.music.stop()
+                        game = Game(self.screen)
+                        game.run()
+                if event.type == pygame.QUIT:
+                    run = False
+            pygame.display.update()
+
+    def draw_character(self, player_frame):
+        """Affichage du personnage"""
+
+        self.screen.blit(self.player_images[player_frame], (100, self.SCREEN_HEIGHT - self.ground_height + self.grass_height - self.player_height * self.player_scale))            
+
+    def draw_bg(self):
+        """Affiche l'arrière_plan"""
+
+        for x in range(10):
+            speed = 1
+            for i in self.bg_images:
+                self.screen.blit(i, ((x * self.bg_width) - self.scroll * speed, self.SCREEN_HEIGHT - self.ground_height - self.bg_height + self.grass_height))
+                speed += 0.2
+
+    def draw_ground(self):
+        """Affiche le sol"""
+
+        for x in range(30):
+            self.screen.blit(self.ground_image, ((x * self.ground_width) - self.scroll * 2.2, self.SCREEN_HEIGHT - self.ground_height))
+
+    def draw_text(self, text, font, text_col, x, y):
+        """Affiche le texte"""
+
+        img = font.render(text, True, text_col).convert_alpha()
+        self.screen.blit(img, (x, y))

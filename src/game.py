@@ -6,11 +6,10 @@ from weapon import list_weapons
 
 class Game:
 
-    def __init__(self):
-        # fenetre de jeu
-        self.screen = pygame.display.set_mode((1920,1080), pygame.FULLSCREEN)
-        pygame.display.set_caption("Dungia")
+    def __init__(self, screen):
 
+        self.screen = screen
+        
         #initialise le catalogue des armes après la fenetre de jeu
         list_weapons()
 
