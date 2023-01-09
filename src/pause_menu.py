@@ -35,6 +35,7 @@ class PauseMenu(pygame.sprite.Sprite):
     def handle_input(self):
         """Gère les inputs dans le menu pause"""
 
+        clock = pygame.time.Clock() #pour limiter les fps
         running = True
 
         while True:
@@ -60,4 +61,6 @@ class PauseMenu(pygame.sprite.Sprite):
                 elif event.type == pygame.QUIT:
                     running = False
                     return running
+
+            clock.tick(60) #60 fps
                 

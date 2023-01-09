@@ -37,7 +37,7 @@ class Menu():
         self.player = Character("player")
         self.animation_steps = 3
         self.player_images = self.player.get_images(self.animation_steps, self.player_height, self.player_scale)
-        self.player_animation_cooldown = 150 #décompte avant animation du personnage
+        self.player_animation_cooldown = 120 #décompte avant animation du personnage
 
         #décor
         self.grass_height = 10 #taille de l'herbe
@@ -80,6 +80,7 @@ class Menu():
         pygame.mixer.music.play(-1) #répète la musique à indéfiniment
 
         running = True
+        clock = pygame.time.Clock() #pour limiter les fps
 
         #boucle principale du menu de démarrage
         while running:
@@ -100,7 +101,7 @@ class Menu():
             if self.scroll > 3000:
                 self.scroll = 0
             else:
-                self.scroll += 1
+                self.scroll += 2
 
             pygame.display.update()
 
@@ -121,6 +122,7 @@ class Menu():
 
                 elif event.type == pygame.QUIT:
                     running = False
+            clock.tick(50) #50 fps
 
 
     def draw_all(self, player_frame):

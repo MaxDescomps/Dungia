@@ -286,43 +286,43 @@
   <object id="287" name="mob_spawn1" x="1091.83" y="1235.76">
    <point/>
   </object>
-  <object id="288" name="mob_spawn2" x="1090.5" y="1160.26">
+  <object id="288" name="mob_spawn2" x="1091.5" y="1159.26">
    <point/>
   </object>
-  <object id="292" name="mob_spawn1" x="1518.16" y="325.59">
+  <object id="292" name="mob_spawn1" x="1517.49" y="331.59">
    <point/>
   </object>
   <object id="293" name="mob_spawn2" x="1520.67" y="428.923">
    <point/>
   </object>
-  <object id="297" name="mob_spawn1" x="1907.16" y="613.09">
+  <object id="297" name="mob_spawn1" x="1789.83" y="599.09">
    <point/>
   </object>
-  <object id="298" name="mob_spawn2" x="1943.17" y="579.09">
+  <object id="298" name="mob_spawn2" x="1921.84" y="597.09">
    <point/>
   </object>
-  <object id="302" name="mob_spawn1" x="1855.49" y="1098.76">
+  <object id="302" name="mob_spawn1" x="1855.49" y="1109.76">
    <point/>
   </object>
-  <object id="307" name="mob_spawn1" x="1506.16" y="1473.59">
+  <object id="307" name="mob_spawn1" x="1504.66" y="1478.59">
    <point/>
   </object>
-  <object id="312" name="mob_spawn2" x="1906.66" y="1807.09">
+  <object id="312" name="mob_spawn2" x="1905.33" y="1819.09">
    <point/>
   </object>
-  <object id="317" name="mob_spawn1" x="2408.89" y="1869.97">
+  <object id="317" name="mob_spawn1" x="2406.22" y="1867.97">
    <point/>
   </object>
-  <object id="322" name="mob_spawn1" x="2356.66" y="1604.1">
+  <object id="322" name="mob_spawn1" x="2353.16" y="1595.6">
    <point/>
   </object>
-  <object id="323" name="mob_spawn2" x="2414.16" y="1435.47">
+  <object id="323" name="mob_spawn2" x="2406.66" y="1433.47">
    <point/>
   </object>
-  <object id="328" name="mob_spawn1" x="1905.67" y="1775.67">
+  <object id="328" name="mob_spawn1" x="1904.34" y="1784.67">
    <point/>
   </object>
-  <object id="329" name="mob_spawn2" x="1596" y="1473.5">
+  <object id="329" name="mob_spawn2" x="1595" y="1481">
    <point/>
   </object>
   <object id="330" name="portal_tech5" x="2368" y="160" width="32" height="32"/>
