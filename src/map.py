@@ -89,6 +89,7 @@ class MapManager:
             if self.player.feet.colliderect(portal_rect):
                 self.map_level += 1 #étage suivant
 
+                self.current_map = portal.target_world
                 next_map_portal = self.select_new_map()
 
                 self.register_map(portal.target_world, portals=[
@@ -97,7 +98,6 @@ class MapManager:
                     NPC("paul", dialog=[f"Vous êtes à l'étage {self.map_level}"])
                 ])
 
-                self.current_map = portal.target_world
                 self.teleport_player(portal.teleport_point)
 
                 if self.map_level > 0:

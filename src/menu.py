@@ -94,15 +94,14 @@ class Menu():
                 if player_frame >= len(self.player_images):
                     player_frame = 0
 
-            #affichage
-            self.draw_all(player_frame)
-
             #renouvellement de l'affichage une fois fini
             if self.scroll > 3000:
                 self.scroll = 0
             else:
                 self.scroll += 2
 
+            #affichage
+            self.draw_all(player_frame)
             pygame.display.update()
 
             for event in pygame.event.get():
@@ -122,6 +121,7 @@ class Menu():
 
                 elif event.type == pygame.QUIT:
                     running = False
+
             clock.tick(50) #50 fps
 
 
@@ -156,5 +156,5 @@ class Menu():
     def draw_text(self, text, font, text_col, x, y):
         """Affiche le texte"""
 
-        img = font.render(text, True, text_col).convert_alpha()
+        img = font.render(text, True, text_col)
         self.screen.blit(img, (x, y))
