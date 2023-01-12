@@ -2,41 +2,78 @@ import pygame
 from game import Game
 
 class Character():
-    def __init__(self, name):
+    """Classe du personnage du menu de démarrage"""
+
+    def __init__(self, name: str):
+        """
+        Constructeur de la classe Character
+        
+        Args:
+            name(str): nom du fichier contenant les sprites du personnage
+        """
+
         self.sheet = pygame.image.load(f'../image/{name}.png').convert_alpha()
 
-    def get_image(self, player_frame, width, height, scale):
+    def get_image(self, player_frame: int, width: float, height: float, row: float, scale: float) -> pygame.Surface:
+        """
+        Récupère une des images du personnage du menu de démarrage
+        
+        Args:
+            player_frame(int): numéro du sprite sur la ligne en partant de la gauche
+            width(float): largeur du sprite
+            height(float): hauteur du sprite
+            row(float): coordonnées de la ligne contenant le sprite
+            scale(float): multiplicateur de la taille du sprite
+        """
+
         image = pygame.Surface([width, height], pygame.SRCALPHA).convert_alpha()
-        image.blit(self.sheet, (0, 0), ((player_frame * width), 64, width, height))
+        image.blit(self.sheet, (0, 0), ((player_frame * width), row, width, height))
         image = pygame.transform.scale(image, (width * scale, height * scale))
+
         return image
 
-    def get_images(self, animation_steps, player_height, player_scale):
+    def get_images(self, animation_steps: int, width: float, height: float, row: float, scale: float) -> list[pygame.Surface]:
+        """
+        Récupère les images du personnage du menu de démarrage
+        
+        Args:
+            animation_steps(int): nombre de sprites à récupérer
+            width(float): largeur des sprites
+            height(float): hauteur des sprites
+            row(float): coordonnées de la ligne contenant les sprites
+            scale(float): multiplicateur de la taille des sprites
+        """
+
         player_images = []
 
-        for x in range(animation_steps):
-            player_images.append(self.get_image(x, 32, player_height, player_scale))
+        for animation_step in range(animation_steps):
+            player_images.append(self.get_image(animation_step, width, height, row, scale))
 
         return player_images
 
 class Menu():
+    """Classe du menu de démarrage"""
 
-    def __init__(self) -> None:
+    def __init__(self):
+        """Constructeur de la classe du menu de démarrage"""
+
+        #limite d'images par seconde
         self.clock = pygame.time.Clock()
-        self.FPS = 60
+        self.FPS = 50
 
         # fenêtre de jeu
         self.SCREEN_WIDTH = 1920
         self.SCREEN_HEIGHT = 1080
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN)
-        pygame.display.set_caption("Dungia")
+        pygame.display.set_caption("DUNGIA")
 
         #personnage annimé
         self.player_height = 32 #hauteur du sprite du personnage
+        self.player_width = 32 #largeur du sprite du personnage
         self.player_scale = 7 / (1920/self.SCREEN_WIDTH) #multiplicateur du sprite du personnage
         self.player = Character("player")
-        self.animation_steps = 3
-        self.player_images = self.player.get_images(self.animation_steps, self.player_height, self.player_scale)
+        self.animation_steps = 3 #nombre d'animations du personnage
+        self.player_images = self.player.get_images(self.animation_steps, self.player_width, self.player_height, 64, self.player_scale)
         self.player_animation_cooldown = 120 #décompte avant animation du personnage
 
         #décor
@@ -44,7 +81,7 @@ class Menu():
         self.get_ground_image()
         self.get_bg_image()
 
-        #écritures
+        #texte
         self.font_size = int(40 / (800/self.SCREEN_WIDTH)) #taille
         self.font = pygame.font.SysFont("arialblack", self.font_size) #police
         self.TEXT_COL = (255, 255, 255) #couleur
@@ -70,17 +107,17 @@ class Menu():
         self.bg_width = self.bg_images[0].get_width()
 
     def play(self):
+        """Lance le menu de démarrage"""
 
-        self.scroll = 0
+        self.scroll = 0 #progression des animations du décor
         last_player_update = pygame.time.get_ticks() #heure de la dernière animation du personnage
         player_frame = 0 #numéro de sprite du personnage affiché
 
-        # music
+        # musique
         pygame.mixer.music.load("../music/intro.wav")
         pygame.mixer.music.play(-1) #répète la musique à indéfiniment
 
         running = True
-        clock = pygame.time.Clock() #pour limiter les fps
 
         #boucle principale du menu de démarrage
         while running:
@@ -88,24 +125,28 @@ class Menu():
             self.clock.tick(self.FPS) #limite de FPS
             current_time = pygame.time.get_ticks()
 
+            #évolution animation personnage
             if current_time - last_player_update >= self.player_animation_cooldown:
                 player_frame += 1
                 last_player_update = current_time
                 if player_frame >= len(self.player_images):
                     player_frame = 0
 
-            #renouvellement de l'affichage une fois fini
+            #renouvellement de l'affichage du décor une fois terminé
             if self.scroll > 3000:
                 self.scroll = 0
             else:
                 self.scroll += 2
 
-            #affichage
+            #affichage complet
             self.draw_all(player_frame)
             pygame.display.update()
 
+            #détection d'input
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
+
+                    #lancement du jeu
                     if event.key == pygame.K_SPACE:
                         pygame.mixer.music.stop()
                         game = Game(self.screen, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
@@ -116,25 +157,34 @@ class Menu():
                         pygame.mixer.music.play(-1)
                         self.scroll = 0
                     
+                    #fermeture du menu
                     elif event.key == pygame.K_ESCAPE:
                         running = False
-
+                
+                #fermeture du menu
                 elif event.type == pygame.QUIT:
                     running = False
 
-            clock.tick(50) #50 fps
-
-
-    def draw_all(self, player_frame):
-        """Affichage complet du menu de démarrage"""
+    def draw_all(self, player_frame: int):
+        """
+        Affichage complet du menu de démarrage
+        
+        Args:
+            player_frame(int): numéro du sprite personnage à afficher
+        """
 
         self.draw_bg()
         self.draw_ground()
         self.draw_character(player_frame)
         self.draw_text("Press Space Button", self.font, self.TEXT_COL, 100, self.font_size)
 
-    def draw_character(self, player_frame):
-        """Affichage du personnage"""
+    def draw_character(self, player_frame: int):
+        """
+        Affichage du personnage
+        
+        Args:
+            player_frame(int): numéro du sprite personnage à afficher
+        """
 
         self.screen.blit(self.player_images[player_frame], (100, self.SCREEN_HEIGHT - self.ground_height + self.grass_height - self.player_height * self.player_scale))            
 

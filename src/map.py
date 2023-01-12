@@ -53,12 +53,12 @@ class MapManager:
         self.map_level = 0 #le numéro de l'étage actuel
         self.boss_fight = False
 
-        next_level = random.choice(self.map_names)
+        next_level = random.choice(self.map_names) #désignation aléatoire de la prochaine carte
 
         self.register_map("home", portals=[
             Portal(from_world="home", origin_point="portal_home", target_world=next_level, teleport_point=f"spawn_{next_level}")
         ], npcs=[
-            NPC("paul", dialog=["Cet endroit ne devrait pas exister...", "Vous voyez la grande pierre de l'autre coté?", "C'est un portail traversez-le!", "Vous ferez peut-être revivre l'esprit linux..."])
+            NPC("paul", dialog=["Cet endroit ne devrait pas exister...", "Vous voyez la grande pierre de l'autre coté?", "C'est un portail traversez-le!"])
         ])
 
         self.teleport_player("player")
@@ -68,6 +68,7 @@ class MapManager:
         """Gère les collisions sur la carte"""
 
         #joueur - pièce
+        #recherche de la pièce actuelle
         self.current_room = None
 
         for room in self.get_map().rooms:
@@ -75,7 +76,7 @@ class MapManager:
                 self.current_room = room
                 break #current_room trouvée
 
-        player_collided = False
+        player_collided = False #indicateur de collision trouvée
 
         #joueur - acide
         if self.player.feet.collidelist(self.current_room.acids) > -1:
