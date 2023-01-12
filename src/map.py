@@ -77,7 +77,7 @@ class MapManager:
         self.register_map("home", portals=[
             Portal(from_world="home", origin_point="portal_home", target_world=next_level, teleport_point=f"spawn_{next_level}")
         ], npcs=[
-            NPC("paul", dialog=["Cet endroit ne devrait pas exister...", "Vous voyez la grande pierre de l'autre coté?", "C'est un portail traversez-le!"])
+            NPC("paul", dialog=["Je pensais que ça n'était qu'un mythe...", "L'ESTACA avait bien un labo secret dans la foret!", "Je vais te suivre à l'interieur...", "Tu vois la grande pierre de l'autre coté?", "C'est un portail... traverse-le!"])
         ])
 
         #placement de entités joueurs et NPC sur la carte actuelle
@@ -116,7 +116,7 @@ class MapManager:
                 self.register_map(portal.target_world, portals=[
                     Portal(from_world=portal.target_world, origin_point=f"portal_{portal.target_world}", target_world=next_map_portal, teleport_point=f"spawn_{next_map_portal}")
                 ], npcs=[
-                    NPC("paul", dialog=[f"Vous êtes à l'étage {self.map_level}"])
+                    NPC("paul", dialog=[f"On est à l'étage {self.map_level}!", "Il faut continuer..."])
                 ])
 
                 self.teleport_player(portal.teleport_point)
