@@ -2,6 +2,8 @@ import pygame
 from menu import Menu
 
 def main():
+    """Fonction principale du projet"""
+
     #initialisation de pygame
     pygame.init()
     pygame.mixer.init()

@@ -26,7 +26,7 @@ class DialogBox:
         Affichage de la boite de dialogue
         
         Args:
-            screen(pygame.Surface): Fenêtre d'affichage
+            screen(pygame.Surface): fenêtre d'affichage
         """
 
         if self.reading:

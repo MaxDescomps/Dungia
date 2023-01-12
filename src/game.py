@@ -1,4 +1,4 @@
-import pygame, pytmx, pyscroll
+import pygame
 from player import *
 from map import MapManager
 from dialog import DialogBox
@@ -6,8 +6,17 @@ from weapon import list_weapons
 from pause_menu import *
 
 class Game:
+    """Classe du jeu"""
 
-    def __init__(self, screen, SCREEN_WIDTH, SCREEN_HEIGHT):
+    def __init__(self, screen:pygame.Surface, SCREEN_WIDTH:int, SCREEN_HEIGHT:int):
+        """
+        Constructeur de la classe Game
+        
+        Args:
+            screen(pygame.Surface): fenêtre d'affichage
+            SCREEN_WIDTH(int): largeur de la fenêtre d'affichage
+            SCREEN_HEIGHT(int): hauteur de la fenêtre d'affichage
+        """
 
         self.screen = screen
         self.SCREEN_WIDTH = SCREEN_WIDTH
@@ -30,6 +39,8 @@ class Game:
         self.running = True
 
     def handle_real_time_input(self):
+        """Gestion des inputs en 'temps réél' (un appui continuel vaut une série d'appuis)"""
+
         #clavier
         pressed = pygame.key.get_pressed()
 
@@ -65,16 +76,12 @@ class Game:
             self.player.shoot()
 
     def handle_input(self):
+        """Gestion des inputs (un appui continuel vaut un appui unique)"""
+
         for event in pygame.event.get():
 
             #évènement souris click
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # if event.button == 1:
-                #     pass
-                #     # print("left mouse button")
-                # elif event.button == 3:
-                #     # print("right mouse button")
-                #     pass
                 if event.button == 4:
                     # print("mouse wheel up")
                     self.player.previous_weapon()
@@ -89,34 +96,27 @@ class Game:
                 
                 elif event.key == pygame.K_ESCAPE:
                         self.running = self.pause_menu.deploy()
-            
-            #évènement souris fin de click
-            # elif event.type == pygame.MOUSEBUTTONUP:
-            #     if event.button == 1:
-            #         # print("left mouse button end")
-            #         pass
-            #     elif event.button == 3:
-            #         # print("right mouse button end")
-            #         pass
 
             #fermeture fenetre de jeu
             elif event.type == pygame.QUIT:
                 self.running = False
 
     def update(self):
-        """Met les sprites et les collisions à jour"""
+        """Met les sprites et les collisions du jeu à jour"""
 
         self.map_manager.update() #update de tous les sprites et collisions
         self.player.crosshair.update() #update du sprite du crosshair
 
     def draw(self):
+        """Affiche les sprites du jeu"""
+
         self.map_manager.draw() #dessine et centre le monde
         self.dialog_box.render(self.screen) #affiche les boites de dialogue ouvertes
         self.player.render_ui(self.screen) #affiche l'interface utilisateur du joueur
 
     def debug(self):
-
-        #bug si resize
+        """Permet d'afficher plus de détails en jeu comme les zones de collision du joueur"""
+        
         #affiche la zone de collision du joueur en ajustant selon le zoom et le centrage
         pygame.draw.rect(self.screen, (255,0,0),
         (self.player.feet.x*self.map_manager.zoom - self.map_manager.get_group().view.x*self.map_manager.zoom,
@@ -124,6 +124,7 @@ class Game:
          self.player.feet.width*self.map_manager.zoom, self.player.feet.height*self.map_manager.zoom), 1)
 
     def run(self):
+        """Démarre le jeu"""
 
         clock = pygame.time.Clock() #pour limiter les fps
         
