@@ -29,6 +29,7 @@ class Mob(Entity):
         self.pdv = self.max_pdv #pdv effectifs
         self.name = name #nom du fichier image png
         self.fighting_mobs = fighting_mobs #liste des mobs combattans actuellement dans la même pièce de la carte
+        self.src_pos_shot = self.rect.center #position de départ des tirs
     
     def teleport_spawn(self, point:tuple[int, int]):
         """
@@ -49,6 +50,7 @@ class Mob(Entity):
             if self.weapon_rate_clock > 0:
                 self.weapon_rate_clock -= 1
             else:
+                self.src_pos_shot = self.rect.center #position de départ des tirs
                 self.shoot()
                 self.weapon_rate_clock = self.max_weapon_rate_clock
 
@@ -99,7 +101,7 @@ class Mob(Entity):
     def shoot(self):
         """Fait tirer le monstre en direction du joueur ciblé"""
 
-        shot = Shot(self, 3, 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)), oriented=True)
+        shot = Shot(self.src_pos_shot, 3, 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)), oriented=True)
         self.player.map_manager.get_group().add(shot)
         self.player.map_manager.get_mob_shots().append(shot)
         pygame.mixer.Channel(2).play(pygame.mixer.Sound("../music/mobshot.wav"))
@@ -131,6 +133,7 @@ class Drone(Mob):
             if self.weapon_rate_clock > 0:
                 self.weapon_rate_clock -= 1
             else:
+                self.src_pos_shot = self.rect.center #position de départ des tirs
                 self.shoot()
                 self.weapon_rate_clock = self.max_weapon_rate_clock
 
@@ -183,6 +186,7 @@ class Android(Mob):
         self.collision.height += 12
         self.weapon = Remington(50, 1, 2, "3", 0.5)
         self.weapon_rate_clock = 0
+        self.src_pos_shot = self.weapon.rect.center
 
     def update(self):
         """Gère les déplacements, attaques et destrucion du monstre"""
@@ -302,7 +306,7 @@ class Android(Mob):
         """Méthode de tir spécialisée de l'android"""
 
         pygame.mixer.Channel(2).play(pygame.mixer.Sound("../music/mobshot.wav"))
-        shots = self.weapon.shoot(self)
+        shots = self.weapon.shoot()
 
         for shot in shots:
             self.player.map_manager.get_group().add(shot, layer=4)
@@ -450,7 +454,7 @@ class Mobot(Mob):
 
         pygame.mixer.Channel(2).play(pygame.mixer.Sound("../music/mobshot.wav"))
         for i in range(-4, 4, 2):
-            shots = self.weapon.shoot(self, i/4 * math.pi + self.angle_modif)
+            shots = self.weapon.shoot(i/4 * math.pi + self.angle_modif)
 
             for shot in shots:
                 self.player.map_manager.get_group().add(shot, layer=4)
@@ -487,8 +491,8 @@ class Boss(Mob):
         shots = []
 
         for i in range(-6, 6, 1):
-            shots.append(CurveShot(0.005 + ((self.max_pdv - self.pdv) / self.max_pdv) * 0.005 * 3, math.pi, 1, self, 1 + (self.max_pdv - self.pdv) / self.max_pdv * 3, 1, i/6 * math.pi + self.angle_modif))
-            shots.append(CurveShot(-0.005 - ((self.max_pdv - self.pdv) / self.max_pdv) * 0.005 * 3, math.pi, 1, self, 1 + (self.max_pdv - self.pdv) / self.max_pdv * 3, 1, i/6 * math.pi + self.angle_modif))
+            shots.append(CurveShot(0.005 + ((self.max_pdv - self.pdv) / self.max_pdv) * 0.005 * 3, math.pi, 1, self.rect.center, 1 + (self.max_pdv - self.pdv) / self.max_pdv * 3, 1, i/6 * math.pi + self.angle_modif))
+            shots.append(CurveShot(-0.005 - ((self.max_pdv - self.pdv) / self.max_pdv) * 0.005 * 3, math.pi, 1, self.rect.center, 1 + (self.max_pdv - self.pdv) / self.max_pdv * 3, 1, i/6 * math.pi + self.angle_modif))
 
         for shot in shots:
             self.player.map_manager.get_group().add(shot, layer=4)
@@ -504,6 +508,7 @@ class Boss(Mob):
             if self.weapon_rate_clock > 0:
                 self.weapon_rate_clock -= 1
             else:
+                self.src_pos_shot = self.rect.center #position de départ des tirs
                 self.shoot()
                 self.weapon_rate_clock = self.max_weapon_rate_clock
 
