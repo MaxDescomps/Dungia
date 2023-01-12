@@ -1,4 +1,5 @@
 from entity import *
+from crosshair import Crosshair
 
 class Player(Entity):
 

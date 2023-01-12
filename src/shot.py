@@ -1,5 +1,4 @@
 import pygame, math
-from animation import AnimateSprite
 
 def calc_angle(src_pos, dest_pos) -> float:
     """Calcule l'angle entre deux points"""

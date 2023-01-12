@@ -1,6 +1,5 @@
-import pygame, copy
+import pygame
 from animation import AnimateSprite
-from crosshair import Crosshair
 from shot import *
 from weapon import *
 
