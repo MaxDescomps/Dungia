@@ -1,9 +1,10 @@
 import pygame
 
 class PauseMenu(pygame.sprite.Sprite):
-    """Constructeur de la classe du menu pause du jeu"""
+    """Menu de pause du jeu"""
 
     def __init__(self, screen, SCREEN_WIDTH, SCREEN_HEIGHT) -> None:
+        """Constructeur de la classe PauseMenu"""
 
         super().__init__()
 

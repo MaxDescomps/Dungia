@@ -1,17 +1,27 @@
 from entity import *
 from weapon import *
+from player import Player
 
 class Mob(Entity):
-    """
-    Classe des monstres
-    Les monstres apparaissent par vagues de 5 monstres maximum
-    """
-    def __init__(self, name, fighting_mobs, player, speed, damage):
+    """Classe des monstres"""
+
+    def __init__(self, name:str, fighting_mobs:list['Mob'], player:Player, speed:float, damage:float):
+        """
+        Constructeur de la classe Mob
+
+        Args:
+            name(str): nom du png du spritesheet
+            fighting_mobs(list[Mob]): liste des monstres combattants à laquelle appartient le monstre
+            player(Player): Joueur visé par le monstre
+            speed(float): vitesse de déplacement du monstre
+            damage(float): dégats infligés par le monstre
+        """
+
         super().__init__(name, 0, 0)
 
         self.damage = damage
         self.weapon = None
-        self.max_weapon_rate_clock = 60
+        self.max_weapon_rate_clock = 60 #décompte avant prochain tir
         self.weapon_rate_clock = self.max_weapon_rate_clock
         self.speed = speed
         self.player = player #joueur à attaquer
@@ -20,11 +30,20 @@ class Mob(Entity):
         self.name = name #nom du fichier image png
         self.fighting_mobs = fighting_mobs #liste des mobs combattans actuellement dans la même pièce de la carte
     
-    def teleport_spawn(self, point):
+    def teleport_spawn(self, point:tuple[int, int]):
+        """
+        Téléporte le monstre à son point d'apparition
+        
+        Args:
+            point(tuple[int, int]): point d'apparition du monstre
+        """
+
         self.position = [point[0], point[1]]
         self.save_location() #permet de ne pas se tp en boucle sur une collision?
     
     def update(self):
+        """Gère les déplacements, attaques et destrucion du monstre"""
+
         if self.pdv > 0:
             #tire sur le joueur
             if self.weapon_rate_clock > 0:
@@ -45,6 +64,8 @@ class Mob(Entity):
             self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce
         
     def move_towards_player(self):
+        """Fait avancer le monstre en direction du joueur ciblé"""
+
         moved = False
 
         delta_x = self.position[0] - self.player.position[0]
@@ -76,20 +97,35 @@ class Mob(Entity):
             self.change_animation()
         
     def shoot(self):
+        """Fait tirer le monstre en direction du joueur ciblé"""
+
         shot = Shot(self, 3, 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)), oriented=True)
         self.player.map_manager.get_group().add(shot)
         self.player.map_manager.get_mob_shots().append(shot)
         pygame.mixer.Channel(2).play(pygame.mixer.Sound("../music/mobshot.wav"))
 
 class Drone(Mob):
+    """Classe spécialisée de monstre de type drone"""
 
-    def __init__(self, fighting_mobs, player, speed, damage):
+    def __init__(self, fighting_mobs:list['Mob'], player:Player, speed:float, damage:float):
+        """
+        Constructeur de la classe Drone
+
+        Args:
+            fighting_mobs(list[Mob]): liste des monstres combattants à laquelle appartient le drone
+            player(Player): Joueur visé par le drone
+            speed(float): vitesse de déplacement du drone
+            damage(float): dégats infligés par le drone
+        """
+
         super().__init__("drone", fighting_mobs, player, speed, damage)
 
         self.feet.width = 15
         self.collision = copy.copy(self.feet)
 
     def update(self):
+        """Gère les déplacements, attaques et destrucion du monstre"""
+
         if self.pdv > 0:
             #tire sur le joueur
             if self.weapon_rate_clock > 0:
@@ -107,8 +143,18 @@ class Drone(Mob):
             self.kill() #retire le sprite des groupes d'affichage
             self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce
     
-    def get_image(self, sprite_sheet, x, y):
-        """Récupère un sprite 32*32 aux coordonnées x et y et en fait un sprite 48*48"""
+    def get_image(self, sprite_sheet:pygame.Surface, x:float, y:float) -> pygame.Surface:
+        """
+        Récupère un sprite 32*32
+
+        Args:
+            sprite_sheet(pygame.Surface): le spritesheet source
+            x(float): coordonnée horizontale du sprite à récupérer
+            y(float): coordonnée verticale du sprite à récupérer
+
+        Returns:
+            image(pygame.Surface): un sprite 48*48
+        """
 
         image = pygame.Surface([32, 32], pygame.SRCALPHA).convert_alpha()#surface avec un parametre de transparence (alpha = 0)
         image.blit(sprite_sheet, (0, 0), (x, y, 32, 32)) #canvas.blit (ajout, (coord sur canvas), (rect de l'ajout sur l'image source))
@@ -117,8 +163,19 @@ class Drone(Mob):
         return image
 
 class Android(Mob):
+    """Classe spécialisée de monstre de type android"""
 
-    def __init__(self, fighting_mobs, player, speed, damage):
+    def __init__(self, fighting_mobs:list['Mob'], player:Player, speed:float, damage:float):
+        """
+        Constructeur de la classe Android
+
+        Args:
+            fighting_mobs(list[Mob]): liste des monstres combattants à laquelle appartient l'android
+            player(Player): Joueur visé par l'android
+            speed(float): vitesse de déplacement de l'android
+            damage(float): dégats infligés par l'android
+        """
+
         super().__init__("android", fighting_mobs, player, speed, damage)
 
         self.speed = 0.5
@@ -128,6 +185,8 @@ class Android(Mob):
         self.weapon_rate_clock = 0
 
     def update(self):
+        """Gère les déplacements, attaques et destrucion du monstre"""
+
         if self.pdv > 0:
             self.manage_weapon()
 
@@ -149,6 +208,8 @@ class Android(Mob):
             self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce
 
     def manage_weapon(self):
+        """Gestion de l'arme du monstre"""
+
         self.weapon.angle = calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)) #position en jeu du crosshair
         self.weapon.rect.center = self.rect.center
 
@@ -218,8 +279,18 @@ class Android(Mob):
             
             self.clock = 0
 
-    def get_image(self, sprite_sheet, x, y):
-        """Récupère un sprite 32*32 aux coordonnées x et y et en fait un sprite 48*48"""
+    def get_image(self, sprite_sheet:pygame.Surface, x:float, y:float) -> pygame.Surface:
+        """
+        Récupère un sprite 32*32
+
+        Args:
+            sprite_sheet(pygame.Surface): le spritesheet source
+            x(float): coordonnée horizontale du sprite à récupérer
+            y(float): coordonnée verticale du sprite à récupérer
+
+        Returns:
+            image(pygame.Surface): un sprite 48*48
+        """
 
         image = pygame.Surface([32, 32], pygame.SRCALPHA).convert_alpha()#surface avec un parametre de transparence (alpha = 0)
         image.blit(sprite_sheet, (0, 0), (x, y, 32, 32)) #canvas.blit (ajout, (coord sur canvas), (rect de l'ajout sur l'image source))
@@ -228,6 +299,8 @@ class Android(Mob):
         return image
 
     def shoot(self):
+        """Méthode de tir spécialisée de l'android"""
+
         pygame.mixer.Channel(2).play(pygame.mixer.Sound("../music/mobshot.wav"))
         shots = self.weapon.shoot(self)
 
@@ -236,8 +309,19 @@ class Android(Mob):
             self.player.map_manager.get_mob_shots().append(shot)
 
 class Mobot(Mob):
+    """Classe spécialisée de monstre de type mobot"""
 
-    def __init__(self, fighting_mobs, player, speed, damage):
+    def __init__(self, fighting_mobs:list['Mob'], player:Player, speed:float, damage:float):
+        """
+        Constructeur de la classe Mobot
+
+        Args:
+            fighting_mobs(list[Mob]): liste des monstres combattants à laquelle appartient le mobot
+            player(Player): Joueur visé par le mobot
+            speed(float): vitesse de déplacement du mobot
+            damage(float): dégats infligés par le mobot
+        """
+
         super().__init__("mobot", fighting_mobs, player, speed, damage)
 
         self.speed = 0.6
@@ -248,6 +332,8 @@ class Mobot(Mob):
         self.angle_modif = 0
 
     def update(self):
+        """Gère les déplacements, attaques et destrucion du monstre"""
+
         if self.pdv > 0:
             self.manage_weapon()
 
@@ -269,6 +355,8 @@ class Mobot(Mob):
             self.fighting_mobs.remove(self) #retire le mob de la liste des mobs combattants de la pièce
 
     def manage_weapon(self):
+        """Gestion de l'arme du monstre"""
+
         self.weapon.angle = calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)) #position en jeu du crosshair
         self.weapon.rect.center = self.rect.center
 
@@ -338,8 +426,18 @@ class Mobot(Mob):
             
             self.clock = 0
 
-    def get_image(self, sprite_sheet, x, y):
-        """Récupère un sprite 32*32 aux coordonnées x et y et en fait un sprite 48*48"""
+    def get_image(self, sprite_sheet:pygame.Surface, x:float, y:float) -> pygame.Surface:
+        """
+        Récupère un sprite 32*32
+
+        Args:
+            sprite_sheet(pygame.Surface): le spritesheet source
+            x(float): coordonnée horizontale du sprite à récupérer
+            y(float): coordonnée verticale du sprite à récupérer
+
+        Returns:
+            image(pygame.Surface): un sprite 48*48
+        """
 
         image = pygame.Surface([32, 32], pygame.SRCALPHA).convert_alpha()#surface avec un parametre de transparence (alpha = 0)
         image.blit(sprite_sheet, (0, 0), (x, y, 32, 32)) #canvas.blit (ajout, (coord sur canvas), (rect de l'ajout sur l'image source))
@@ -348,6 +446,7 @@ class Mobot(Mob):
         return image
 
     def shoot(self):
+        """Méthode de tir spécialisée du mobot"""
 
         pygame.mixer.Channel(2).play(pygame.mixer.Sound("../music/mobshot.wav"))
         for i in range(-4, 4, 2):
@@ -360,8 +459,20 @@ class Mobot(Mob):
         self.angle_modif += 0.2
 
 class Boss(Mob):
+    """Classe spécialisée de monstre de type boss"""
 
-    def __init__(self, fighting_mobs, player, speed, damage, map_level):
+    def __init__(self, fighting_mobs:list['Mob'], player:Player, speed:float, damage:float, map_level:int):
+        """
+        Constructeur de la classe Boss
+
+        Args:
+            fighting_mobs(list[Mob]): liste des monstres combattants à laquelle appartient le boss
+            player(Player): Joueur visé par le boss
+            speed(float): vitesse de déplacement du boss
+            damage(float): dégats infligés par le boss
+            map_level(int): numéro de l'étage du boss
+        """
+
         super().__init__("boss", fighting_mobs, player, speed, damage)
 
         self.speed = 0.2 * map_level
@@ -371,6 +482,8 @@ class Boss(Mob):
         self.pdv = 100
 
     def shoot(self):
+        """Méthode de tir spécialisée du boss"""
+
         shots = []
 
         for i in range(-6, 6, 1):
@@ -384,6 +497,8 @@ class Boss(Mob):
         self.angle_modif += 0.2
 
     def update(self):
+        """Gère les déplacements, attaques et destrucion du monstre"""
+
         if self.pdv > 0:
             #tire sur le joueur
             if self.weapon_rate_clock > 0:

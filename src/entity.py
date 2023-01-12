@@ -26,7 +26,7 @@ class Entity(AnimateSprite):
         self.old_position = self.position.copy()
 
     def save_location(self):
-        """Enregistre la position du joueur"""
+        """Enregistre la position de l'entité"""
 
         self.old_position = self.position.copy()
 
@@ -51,7 +51,7 @@ class Entity(AnimateSprite):
         self.position[1] += self.speed
     
     def update(self):
-        """Met la position des rectangles du joueur à jour"""
+        """Met la position des rectangles de l'entité à jour"""
 
         self.rect.topleft = self.position #la position de l'entité avec [0,0] le coin superieur gauche
         self.feet.midbottom = self.rect.midbottom #aligne les centres des rect entity.feet et entity.rect

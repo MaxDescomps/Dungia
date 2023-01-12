@@ -1,7 +1,7 @@
 import pygame, pytmx, pyscroll, random, copy, player
 import pygame.sprite
 from dataclasses import dataclass
-from npc import *
+from npc import NPC
 from shot import Shot
 from door import *
 from mob import *
@@ -619,4 +619,4 @@ class MapManager:
         npcs = map_data.npcs
 
         for npc in npcs:
-            npc.teleport_spawn(map_data)
+            npc.teleport_spawn(self.get_object(npc.name))
