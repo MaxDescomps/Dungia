@@ -1,13 +1,16 @@
-import pygame, pytmx, pyscroll, random, copy
+import pygame, pytmx, pyscroll, random, copy, player
 import pygame.sprite
 from dataclasses import dataclass
 from npc import *
 from shot import Shot
 from door import *
 from mob import *
+from dialog import DialogBox
 
 @dataclass
 class Room:
+    """Représentation d'une pièce de la carte"""
+
     rect: pygame.Rect
     doors: list[Door]
     mobs: list[Mob]
@@ -21,6 +24,8 @@ class Room:
 
 @dataclass
 class Portal:
+    """Représentation d'un portail de la carte"""
+
     from_world: str
     origin_point: str
     target_world: str
@@ -28,6 +33,8 @@ class Portal:
 
 @dataclass
 class Map:
+    """Représentation de la carte"""
+
     name: str
     walls: list[pygame.Rect]
     acids: list[pygame.Rect]
@@ -41,26 +48,39 @@ class Map:
     rooms: list[Room]
 
 class MapManager:
+    """Gestionnaire des cartes du jeu"""
 
-    def __init__(self, screen, player):
+    def __init__(self, screen:pygame.Surface, player:player.Player):
+        """
+        Constructeur de la classe MapManager
+        
+        Args:
+            screen(pygame.Surface): fenêtre d'affichage
+            player: joueur dans l'environnement de ce gestionnaire de carte
+        """
+
         self.screen = screen
         self.player = player
-        self.maps = dict()
-        self.current_map = "home"
-        self.current_room = None
-        self.zoom = 3
-        self.map_names = ["tech3", "tech4", "tech5"]
+
+        self.maps = dict() #cartes gérées
+        self.map_names = ["tech3", "tech4", "tech5"] #nom des différentes cartes
+        self.current_map = "home" #carte actuelle du joueur
+        self.current_room = None #pièce actuelle du joueur
+
+        self.zoom = 3 #zoom d'affichage
         self.map_level = 0 #le numéro de l'étage actuel
-        self.boss_fight = False
+        self.boss_fight = False #indicateur de combat contre un boss
 
         next_level = random.choice(self.map_names) #désignation aléatoire de la prochaine carte
 
+        #génération de la première carte
         self.register_map("home", portals=[
             Portal(from_world="home", origin_point="portal_home", target_world=next_level, teleport_point=f"spawn_{next_level}")
         ], npcs=[
             NPC("paul", dialog=["Cet endroit ne devrait pas exister...", "Vous voyez la grande pierre de l'autre coté?", "C'est un portail traversez-le!"])
         ])
 
+        #placement de entités joueurs et NPC sur la carte actuelle
         self.teleport_player("player")
         self.teleport_npcs()
 
@@ -260,7 +280,14 @@ class MapManager:
                                                 if mob_rect.collidelist(self.current_room.walls) > -1:
                                                     mob.move_right()
 
-    def select_new_map(self):
+    def select_new_map(self) -> str:
+        """
+        Sélectionne une nouvelle carte différente de la carte actuelle
+        
+        Returns:
+            new_map(str): nom de la nouvelle carte
+        """
+
         new_map = random.choice(self.map_names)
 
         while(new_map == self.current_map):
@@ -270,8 +297,9 @@ class MapManager:
 
     def manage_room_hostility(self):
         """
-        Fais apparaitre les monstres d'une pièce par vagues de 4 (maximum 5 apparitions par vague)
-        Cause la fermeture des portes d'une pièce hostile
+        Gestion d'une pièce hostile
+        Fais apparaitre les monstres par vagues
+        Gère la fermeture et l'ouverture des portes
         """
         room = self.current_room
 
@@ -333,12 +361,12 @@ class MapManager:
             for door in room.doors:
                 door.opening = True
 
-    def teleport_player(self, name):
+    def teleport_player(self, name:str):
         """
         Téléporte le joueur sur un point de spawn dans une carte
         
         Args:
-            name (str): nom du tmx de la carte à charger
+            name(str): nom du point de destination
         """
         self.player.weapon.kill() #supprime l'arme du joueur du groupe de calques
 
@@ -348,10 +376,14 @@ class MapManager:
 
         self.get_map().group.add(self.player.weapon, layer = 5) #ajout de l'arme du joueur au groupe de calques
 
-    def register_map(self, name, portals=[], npcs=[]):
+    def register_map(self, name:str, portals:list[Portal]=[], npcs:list[NPC]=[]):
         """
-        Charge une carte une seule fois pour le reste du programme depuis un fichier tmx en remplissant
-        une instance de la classe de données Map
+        Génère une carte depuis un fichier tmx
+
+        Args:
+            name(str): nom du fichier tmx de la carte
+            portals(list[Portal]): portails présents sur la carte
+            npcs(list[NPC]): NPCs présents sur la carte
         """
 
         tmx_data = pytmx.util_pygame.load_pygame(f"../image/{name}.tmx") #charge le fichier tmx avec les surfaces de pygame 
@@ -475,22 +507,64 @@ class MapManager:
         #creer un objet map
         self.maps[name] = Map(name, walls, acids, group, tmx_data, portals, npcs, player_shots, mob_shots, doors, rooms)
 
-    def get_map(self):
+    def get_map(self) -> Map:
+        """
+        Récupère la carte actuelle du gestionnaire de cartes
+        
+        Returns:
+            current_map(Map): la carte actuelle
+        """
+
         return self.maps[self.current_map]
 
-    def get_group(self):
+    def get_group(self) -> pyscroll.PyscrollGroup:
+        """
+        Récupère le groupe de calques de la carte
+        
+        Returns:
+            group(pyscroll.PyscrollGroup): le groupe de calques de la carte
+        """
+
         return self.get_map().group
 
     def get_walls(self) -> list[pygame.Rect]:
+        """
+        Récupère les collisions des murs de la carte
+        
+        Returns:
+            walls(list[pygame.Rect]): les collisions des murs de la carte
+        """
+
         return self.get_map().walls
 
     def get_npcs(self) -> list[NPC]:
+        """
+        Récupère les NPCs de la carte
+        
+        Returns:
+            npcs(list[NPC]): les NPCs de la carte
+        """
+
         return self.get_map().npcs
 
-    def get_player_shots(self):
+    def get_player_shots(self) -> list[Shot]:
+        """
+        Récupère les tirs des joueurs
+        
+        Returns:
+            player_shots(list[Shot]): les tirs des joueurs
+        """
+
         return self.get_map().player_shots
 
-    def get_mob_shots(self):
+    def get_mob_shots(self) -> list[Shot]:
+        """
+        Récupère les tirs des monstres
+        
+        Returns:
+            mob_shots(list[Shot]): les tirs des monstres
+        """
+
         return self.get_map().mob_shots
 
     def draw(self):
@@ -505,13 +579,26 @@ class MapManager:
         self.get_group().update() #appel la méthode update de tous les sprites du groupe
         self.check_collisions() #gère les collisions sur la carte
 
-    def get_object(self, name):
-        """Récupère les informations d'un objet du fichier tmx de la carte"""
+    def get_object(self, name:str) -> pytmx.TiledObject:
+        """
+        Récupère un objet du fichier tmx de la carte
+
+        Args:
+            name(str): le nom de l'objet à récupérer dans le fichier tmx
+        
+        Returns:
+            object(pytmx.TiledObject): un objet du fichier tmx de la carte
+        """
 
         return self.get_map().tmx_data.get_object_by_name(name)
 
-    def check_npc_collisions(self, dialog_box):
-        """Active le dialogue d'un un NPC en collision avec le joueur"""
+    def check_npc_collisions(self, dialog_box:DialogBox):
+        """
+        Active le dialogue d'un NPC en collision avec le joueur
+        
+        Args:
+            dialog_box(DialogBox): la boite de dialogue à activer
+        """
 
         npcs = self.get_npcs()#?toute la carte au lieu de la pièce
 
