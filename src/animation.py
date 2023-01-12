@@ -17,8 +17,9 @@ class AnimateSprite(pygame.sprite.Sprite):
         self.clock = 0 #compteur avant changement d'animation
         self.direction = "down"
 
-        self.animation_index = 0
+        self.animation_index = 0 #numéro du sprite affiché
 
+        #sprites organisés selon la direction correspondante
         self.images = {
             "down": self.get_images(self.sprite_sheet, 0, 0, 3),
             "left": self.get_images(self.sprite_sheet, 32, 0, 3),
@@ -42,15 +43,18 @@ class AnimateSprite(pygame.sprite.Sprite):
             
             self.clock = 0
 
-    def get_images(self, sprite_sheet, y, start, nb_sprites):
+    def get_images(self, sprite_sheet: pygame.Surface, y: float, start: int, nb_sprites: int) -> list[pygame.Surface]:
         """
-        Récupère les sprites d'une ligne d'un spritesheet 32x32
+        Récupère les sprites d'une ligne d'un spritesheet de type 32x32
 
         Args:
-            y(int): numéro de ligne sur le spritesheet
+            sprite_sheet(pygame.Surface): le spritesheet source
+            y(int): coordonnée verticale des sprites à récupérer
+            start(int): premier spite à récupérer sur une ligne
+            nb_sprites(int): nombre de sprites à récupérer sur une ligne
 
         Returns:
-            images(list): une liste d'images
+            images(list): la liste des sprites récupérés sur une ligne du spritesheet
         """
 
         images = []
@@ -62,9 +66,17 @@ class AnimateSprite(pygame.sprite.Sprite):
         
         return images
 
-    def get_image(self, sprite_sheet, x, y):
-        """Récupère un sprite 32*32 aux coordonnées x et y"""
+    def get_image(self, sprite_sheet: pygame.Surface, x: float, y:float) -> pygame.Surface:
+        """
+        Récupère un sprite 32*32 aux coordonnées x et y
+        
+        Args:
+            sprite_sheet(pygame.Surface): le spritesheet source
+            x(int): coordonnée horizontale du sprite à récupérer
+            y(int): coordonnée verticale du sprite à récupérer
+        """
 
         image = pygame.Surface([32, 32], pygame.SRCALPHA).convert_alpha() #surface avec un parametre de transparence (alpha = 0)
         image.blit(sprite_sheet, (0, 0), (x, y, 32, 32)) #canvas.blit (ajout, (coord sur canvas), (rect de l'ajout sur l'image source))
+        
         return image
