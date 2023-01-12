@@ -1,8 +1,9 @@
 import pygame
 
 class AnimateSprite(pygame.sprite.Sprite):
+    """Classe AnimateSprite utilisée pour animer les entités selon la direction"""
 
-    def __init__(self, name):
+    def __init__(self, name: str):
         """
         Constructeur de la classe AnimateSprite
         
@@ -12,8 +13,8 @@ class AnimateSprite(pygame.sprite.Sprite):
 
         super().__init__()
         self.sprite_sheet = pygame.image.load(f"../image/{name}.png").convert_alpha() #spritesheet avec paramètre de transparence alpha
-        self.speed = 2
-        self.clock = 0
+        self.speed = 2 #vitesse de changement d'animation
+        self.clock = 0 #compteur avant changement d'animation
         self.direction = "down"
 
         self.animation_index = 0

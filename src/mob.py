@@ -76,7 +76,7 @@ class Mob(Entity):
             self.change_animation()
         
     def shoot(self):
-        shot = Shot(self, 3, "techpack/Projectiles/projectiles x1", 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)), oriented=True)
+        shot = Shot(self, 3, 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)), oriented=True)
         self.player.map_manager.get_group().add(shot)
         self.player.map_manager.get_mob_shots().append(shot)
         pygame.mixer.Channel(2).play(pygame.mixer.Sound("../music/mobshot.wav"))
@@ -374,8 +374,8 @@ class Boss(Mob):
         shots = []
 
         for i in range(-6, 6, 1):
-            shots.append(CurveShot(0.005 + ((self.max_pdv - self.pdv) / self.max_pdv) * 0.005 * 3, math.pi, 1, self, 1 + (self.max_pdv - self.pdv) / self.max_pdv * 3, "techpack/Projectiles/projectiles x1", 1, i/6 * math.pi + self.angle_modif))
-            shots.append(CurveShot(-0.005 - ((self.max_pdv - self.pdv) / self.max_pdv) * 0.005 * 3, math.pi, 1, self, 1 + (self.max_pdv - self.pdv) / self.max_pdv * 3, "techpack/Projectiles/projectiles x1", 1, i/6 * math.pi + self.angle_modif))
+            shots.append(CurveShot(0.005 + ((self.max_pdv - self.pdv) / self.max_pdv) * 0.005 * 3, math.pi, 1, self, 1 + (self.max_pdv - self.pdv) / self.max_pdv * 3, 1, i/6 * math.pi + self.angle_modif))
+            shots.append(CurveShot(-0.005 - ((self.max_pdv - self.pdv) / self.max_pdv) * 0.005 * 3, math.pi, 1, self, 1 + (self.max_pdv - self.pdv) / self.max_pdv * 3, 1, i/6 * math.pi + self.angle_modif))
 
         for shot in shots:
             self.player.map_manager.get_group().add(shot, layer=4)
