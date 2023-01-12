@@ -203,8 +203,17 @@ class Menu():
         for x in range(30):
             self.screen.blit(self.ground_image, ((x * self.ground_width) - self.scroll * 2.2, self.SCREEN_HEIGHT - self.ground_height))
 
-    def draw_text(self, text, font, text_col, x, y):
-        """Affiche le texte"""
+    def draw_text(self, text:str, font:pygame.font.Font, text_col:tuple[int,int,int], x:float, y:float):
+        """
+        Affiche le texte
+        
+        Args:
+            text(str): texte à afficher
+            font(pygame.font.Font): police du texte
+            text_col(tuple[int,int,int]): couleur du texte
+            x(float): coordonnée horizontale du texte
+            y(float): coordonnée verticale du texte
+        """
 
         img = font.render(text, True, text_col)
         self.screen.blit(img, (x, y))
