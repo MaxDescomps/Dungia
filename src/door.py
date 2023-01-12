@@ -6,7 +6,7 @@ class Door(pygame.sprite.Sprite):
     Les portes d'une pièce hostile se ferment et se réouvrent quand elle ne l'est plus.
     """
     
-    def __init__(self, rect):
+    def __init__(self, rect:pygame.Rect):
         """
         Constructeur de la classe Door
 
@@ -15,8 +15,8 @@ class Door(pygame.sprite.Sprite):
         """
 
         super().__init__()
-        self.speed = 2
-        self.clock = 0
+        self.speed = 2 #vitesse d'animation
+        self.clock = 0 #compteur d'animation
 
         self.opening = True #initialement sur True, indique que la porte s'ouvre
         self.closing = False #initialement sur False, indique que la porte se ferme
@@ -81,11 +81,10 @@ class Door(pygame.sprite.Sprite):
 
 class HDoor(Door):
     """
-    Classe des portes horizontales en jeu (haut - bas). Les portes sont toutes initialement ouvertes.
-    Les portes d'une pièce hostile se ferment et se réouvrent quand elle ne l'est plus.
+    Classe des portes horizontales en jeu (haut - bas).
     """
     
-    def __init__(self, rect):
+    def __init__(self, rect:pygame.Rect):
         """
         Constructeur de la classe HDoor
 
@@ -102,15 +101,15 @@ class HDoor(Door):
 
         self.collision_rect = rect
 
-    def get_images(self, y):
+    def get_images(self, y:int) -> list[pygame.Surface]:
         """
-        Récupère les sprites d'une ligne d'un spritesheet 32x64
+        Récupère les sprites d'une ligne d'un spritesheet 32*64
         
         Args:
             y(int): numéro de ligne sur le spritesheet
 
         Returns:
-            images(list): une liste d'images
+            images(list[pygame.Surface]): liste des sprites de la porte
         """
 
         images = []
@@ -122,20 +121,29 @@ class HDoor(Door):
         
         return images
 
-    def get_image(self, x, y):
-        """Récupère un sprite 32*64 aux coordonnées x et y"""
+    def get_image(self, x:float, y:float) -> pygame.Surface:
+        """
+        Récupère un sprite de 32*64
+        
+        Args:
+            x(float): coordonnée horizontale du sprite sur le spritesheet
+            y(float): coordonnée verticale du sprite sur le spritesheet
+
+        Returns:
+            image(pygame.Surface): sprite de la porte
+        """
 
         image = pygame.Surface([64, 32], pygame.SRCALPHA)#surface avec un parametre de transparence (alpha = 0)
         image.blit(self.sprite_sheet, (0, 0), (x, y, 64, 32)) #canvas.blit (ajout, (coord sur canvas), (rect de l'ajout sur l'image source))
+
         return image.convert_alpha()
 
 class VRDoor(Door):
     """
-    Classe des portes verticales à droite en jeu. Les portes sont toutes initialement ouvertes.
-    Les portes d'une pièce hostile se ferment et se réouvrent quand elle ne l'est plus.
+    Classe des portes verticales à droite en jeu.
     """
     
-    def __init__(self, rect):
+    def __init__(self, rect:pygame.Rect):
         """
         Constructeur de la classe VRDoor
 
@@ -145,7 +153,7 @@ class VRDoor(Door):
 
         super().__init__(rect)
 
-        self.speed = 1
+        self.speed = 1 #vitesse d'animation
         self.collision_rect = pygame.Rect(self.rect.x + 24, self.rect.y, 8, self.rect.height)
 
         self.sprite_sheet = pygame.image.load("../image/techpack/tileset x1.png").convert_alpha() #spritesheet avec paramètre de transparence alpha
@@ -153,15 +161,16 @@ class VRDoor(Door):
         self.images = self.get_images(26, 11)
         self.image = self.images[0]
 
-    def get_images(self, x, y):
+    def get_images(self, x: int, y: int) -> list[pygame.Surface]:
         """
         Récupère des sprites d'une ligne d'un spritesheet 64x32
         
         Args:
+            x(int): numéro de colonne sur le spritesheet
             y(int): numéro de ligne sur le spritesheet
 
         Returns:
-            images(list): une liste d'images
+            images(list[pygame.Surface]): une liste d'images
         """
 
         images = []
@@ -172,20 +181,29 @@ class VRDoor(Door):
         
         return images
 
-    def get_image(self, x, y):
-        """Récupère un sprite 64x32 aux coordonnées x et y"""
+    def get_image(self, x: float, y: float) -> pygame.Surface:
+        """
+        Récupère un sprite 64x32
+        
+        Args:
+            x(float): coordonnée horizontale du sprite sur le spritesheet
+            y(float): coordonnée verticale du sprite sur le spritesheet
+
+        Returns:
+            image(pygame.Surface): sprite de la porte
+        """
 
         image = pygame.Surface([32, 64], pygame.SRCALPHA)#surface avec un parametre de transparence (alpha = 0)
         image.blit(self.sprite_sheet, (0, 0), (x, y, 32, 64)) #canvas.blit (ajout, (coord sur canvas), (rect de l'ajout sur l'image source))
+
         return image.convert_alpha()
 
 class VLDoor(Door):
     """
-    Classe des portes verticales à gauche en jeu. Les portes sont toutes initialement ouvertes.
-    Les portes d'une pièce hostile se ferment et se réouvrent quand elle ne l'est plus.
+    Classe des portes verticales à gauche en jeu.
     """
     
-    def __init__(self, rect):
+    def __init__(self, rect:pygame.Rect):
         """
         Constructeur de la classe VLDoor
 
@@ -196,22 +214,23 @@ class VLDoor(Door):
         super().__init__(rect)
 
         self.collision_rect = pygame.Rect(self.rect.x, self.rect.y, 8, self.rect.height)
-        self.speed = 1
+        self.speed = 1 #vitesse d'animation
 
         self.sprite_sheet = pygame.image.load("../image/techpack/tileset x1.png").convert_alpha() #spritesheet avec paramètre de transparence alpha
 
         self.images = self.get_images(26, 9)
         self.image = self.images[0]
 
-    def get_images(self, x, y):
+    def get_images(self, x: int, y: int) -> list[pygame.Surface]:
         """
         Récupère des sprites d'une ligne d'un spritesheet 64x32
         
         Args:
+            x(int): numéro de colonne sur le spritesheet
             y(int): numéro de ligne sur le spritesheet
 
         Returns:
-            images(list): une liste d'images
+            images(list[pygame.Surface]): une liste d'images
         """
 
         images = []
@@ -222,9 +241,19 @@ class VLDoor(Door):
         
         return images
 
-    def get_image(self, x, y):
-        """Récupère un sprite 64x32 aux coordonnées x et y"""
+    def get_image(self, x: float, y: float) -> pygame.Surface:
+        """
+        Récupère un sprite 64x32
+        
+        Args:
+            x(float): coordonnée horizontale du sprite sur le spritesheet
+            y(float): coordonnée verticale du sprite sur le spritesheet
+
+        Returns:
+            image(pygame.Surface): sprite de la porte
+        """
 
         image = pygame.Surface([32, 64], pygame.SRCALPHA)#surface avec un parametre de transparence (alpha = 0)
         image.blit(self.sprite_sheet, (0, 0), (x, y, 32, 64)) #canvas.blit (ajout, (coord sur canvas), (rect de l'ajout sur l'image source))
+
         return image.convert_alpha()

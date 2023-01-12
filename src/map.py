@@ -518,7 +518,7 @@ class MapManager:
         if npcs:
             for npc in npcs:
                 if npc.feet.colliderect(self.player.rect):
-                    dialog_box.execute(self.map_level, npc.dialog)
+                    dialog_box.execute(npc.dialog)
                 else:
                     dialog_box.reading = 0
         else:
