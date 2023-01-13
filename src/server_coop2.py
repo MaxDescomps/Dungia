@@ -36,9 +36,11 @@ def threaded_client(conn,):
 
                 players[0].shooting = False #assure que l'information d'un tir n'est reçue q'une fois
 
-                players[1].weapon.kill() #retire l'ancienne arme des groupes d'affichage
-                players[1].weapon = players[1].weapons[players[1].weapon_index]
-                players[1].map_manager.get_group().add(players[1].weapon, layer=5) #ajoute la nouvelle arme au groupe d'affichage
+                #changement d'arme du joueur distant
+                if players[1].weapon is not players[1].weapons[players[1].weapon_index]:
+                    players[1].weapon.kill() #retire l'ancienne arme des groupes d'affichage
+                    players[1].weapon = players[1].weapons[players[1].weapon_index]
+                    players[1].map_manager.get_group().add(players[1].weapon, layer=5) #ajoute la nouvelle arme au groupe d'affichage
 
                 conn.send(pickle.dumps(reply))
         

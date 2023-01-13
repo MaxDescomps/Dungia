@@ -194,9 +194,11 @@ class GameCli(Game):
 
             self.p2.position, self.p2.true_angle, self.p2.shooting, self.p2.weapon_index = data[0], data[1], data[3], data[4]
 
-            self.p2.weapon.kill() #retire l'ancienne arme des groupes d'affichage
-            self.p2.weapon = self.p2.weapons[self.p2.weapon_index]
-            self.map_manager.get_group().add(self.p2.weapon, layer=5) #ajoute la nouvelle arme au groupe d'affichage
+            #changement d'arme du joueur distant
+            if self.p2.weapon is not self.p2.weapons[self.p2.weapon_index]:
+                self.p2.weapon.kill() #retire l'ancienne arme des groupes d'affichage
+                self.p2.weapon = self.p2.weapons[self.p2.weapon_index]
+                self.map_manager.get_group().add(self.p2.weapon, layer=5) #ajoute la nouvelle arme au groupe d'affichage
 
             #changement de carte
             if self.player.map_manager.current_map != data[2]:
