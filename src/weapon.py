@@ -18,6 +18,7 @@ class Weapon(pygame.sprite.Sprite):
 
         super().__init__()
 
+        self.angle = 0
         self.bullet_speed = bullet_speed
         self.max_rate_clock = max_rate_clock
         self.damage = damage

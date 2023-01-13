@@ -30,9 +30,9 @@ def threaded_client(conn,):
             if not data:
                 connected = False
             else:
-                players[1].position = data
+                players[1].position, players[1].true_angle = data[0], data[1]
 
-                reply = players[0].position
+                reply = [players[0].position, players[0].weapon.angle, players[0].map_manager.current_map]
 
                 conn.send(pickle.dumps(reply))
         

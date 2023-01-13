@@ -161,14 +161,17 @@ class GameCli(Game):
         super().__init__(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
         #generer un joueur
         self.p2 = PlayerMulti()
-        self.p2.position = self.n.send(self.player.position)
+
+        data = self.n.send([self.player.position, self.player.weapon.angle])
+        self.p2.position, self.p2.true_angle = data[0], data[1]
+
         self.player = Player() #création joueur
         self.player.position = p
         self.map_manager = MapManagerMulti(self.screen, self.player, self.p2)
 
         #donne les informations au joueur pour gere l'angle de visée (position du crosshair selon déplacement de la carte)
         self.player.map_manager = self.map_manager
-        # self.p2.map_manager = self.map_manager
+        self.p2.map_manager = self.map_manager
 
     def run(self):
         """Démarre le jeu"""
@@ -185,7 +188,16 @@ class GameCli(Game):
             self.p2.rect.topleft = self.p2.position #la position du joueur avec [0,0] le coin superieur gauche
             self.p2.feet.midbottom = self.p2.rect.midbottom #aligne les centres des rect player.feet et player.rect
 
-            self.p2.position = self.n.send(self.player.position)
+            data = self.n.send([self.player.position, self.player.weapon.angle])
+
+            self.p2.position, self.p2.true_angle = data[0], data[1]
+
+            #changement de carte
+            if self.player.map_manager.current_map != data[2]:
+                self.player.map_manager.register_map(data[2])
+                self.player.map_manager.current_map = data[2]
+                self.map_manager.map_level += 1
+                self.map_manager.teleport_player(f"spawn_{self.map_manager.current_map}")
 
             #si le serveur est connecté
             if self.p2.position:
