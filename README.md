@@ -20,8 +20,7 @@ CONTRÔLES:
   Echap pour ouvrir le menu pause ou pour quitter le jeu dans le menu de démarrage  
 
 MODE MULTIJOUEUR LOCAL:  
-  Une branche du projet supporte le mode multijoueur en local.  
-  Attention: le multijoueur oblige seulement les joueurs à progresser en parallèle et leur permet de se voir, mais chacun combat ses propres monstres.  
+  Une branche du projet supporte le mode multijoueur en local.
   
   Pour jouer à deux il faut un joueur hôte et un joueur invité.  
   Le joueur hôte appuie sur 'h' dans le menu de démarrage, et donne l'adresse ip qui lui est donnée dans son terminal à l'invité.  
