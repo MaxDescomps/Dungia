@@ -165,6 +165,8 @@ class GameCli(Game):
         data = self.n.send([self.player.position, self.player.weapon.angle, self.player.shooting, self.player.weapon_index])
         self.p2.position, self.p2.true_angle, self.p2.shooting = data[0], data[1], data[3]
 
+        self.p2.update()
+
         self.player = Player() #création joueur
         self.player.position = p
         self.map_manager = MapManagerCli(self.screen, self.player, self.p2)
@@ -192,7 +194,19 @@ class GameCli(Game):
 
             self.player.shooting = False #assure que l'information d'un tir n'est reçue q'une fois
 
-            self.p2.position, self.p2.true_angle, self.p2.shooting, self.p2.weapon_index = data[0], data[1], data[3], data[4]
+            self.p2.position, self.p2.true_angle, self.p2.shooting, self.p2.weapon_index, fighting_mob_info = data[0], data[1], data[3], data[4], data[5]
+
+            #efface les anciens mobs combattants
+            for mob in self.map_manager.p2_current_room.fighting_mobs:
+                if mob.weapon:
+                    mob.weapon.kill()
+
+                mob.kill() #retire le sprite des groupes d'affichage
+                mob.fighting_mobs.remove(mob) #retire le mob de la liste des mobs combattants de la pièce
+
+            #récupération des mobs du serveur
+            for mob_info in fighting_mob_info:
+                self.map_manager.add_serv_mob(mob_info)
 
             #changement d'arme du joueur distant
             if self.p2.weapon is not self.p2.weapons[self.p2.weapon_index]:
@@ -206,6 +220,7 @@ class GameCli(Game):
                 self.player.map_manager.current_map = data[2]
                 self.map_manager.map_level += 1
                 self.map_manager.teleport_player(f"spawn_{self.map_manager.current_map}")
+                self.p2.update()
 
             #si le serveur est connecté
             if self.p2.position:

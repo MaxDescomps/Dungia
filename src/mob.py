@@ -19,6 +19,7 @@ class Mob(Entity):
 
         super().__init__(name, 0, 0)
 
+        self.type = 0
         self.damage = damage
         self.weapon = None
         self.max_weapon_rate_clock = 60 #décompte avant prochain tir
@@ -122,6 +123,7 @@ class Drone(Mob):
 
         super().__init__("drone", fighting_mobs, player, speed, damage)
 
+        self.type = 1
         self.feet.width = 15
         self.collision = copy.copy(self.feet)
 
@@ -180,7 +182,8 @@ class Android(Mob):
         """
 
         super().__init__("android", fighting_mobs, player, speed, damage)
-
+        
+        self.type = 2
         self.speed = 0.5
         self.collision = copy.copy(self.feet)
         self.collision.height += 12
@@ -328,6 +331,7 @@ class Mobot(Mob):
 
         super().__init__("mobot", fighting_mobs, player, speed, damage)
 
+        self.type = 3
         self.speed = 0.6
         self.collision = copy.copy(self.feet)
         self.collision.height += 12
@@ -479,6 +483,7 @@ class Boss(Mob):
 
         super().__init__("boss", fighting_mobs, player, speed, damage)
 
+        self.type = 4
         self.speed = 0.2 * map_level
         self.angle_modif = 0
         self.max_weapon_rate_clock = 80

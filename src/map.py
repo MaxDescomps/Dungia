@@ -797,18 +797,172 @@ class MapManagerCli(MapManagerMulti):
         self.map_names = ["tech3", "tech4", "tech5"] #nom des différentes cartes
         self.current_map = "home" #carte actuelle du joueur
         self.current_room = None #pièce actuelle du joueur
+        self.p2_current_room = None #pièce actuelle du joueur2
+
 
         self.zoom = 3 #zoom d'affichage
         self.map_level = 0 #le numéro de l'étage actuel
         self.boss_fight = False #indicateur de combat contre un boss
-
-        next_level = random.choice(self.map_names) #désignation aléatoire de la prochaine carte
 
         #génération de la première carte
         self.register_map("home", npcs=[
             NPC("paul", dialog=["Je pensais que ça n'était qu'un mythe...", "L'ESTACA avait bien un labo secret dans la foret!", "Je vais te suivre à l'interieur...", "Tu vois la grande pierre de l'autre coté?", "C'est un portail... traverse-le!"])
         ])
 
+        self.check_p2_room() #met l'information de la pièce du joueur 2 à jour
+
         #placement de entités joueurs et NPC sur la carte actuelle
         self.teleport_player("player")
         self.teleport_npcs()
+    
+    def register_map(self, name:str, portals:list[Portal]=[], npcs:list[NPC]=[]):
+        """
+        Génère une carte depuis un fichier tmx
+
+        Args:
+            name(str): nom du fichier tmx de la carte
+            portals(list[Portal]): portails présents sur la carte
+            npcs(list[NPC]): NPCs présents sur la carte
+        """
+
+        tmx_data = pytmx.util_pygame.load_pygame(f"../image/{name}.tmx") #charge le fichier tmx avec les surfaces de pygame 
+        map_data = pyscroll.data.TiledMapData(tmx_data) #récupère les données de la carte
+        self.map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size()) #gère le déplacement de la carte (quand le joueur est au centre de l'écran)
+        self.map_layer.zoom = self.zoom #zoom sur la carte
+
+        player_shots = [] #liste des tirs du joueur
+        mob_shots = [] #liste des tirs des monstres
+        doors = [] #liste des portes de la carte
+        mob_spawns = [] #liste des points de spawn pour mob dans la carte
+        boss_spawns = [] #liste des points de spawn pour boss dans la carte
+        walls = [] #liste des rectangles de collision bloquants
+        acids = [] #liste des cases acides
+
+        for obj in tmx_data.objects:
+            if obj.name == "door":
+                door = HDoor(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+                doors.append(door)
+
+            elif obj.name == "v_r_door":
+                door = VRDoor(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+                doors.append(door)
+
+            elif obj.name == "v_l_door":
+                door = VLDoor(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+                doors.append(door)
+
+            elif obj.name == "collision":
+                walls.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+
+            elif obj.name == "acid":
+                acids.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+
+            elif obj.name == "boss_spawn":
+                boss_spawns.append((obj.x, obj.y))
+
+            else:
+                for i in range (1,6):
+                    if obj.name == f"mob_spawn{i}":
+                        mob_spawns.append((obj.x, obj.y))
+                        break
+
+        #liste des pièces
+        rooms = []
+
+        #récupère les pièces du tmx et leurs informations après enregistrement des autres éléments
+        for obj in tmx_data.objects:
+            if obj.name == "room":
+                #rectangle de la pièce
+                room_rect = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
+
+                #récupération des points de spawn des boss de la pièce
+                room_boss_spawns = []
+                for boss_spawn in boss_spawns:
+                    if room_rect.collidepoint(boss_spawn):
+                        room_boss_spawns.append(boss_spawn)
+
+                #récupération des points de spawn des mobs de la pièce
+                room_mob_spawns = []
+                for mob_spawn in mob_spawns:
+                    if room_rect.collidepoint(mob_spawn):
+                        room_mob_spawns.append(mob_spawn)
+
+                #récupération des portes de la pièce
+                room_doors = []
+                for door in doors:
+                    if door.rect.colliderect(room_rect):
+
+                        room_doors.append(door)
+
+                #récupération des murs de la pièce
+                room_walls = []
+                for wall in walls:
+                    if wall.colliderect(room_rect):
+
+                        room_walls.append(wall)
+
+                #récupération des cases acides de la pièce
+                room_acids = []
+                for acid in acids:
+                    if acid.colliderect(room_rect):
+
+                        room_acids.append(acid)
+
+                #mobs combattants dans la pièce
+                room_fighting_mobs = []
+                room_mobs = []
+                room_boss = []
+
+                rooms.append(Room(room_rect, room_doors, room_mobs, room_mob_spawns, room_boss, room_boss_spawns, room_fighting_mobs, room_walls, room_acids))
+
+
+        # dessiner le groupe de calques
+        group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=2) #groupe de calques
+        group.add(self.player, layer = 6) #ajout du joueur au groupe de calques
+        group.add(self.p2, layer = 6) #ajout du joueur 2 au groupe de calques
+
+        #ajout des npc au groupe
+        for npc in npcs:
+            group.add(npc)
+
+        #ajout des portes au groupe
+        for door in doors:
+            group.add(door, layer=7)
+
+        #creer un objet map
+        self.maps[name] = Map(name, walls, acids, group, tmx_data, portals, npcs, player_shots, mob_shots, doors, rooms)
+
+    def add_serv_mob(self, mob_info:list[int]):
+        mob_type = mob_info[2]
+
+        if mob_type == 1:
+            mob = Drone(self.p2_current_room.fighting_mobs, self.p2, 1, 1)
+        elif mob_type == 2:
+            mob = Android(self.p2_current_room.fighting_mobs, self.p2, 1, 1)
+        elif mob_type == 3:
+            mob = Mobot(self.p2_current_room.fighting_mobs, self.p2, 1, 1)
+        elif mob_type == 4:
+            mob = Boss(self.p2_current_room.fighting_mobs, self.p2, 1, 2, self.map_level)
+
+        mob.position = [mob_info[0], mob_info[1]]
+        
+        self.p2_current_room.fighting_mobs.append(mob)
+        self.get_group().add(mob)
+
+        if mob.weapon:
+            self.get_group().add(mob.weapon, layer=1) #ajout de l'arme du mob au groupe de calques
+
+    def check_p2_room(self):
+        self.p2_current_room = None
+
+        for room in self.get_map().rooms:
+            if self.p2.feet.colliderect(room.rect):
+                self.p2_current_room = room
+                break #current_room trouvée
+
+    def update(self):
+        """Met à jour le groupe de calques ses collisions"""
+
+        self.get_group().update() #appel la méthode update de tous les sprites du groupe
+        self.check_collisions() #gère les collisions sur la carte
+        self.check_p2_room() #met l'information de la pièce du joueur 2 à jour

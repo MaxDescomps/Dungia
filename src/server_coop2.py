@@ -32,7 +32,15 @@ def threaded_client(conn,):
             else:
                 players[1].position, players[1].true_angle, players[1].shooting, players[1].weapon_index = data[0], data[1], data[2], data[3]
 
-                reply = [players[0].position, players[0].weapon.angle, players[0].map_manager.current_map, players[0].shooting, players[0].weapon_index]
+                #infos des monstres du serveur
+                fighting_mobs_info = []
+                for mob in players[0].map_manager.current_room.fighting_mobs:
+                    mob_info = copy.copy(mob.position) #copy pour ne pas modifier la vrai position du monstre
+                    mob_info.append(mob.type)
+
+                    fighting_mobs_info.append(mob_info)
+
+                reply = [players[0].position, players[0].weapon.angle, players[0].map_manager.current_map, players[0].shooting, players[0].weapon_index, fighting_mobs_info]
 
                 players[0].shooting = False #assure que l'information d'un tir n'est reçue q'une fois
 
