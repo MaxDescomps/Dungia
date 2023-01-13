@@ -1,9 +1,10 @@
 import pygame
 from player import *
-from map import MapManager
+from map import MapManager, MapManagerMulti
 from dialog import DialogBox
-from weapon import list_weapons
 from pause_menu import *
+from network import Network
+import server_coop2
 
 class Game:
     """Classe du jeu"""
@@ -23,9 +24,6 @@ class Game:
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
 
         self.pause_menu = PauseMenu(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
-        
-        #initialise le catalogue des armes après la fenetre de jeu
-        list_weapons()
 
         #generer un joueur
         self.player = Player() #création joueur
@@ -146,3 +144,110 @@ class Game:
             pygame.display.flip() #rafraîchit l'affichage
 
             clock.tick(60) #60 fps
+
+class GameCli(Game):
+
+    def __init__(self, screen:pygame.Surface, SCREEN_WIDTH:int, SCREEN_HEIGHT:int, p, n:Network):
+        """
+        Constructeur de la classe Game
+        
+        Args:
+            screen(pygame.Surface): fenêtre d'affichage
+            SCREEN_WIDTH(int): largeur de la fenêtre d'affichage
+            SCREEN_HEIGHT(int): hauteur de la fenêtre d'affichage
+        """
+        self.n = n
+
+        super().__init__(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
+        #generer un joueur
+        self.p2 = PlayerMulti()
+        self.p2.position = self.n.send(self.player.position)
+        self.player = Player() #création joueur
+        self.player.position = p
+        self.map_manager = MapManagerMulti(self.screen, self.player, self.p2)
+
+        #donne les informations au joueur pour gere l'angle de visée (position du crosshair selon déplacement de la carte)
+        self.player.map_manager = self.map_manager
+        # self.p2.map_manager = self.map_manager
+
+    def run(self):
+        """Démarre le jeu"""
+
+        clock = pygame.time.Clock() #pour limiter les fps
+        
+        pygame.mixer.music.load("../music/mysterious.wav")
+        pygame.mixer.music.play(-1) #répète la musique à indéfiniment
+
+        # boucle de jeu
+        while self.player.pdv > 0 and self.running:
+            
+            #récupération du j2
+            self.p2.rect.topleft = self.p2.position #la position du joueur avec [0,0] le coin superieur gauche
+            self.p2.feet.midbottom = self.p2.rect.midbottom #aligne les centres des rect player.feet et player.rect
+
+            self.p2.position = self.n.send(self.player.position)
+
+            #si le serveur est connecté
+            if self.p2.position:
+
+                self.player.save_location() #enregistre la position du joueur avant deplacement pour pouvoir revenir en arrière en cas de collision
+                self.handle_real_time_input() #gestion input à chaque frame
+                self.handle_input() #gestion input à chaque click
+                self.update() #met les sprites et les collisions à jour
+
+                self.draw() #modifie l'affichage des sprites du jeu
+                self.player.handle_damage() #effet visuel des dégats et gestion du compteur d'invincibilité temporaire
+                # self.debug()
+
+                pygame.display.flip() #rafraîchit l'affichage
+
+                clock.tick(60) #60 fps
+
+            else:
+                self.running = False
+
+        if self.p2.position:
+            self.n.send("".encode("utf-8"))
+
+class GameHost(Game):
+    def __init__(self, screen: pygame.Surface, SCREEN_WIDTH: int, SCREEN_HEIGHT: int, p:Player, p2:Player):
+
+        super().__init__(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
+
+        #generer un joueur
+        self.p2 = p2
+        self.player = p #création joueur
+        self.map_manager = MapManagerMulti(self.screen, self.player, self.p2)
+
+        #donne les informations au joueur pour gere l'angle de visée (position du crosshair selon déplacement de la carte)
+        self.player.map_manager = self.map_manager
+        self.p2.map_manager = self.map_manager
+
+
+    def run(self):
+        """Démarre le jeu"""
+
+        clock = pygame.time.Clock() #pour limiter les fps
+        
+        pygame.mixer.music.load("../music/mysterious.wav")
+        pygame.mixer.music.play(-1) #répète la musique à indéfiniment
+
+        # boucle de jeu
+        while self.player.pdv > 0 and self.running:
+            self.p2 = server_coop2.players[1]
+
+            self.player.save_location() #enregistre la position du joueur avant deplacement pour pouvoir revenir en arrière en cas de collision
+            self.handle_real_time_input() #gestion input à chaque frame
+            self.handle_input() #gestion input à chaque click
+            self.update() #met les sprites et les collisions à jour
+
+            self.draw() #modifie l'affichage des sprites du jeu
+            self.player.handle_damage() #effet visuel des dégats et gestion du compteur d'invincibilité temporaire
+            # self.debug()
+
+            pygame.display.flip() #rafraîchit l'affichage
+
+            clock.tick(60) #60 fps
+
+        server_coop2.current_player -= 1
+        server_coop2.host_connected = 0

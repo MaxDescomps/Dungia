@@ -38,7 +38,7 @@ class Player(Entity):
         self.take_weapon("gun")
 
         #raccourcis
-        self.weapon = self.weapons[self.weapon_index]
+        self.weapon = Weapon(9, 1, 4, "1")
 
     def crosshair_pos(self) -> list[int]:
         """
@@ -248,3 +248,67 @@ class Player(Entity):
 
         GB = min(255, max(0, round(255 * (1-scale)))) #vert et bleu du filtre RGB, va de 85 à 255
         self.map_manager.screen.fill((255, GB, GB), special_flags = pygame.BLEND_MULT)
+
+class PlayerMulti(Player):
+    """Classe d'un joueur multijoueur importé du serveur"""
+    
+    def __init__(self):
+        super().__init__()
+
+        self.true_angle = 0 #angle du joueur multi dans son vrai monde
+
+    def manage_weapon(self):
+        """Gestion de l'utilisation de l'arme du joueur"""
+
+        #décrémentation du compteur de cadence de tir de l'arme en main
+        if self.weapon_rate_clocks[self.weapon_index]:
+            self.weapon_rate_clocks[self.weapon_index] -= 1
+
+        self.weapon.angle = self.true_angle #position en jeu du crosshair
+        self.weapon.rect.center = self.rect.center
+
+        #coefficients du vecteur de déplacement de l'arme par rapport au joueur
+        self.weapon.speed_x = math.cos(self.weapon.angle)
+        self.weapon.speed_y = math.sin(self.weapon.angle)
+
+        #rotation de l'image de l'arme en fonction de l'angle
+        self.weapon.rotate_img()
+
+        #copie de la position pour pouvoir faire des calculs sur nombres flottants
+        self.weapon.pos = [None, None]
+        self.weapon.pos[0] = self.weapon.rect[0]
+        self.weapon.pos[1] = self.weapon.rect[1]
+
+        #met la position du tir à jour
+        mult = 18 #distance entre le corps et l'arme
+        if isinstance(self.weapon, Gun):
+            mult -= 4
+
+        self.weapon.pos[0] += mult * self.weapon.speed_x
+        self.weapon.pos[1] += mult * self.weapon.speed_y
+
+        #maj du rectangle d'affichage
+        self.weapon.rect.topleft = self.weapon.pos
+
+        #arme et joueur visent dans le bon sens
+        if (self.weapon.angle > math.pi / 2) or (self.weapon.angle < -math.pi / 2): #côté gauche
+            self.weapon.image = pygame.transform.flip(self.weapon.image, False, True)
+
+            if (self.weapon.angle > math.pi * (3/4)) or (self.weapon.angle < -math.pi * (3/4)):
+                self.change_animation_list("left")
+
+            elif (self.weapon.angle < -math.pi/4) and (self.weapon.angle > -math.pi * (3/4)):
+                self.change_animation_list("up")
+
+            else:
+                self.change_animation_list("down")
+
+        else: #côté droit
+            if (self.weapon.angle < math.pi/4) and (self.weapon.angle > -math.pi/4):
+                self.change_animation_list("right")
+
+            elif (self.weapon.angle < -math.pi/4) and (self.weapon.angle > -math.pi * (3/4)):
+                self.change_animation_list("up")
+
+            else:
+                self.change_animation_list("down")
