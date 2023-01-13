@@ -776,3 +776,39 @@ class MapManagerMulti(MapManager):
 
         #creer un objet map
         self.maps[name] = Map(name, walls, acids, group, tmx_data, portals, npcs, player_shots, mob_shots, doors, rooms)
+
+class MapManagerCli(MapManagerMulti):
+
+    def __init__(self, screen: pygame.Surface, player: player.Player, p2: player.Player):
+        """
+        Constructeur de la classe MapManagerCli
+        
+        Args:
+            screen(pygame.Surface): fenêtre d'affichage
+            player: joueur dans l'environnement de ce gestionnaire de carte
+            p2: représentation du joueur hôte
+        """
+        
+        self.p2 = p2
+        self.screen = screen
+        self.player = player
+
+        self.maps = dict() #cartes gérées
+        self.map_names = ["tech3", "tech4", "tech5"] #nom des différentes cartes
+        self.current_map = "home" #carte actuelle du joueur
+        self.current_room = None #pièce actuelle du joueur
+
+        self.zoom = 3 #zoom d'affichage
+        self.map_level = 0 #le numéro de l'étage actuel
+        self.boss_fight = False #indicateur de combat contre un boss
+
+        next_level = random.choice(self.map_names) #désignation aléatoire de la prochaine carte
+
+        #génération de la première carte
+        self.register_map("home", npcs=[
+            NPC("paul", dialog=["Je pensais que ça n'était qu'un mythe...", "L'ESTACA avait bien un labo secret dans la foret!", "Je vais te suivre à l'interieur...", "Tu vois la grande pierre de l'autre coté?", "C'est un portail... traverse-le!"])
+        ])
+
+        #placement de entités joueurs et NPC sur la carte actuelle
+        self.teleport_player("player")
+        self.teleport_npcs()

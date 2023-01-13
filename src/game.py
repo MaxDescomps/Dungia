@@ -1,6 +1,6 @@
 import pygame
 from player import *
-from map import MapManager, MapManagerMulti
+from map import *
 from dialog import DialogBox
 from pause_menu import *
 from network import Network
@@ -162,12 +162,12 @@ class GameCli(Game):
         #generer un joueur
         self.p2 = PlayerMulti()
 
-        data = self.n.send([self.player.position, self.player.weapon.angle])
-        self.p2.position, self.p2.true_angle = data[0], data[1]
+        data = self.n.send([self.player.position, self.player.weapon.angle, self.player.shooting])
+        self.p2.position, self.p2.true_angle, self.p2.shooting = data[0], data[1], data[3]
 
         self.player = Player() #création joueur
         self.player.position = p
-        self.map_manager = MapManagerMulti(self.screen, self.player, self.p2)
+        self.map_manager = MapManagerCli(self.screen, self.player, self.p2)
 
         #donne les informations au joueur pour gere l'angle de visée (position du crosshair selon déplacement de la carte)
         self.player.map_manager = self.map_manager
@@ -188,9 +188,11 @@ class GameCli(Game):
             self.p2.rect.topleft = self.p2.position #la position du joueur avec [0,0] le coin superieur gauche
             self.p2.feet.midbottom = self.p2.rect.midbottom #aligne les centres des rect player.feet et player.rect
 
-            data = self.n.send([self.player.position, self.player.weapon.angle])
+            data = self.n.send([self.player.position, self.player.weapon.angle, self.player.shooting])
 
-            self.p2.position, self.p2.true_angle = data[0], data[1]
+            self.player.shooting = False #assure que l'information d'un tir n'est reçue q'une fois
+
+            self.p2.position, self.p2.true_angle, self.p2.shooting = data[0], data[1], data[3]
 
             #changement de carte
             if self.player.map_manager.current_map != data[2]:

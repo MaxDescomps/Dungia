@@ -30,9 +30,11 @@ def threaded_client(conn,):
             if not data:
                 connected = False
             else:
-                players[1].position, players[1].true_angle = data[0], data[1]
+                players[1].position, players[1].true_angle, players[1].shooting = data[0], data[1], data[2]
 
-                reply = [players[0].position, players[0].weapon.angle, players[0].map_manager.current_map]
+                reply = [players[0].position, players[0].weapon.angle, players[0].map_manager.current_map, players[0].shooting]
+
+                players[0].shooting = False #assure que l'information d'un tir n'est reçue q'une fois
 
                 conn.send(pickle.dumps(reply))
         

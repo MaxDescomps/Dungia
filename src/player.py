@@ -40,6 +40,8 @@ class Player(Entity):
         #raccourcis
         self.weapon = Weapon(9, 1, 4, "1")
 
+        self.shooting = False #valeur envoyée par le joueur hôte aux invités pour indiquer qu'il tente de tirer
+
     def crosshair_pos(self) -> list[int]:
         """
         Récupère et convertit la position du crosshair du joueur pour correspondre au zoom et déplacement de la carte
@@ -121,6 +123,7 @@ class Player(Entity):
     def shoot(self):
         "Tir du joueur"
 
+        self.shooting = True
         if not self.weapon_rate_clocks[self.weapon_index]:
             self.weapon_rate_clocks[self.weapon_index] = self.weapon.max_rate_clock
             shots = self.weapon.shoot()
@@ -312,3 +315,16 @@ class PlayerMulti(Player):
 
             else:
                 self.change_animation_list("down")
+
+    def update(self):
+        """Mise a jour du joueur"""
+
+        if self.pdv > 0:
+            self.manage_weapon()
+
+            self.rect.topleft = self.position #la position du joueur avec [0,0] le coin superieur gauche
+            self.feet.midbottom = self.rect.midbottom #aligne les centres des rect player.feet et player.rect
+        
+        if self.shooting:
+            self.shoot()
+            self.shooting = False
