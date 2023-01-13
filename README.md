@@ -21,7 +21,7 @@ CONTRÔLES:
 
 MODE MULTIJOUEUR:  
   Une branche du projet supporte le mode multijoueur.  
-  Attention: le multijoueur oblige uniquement aux joueurs de progresser en parallèle et leur permet de se voir, mais chacun combat ses propres monstres.  
+  Attention: le multijoueur oblige seulement les joueurs à progresser en parallèle et leur permet de se voir, mais chacun combat ses propres monstres.  
   
   Pour jouer à deux il faut un joueur hôte et un joueur invité.  
   Le joueur hôte appuie sur 'h' dans le menu de démarrage, et donne l'adresse ip qui lui est donnée dans son terminal à l'invité.  
