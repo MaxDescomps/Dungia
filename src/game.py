@@ -162,7 +162,7 @@ class GameCli(Game):
         #generer un joueur
         self.p2 = PlayerMulti()
 
-        data = self.n.send([self.player.position, self.player.weapon.angle, self.player.shooting])
+        data = self.n.send([self.player.position, self.player.weapon.angle, self.player.shooting, self.player.weapon_index])
         self.p2.position, self.p2.true_angle, self.p2.shooting = data[0], data[1], data[3]
 
         self.player = Player() #création joueur
@@ -188,11 +188,15 @@ class GameCli(Game):
             self.p2.rect.topleft = self.p2.position #la position du joueur avec [0,0] le coin superieur gauche
             self.p2.feet.midbottom = self.p2.rect.midbottom #aligne les centres des rect player.feet et player.rect
 
-            data = self.n.send([self.player.position, self.player.weapon.angle, self.player.shooting])
+            data = self.n.send([self.player.position, self.player.weapon.angle, self.player.shooting, self.player.weapon_index])
 
             self.player.shooting = False #assure que l'information d'un tir n'est reçue q'une fois
 
-            self.p2.position, self.p2.true_angle, self.p2.shooting = data[0], data[1], data[3]
+            self.p2.position, self.p2.true_angle, self.p2.shooting, self.p2.weapon_index = data[0], data[1], data[3], data[4]
+
+            self.p2.weapon.kill() #retire l'ancienne arme des groupes d'affichage
+            self.p2.weapon = self.p2.weapons[self.p2.weapon_index]
+            self.map_manager.get_group().add(self.p2.weapon, layer=5) #ajoute la nouvelle arme au groupe d'affichage
 
             #changement de carte
             if self.player.map_manager.current_map != data[2]:

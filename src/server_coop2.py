@@ -30,11 +30,15 @@ def threaded_client(conn,):
             if not data:
                 connected = False
             else:
-                players[1].position, players[1].true_angle, players[1].shooting = data[0], data[1], data[2]
+                players[1].position, players[1].true_angle, players[1].shooting, players[1].weapon_index = data[0], data[1], data[2], data[3]
 
-                reply = [players[0].position, players[0].weapon.angle, players[0].map_manager.current_map, players[0].shooting]
+                reply = [players[0].position, players[0].weapon.angle, players[0].map_manager.current_map, players[0].shooting, players[0].weapon_index]
 
                 players[0].shooting = False #assure que l'information d'un tir n'est reçue q'une fois
+
+                players[1].weapon.kill() #retire l'ancienne arme des groupes d'affichage
+                players[1].weapon = players[1].weapons[players[1].weapon_index]
+                players[1].map_manager.get_group().add(players[1].weapon, layer=5) #ajoute la nouvelle arme au groupe d'affichage
 
                 conn.send(pickle.dumps(reply))
         
