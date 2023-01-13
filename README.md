@@ -19,7 +19,7 @@ CONTRÔLES:
   Tir avec le click gauche de la souris  
   Echap pour ouvrir le menu pause ou pour quitter le jeu dans le menu de démarrage  
 
-MODE MULTIJOUEUR:
+MODE MULTIJOUEUR:  
   Une branche du projet supporte le mode multijoueur.  
   Attention: le multijoueur oblige uniquement aux joueurs de progresser en parallèle et leur permet de se voir, mais chacun combat ses propres monstres.  
   
