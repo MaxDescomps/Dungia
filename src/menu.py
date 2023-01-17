@@ -1,5 +1,9 @@
 import pygame
-from game import Game
+from game import *
+import network
+import server_coop2
+import threading
+from weapon import list_weapons
 
 class Character():
     """Classe du personnage du menu de démarrage"""
@@ -62,10 +66,16 @@ class Menu():
         self.FPS = 50
 
         # fenêtre de jeu
-        self.SCREEN_WIDTH = 1920
-        self.SCREEN_HEIGHT = 1080
+        self.SCREEN_WIDTH = 1280
+        self.SCREEN_HEIGHT = 720
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN)
         pygame.display.set_caption("DUNGIA")
+
+        #initialise le catalogue des armes après la fenetre de jeu
+        list_weapons()
+
+        #multi
+        server_coop2.define_players()
 
         #personnage annimé
         self.player_height = 32 #hauteur du sprite du personnage
@@ -149,8 +159,29 @@ class Menu():
                     #lancement du jeu
                     if event.key == pygame.K_SPACE:
                         pygame.mixer.music.stop()
+
                         game = Game(self.screen, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
                         game.run()
+
+                        #redémarre le menu si on quitte le jeu
+                        pygame.mixer.music.load("../music/intro_low.wav")
+                        pygame.mixer.music.play(-1)
+                        self.scroll = 0
+
+                    elif event.key == pygame.K_h:
+                        pygame.mixer.music.stop()
+                        
+                        self.jeu_hote()
+
+                        #redémarre le menu si on quitte le jeu
+                        pygame.mixer.music.load("../music/intro_low.wav")
+                        pygame.mixer.music.play(-1)
+                        self.scroll = 0
+                    
+                    elif event.key == pygame.K_c:
+                        pygame.mixer.music.stop()
+
+                        self.jeu_cli()
 
                         #redémarre le menu si on quitte le jeu
                         pygame.mixer.music.load("../music/intro_low.wav")
@@ -164,6 +195,29 @@ class Menu():
                 #fermeture du menu
                 elif event.type == pygame.QUIT:
                     running = False
+
+    def jeu_cli(self):
+        """Lance le jeu pour un client multijoueur (joueur invité)"""
+
+        netw = network.Network()
+
+        position = netw.get_position()
+
+        game = GameCli(self.screen, self.SCREEN_WIDTH, self.SCREEN_HEIGHT, position, netw)
+        game.run()
+
+    def jeu_hote(self):
+        """Lance le jeu pour un client-serveur multijoueur (joueur hôte)"""
+        
+        th_serv = threading.Thread(target=server_coop2.main)
+        # le thread n'est pas deamon pour deconnecter les clients et le socket proprement après fermeture du processus père
+        th_serv.start()
+
+        player = server_coop2.players[0]
+        p2 = server_coop2.players[1]
+
+        game = GameHost(self.screen, self.SCREEN_WIDTH, self.SCREEN_HEIGHT, player, p2)
+        game.run()
 
     def draw_all(self, player_frame: int):
         """

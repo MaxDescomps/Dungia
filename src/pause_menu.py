@@ -10,10 +10,13 @@ class PauseMenu(pygame.sprite.Sprite):
 
         self.screen = screen
 
+        mult_width = SCREEN_WIDTH / 1920
+        mult_height = SCREEN_HEIGHT / 1080
+
         self.image = pygame.image.load(f"../image/menu_pause2.png").convert() #spritesheet avec paramètre de transparence alpha
         self.image = pygame.transform.scale(self.image, (SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.resume_rect = pygame.Rect(645, 561, 629, 126)
-        self.exit_rect = pygame.Rect(645, 767, 629 , 126)
+        self.resume_rect = pygame.Rect(mult_width * 645, mult_height * 561, mult_width * 629, mult_height * 126)
+        self.exit_rect = pygame.Rect(mult_width * 645, mult_height * 767, mult_width * 629 , mult_height * 126)
         
     def deploy(self):
         """Déploie le menu pause"""
