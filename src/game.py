@@ -146,29 +146,33 @@ class Game:
             clock.tick(60) #60 fps
 
 class GameCli(Game):
+    """Classe de jeu du client en multijoueur"""
 
-    def __init__(self, screen:pygame.Surface, SCREEN_WIDTH:int, SCREEN_HEIGHT:int, p, n:Network):
+    def __init__(self, screen:pygame.Surface, SCREEN_WIDTH:int, SCREEN_HEIGHT:int, position:list[float], network:Network):
         """
-        Constructeur de la classe Game
+        Constructeur de la classe GameCli
         
         Args:
             screen(pygame.Surface): fenêtre d'affichage
             SCREEN_WIDTH(int): largeur de la fenêtre d'affichage
             SCREEN_HEIGHT(int): hauteur de la fenêtre d'affichage
+            position(list[float]): position du client sur le serveur en le rejoignant
+            network(Network): réseau du serveur
         """
-        self.n = n
+
+        self.network = network
 
         super().__init__(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
         #generer un joueur
         self.p2 = PlayerMulti()
 
-        data = self.n.send([self.player.position, self.player.weapon.angle, self.player.shooting, self.player.weapon_index])
+        data = self.network.send([self.player.position, self.player.weapon.angle, self.player.shooting, self.player.weapon_index])
         self.p2.position, self.p2.true_angle, self.p2.shooting = data[0], data[1], data[3]
 
         self.p2.update()
 
         self.player = Player() #création joueur
-        self.player.position = p
+        self.player.position = position
         self.map_manager = MapManagerCli(self.screen, self.player, self.p2)
 
         #donne les informations au joueur pour gere l'angle de visée (position du crosshair selon déplacement de la carte)
@@ -190,7 +194,7 @@ class GameCli(Game):
             self.p2.rect.topleft = self.p2.position #la position du joueur avec [0,0] le coin superieur gauche
             self.p2.feet.midbottom = self.p2.rect.midbottom #aligne les centres des rect player.feet et player.rect
 
-            data = self.n.send([self.player.position, self.player.weapon.angle, self.player.shooting, self.player.weapon_index])
+            data = self.network.send([self.player.position, self.player.weapon.angle, self.player.shooting, self.player.weapon_index])
 
             self.player.shooting = False #assure que l'information d'un tir n'est reçue q'une fois
 
@@ -242,16 +246,28 @@ class GameCli(Game):
                 self.running = False
 
         if self.p2.position:
-            self.n.send("".encode("utf-8"))
+            self.network.send("".encode("utf-8"))
 
 class GameHost(Game):
-    def __init__(self, screen: pygame.Surface, SCREEN_WIDTH: int, SCREEN_HEIGHT: int, p:Player, p2:Player):
+    """Classe de jeu du client-serveur (hôte de la partie)"""
+
+    def __init__(self, screen: pygame.Surface, SCREEN_WIDTH: int, SCREEN_HEIGHT: int, player:Player, p2:Player):
+        """
+        Constructeur de la classe GameHost
+        
+        Args:
+            screen(pygame.Surface): fenêtre d'affichage
+            SCREEN_WIDTH(int): largeur de la fenêtre d'affichage
+            SCREEN_HEIGHT(int): hauteur de la fenêtre d'affichage
+            player(Player): joueur hôte
+            p2(Player): joueur distant
+        """
 
         super().__init__(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
 
         #generer un joueur
         self.p2 = p2
-        self.player = p #création joueur
+        self.player = player #création joueur
         self.map_manager = MapManagerMulti(self.screen, self.player, self.p2)
 
         #donne les informations au joueur pour gere l'angle de visée (position du crosshair selon déplacement de la carte)
