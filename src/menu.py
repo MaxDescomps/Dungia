@@ -197,23 +197,26 @@ class Menu():
                     running = False
 
     def jeu_cli(self):
-        n = network.Network()
+        """Lance le jeu pour un client multijoueur (joueur invité)"""
 
-        p = n.get_p()
+        netw = network.Network()
 
-        game = GameCli(self.screen, self.SCREEN_WIDTH, self.SCREEN_HEIGHT, p, n)
+        position = netw.get_position()
+
+        game = GameCli(self.screen, self.SCREEN_WIDTH, self.SCREEN_HEIGHT, position, netw)
         game.run()
 
     def jeu_hote(self):
-
+        """Lance le jeu pour un client-serveur multijoueur (joueur hôte)"""
+        
         th_serv = threading.Thread(target=server_coop2.main)
         # le thread n'est pas deamon pour deconnecter les clients et le socket proprement après fermeture du processus père
         th_serv.start()
 
-        p = server_coop2.players[0]
+        player = server_coop2.players[0]
         p2 = server_coop2.players[1]
 
-        game = GameHost(self.screen, self.SCREEN_WIDTH, self.SCREEN_HEIGHT, p, p2)
+        game = GameHost(self.screen, self.SCREEN_WIDTH, self.SCREEN_HEIGHT, player, p2)
         game.run()
 
     def draw_all(self, player_frame: int):

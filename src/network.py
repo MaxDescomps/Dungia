@@ -10,10 +10,10 @@ class Network:
         self.server = input("ip du serveur: ")
         self.port = port
         self.addr = (self.server, self.port)
-        self.p = self.connect()
+        self.position = self.connect()
 
-    def get_p(self):
-        return self.p
+    def get_position(self):
+        return self.position
 
     def connect(self):
         try:
