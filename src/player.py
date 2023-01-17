@@ -328,3 +328,16 @@ class PlayerMulti(Player):
         if self.shooting:
             self.shoot()
             self.shooting = False
+
+    def take_weapon(self, name:str):
+        """
+        Récupération d'une arme
+
+        Args:
+            name(str): nom de l'arme
+        """
+
+        weapon = copy.copy(weapons2[name]) #copie pour ne pas modifier le catalogue d'armes
+
+        self.weapons.append(weapon)
+        self.weapon_rate_clocks.append(0)

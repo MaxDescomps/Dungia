@@ -170,21 +170,27 @@ class Gun(Weapon):
         Shot(self.rect.center, self.bullet_speed, self.damage, self.angle + random.uniform(-0.1, 0.1), self.name, oriented=True)
         ]
 
-weapons = dict() #liste des armes
+weapons = dict() #liste des armes du joueur principal
+weapons2 = dict() #liste des armes du deuxième joueur
 
 def list_weapons():
     """Remplit la liste des armes"""
 
     global weapons
-    weapons["ak-47"] = Weapon(9, 1, 4, "1")
-    weapons["ksg"] = KSG(25, 1, 4, "2")
-    weapons["remington"] = Remington(30, 1, 3, "3", 0.3)
-    weapons["pp-bizon"] = PPBizon(6, 1, 3, "4")
-    weapons["rocket-launcher"] = Weapon(40, 5, 3, "5")
-    weapons["sniper"] = Weapon(80, 10, 6, "6")
-    weapons["shadow"] = Weapon(20, 1, 3, "7")
-    weapons["x-tech"] = Weapon(20, 1, 3, "8")
-    weapons["ray-gun"] = Weapon(20, 1, 3, "9")
-    weapons["atomus"] = Weapon(4, 0.5, 3, "10")
-    # weapons["atomus"] = Weapon(4, 10, 10, "10")
-    weapons["gun"] = Gun(16, 2, 3, "11")
+    global weapons2
+
+    weapon_lists = [weapons, weapons2]
+
+    for weapon_list in weapon_lists:
+        weapon_list["ak-47"] = Weapon(9, 1, 4, "1")
+        weapon_list["ksg"] = KSG(25, 1, 4, "2")
+        weapon_list["remington"] = Remington(30, 1, 3, "3", 0.3)
+        weapon_list["pp-bizon"] = PPBizon(6, 1, 3, "4")
+        weapon_list["rocket-launcher"] = Weapon(40, 5, 3, "5")
+        weapon_list["sniper"] = Weapon(80, 10, 6, "6")
+        weapon_list["shadow"] = Weapon(20, 1, 3, "7")
+        weapon_list["x-tech"] = Weapon(20, 1, 3, "8")
+        weapon_list["ray-gun"] = Weapon(20, 1, 3, "9")
+        weapon_list["atomus"] = Weapon(4, 0.5, 3, "10")
+        # weapon_list["atomus"] = Weapon(4, 10, 10, "10")
+        weapon_list["gun"] = Gun(16, 2, 3, "11")

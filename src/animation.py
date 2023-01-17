@@ -74,6 +74,9 @@ class AnimateSprite(pygame.sprite.Sprite):
             sprite_sheet(pygame.Surface): le spritesheet source
             x(float): coordonnée horizontale du sprite à récupérer
             y(float): coordonnée verticale du sprite à récupérer
+
+        Returns:
+            image(pygame.Surface): le sprite récupéré
         """
 
         image = pygame.Surface([32, 32], pygame.SRCALPHA).convert_alpha() #surface avec un parametre de transparence (alpha = 0)
