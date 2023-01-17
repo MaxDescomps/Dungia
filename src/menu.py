@@ -66,8 +66,8 @@ class Menu():
         self.FPS = 50
 
         # fenêtre de jeu
-        self.SCREEN_WIDTH = 1920
-        self.SCREEN_HEIGHT = 1080
+        self.SCREEN_WIDTH = 1280
+        self.SCREEN_HEIGHT = 720
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.FULLSCREEN)
         pygame.display.set_caption("DUNGIA")
 

@@ -67,7 +67,7 @@ class MapManager:
         self.current_map = "home" #carte actuelle du joueur
         self.current_room = None #pièce actuelle du joueur
 
-        self.zoom = 3 #zoom d'affichage
+        self.zoom = 2 #zoom d'affichage
         self.map_level = 0 #le numéro de l'étage actuel
         self.boss_fight = False #indicateur de combat contre un boss
 
