@@ -268,7 +268,7 @@ class GameHost(Game):
         #generer un joueur
         self.p2 = p2
         self.player = player #création joueur
-        self.map_manager = MapManagerMulti(self.screen, self.player, self.p2)
+        self.map_manager = MapManagerHost(self.screen, self.player, self.p2)
 
         #donne les informations au joueur pour gere l'angle de visée (position du crosshair selon déplacement de la carte)
         self.player.map_manager = self.map_manager

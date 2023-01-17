@@ -574,7 +574,7 @@ class MapManager:
         self.get_group().center(self.player.rect.center) #centre le groupe de calques sur l'image du joueur
 
     def update(self):
-        """Met à jour le groupe de calques ses collisions"""
+        """Met à jour le groupe de calques des collisions"""
 
         self.get_group().update() #appel la méthode update de tous les sprites du groupe
         self.check_collisions() #gère les collisions sur la carte
@@ -622,10 +622,7 @@ class MapManager:
             npc.teleport_spawn(self.get_object(npc.name))
 
 class MapManagerMulti(MapManager):
-    def __init__(self, screen: pygame.Surface, player: player.Player, p2: player.Player):
-        self.p2 = p2
-        super().__init__(screen, player)
-
+    """Classe du gestionnaire de cartes du mode multijoueur"""
 
     def teleport_player(self, name:str):
         """
@@ -644,6 +641,22 @@ class MapManagerMulti(MapManager):
 
         self.get_map().group.add(self.player.weapon, layer = 5) #ajout de l'arme du joueur au groupe de calques
         self.get_map().group.add(self.p2.weapon, layer = 5) #ajout de l'arme du joueur au groupe de calques
+
+class MapManagerHost(MapManagerMulti):
+    """Classe du gestionnaire de cartes du client-serveur (joueur hôte) en multijoueur"""
+
+    def __init__(self, screen: pygame.Surface, player: player.Player, p2: player.Player):
+        """
+        Constructeur de la classe MapManagerHost
+        
+        Args:
+            screen(pygame.Surface): fenêtre d'affichage
+            player: joueur dans l'environnement de ce gestionnaire de carte
+            p2: représentation du joueur client
+        """
+
+        self.p2 = p2
+        super().__init__(screen, player)
 
     def register_map(self, name:str, portals:list[Portal]=[], npcs:list[NPC]=[]):
         """
@@ -778,6 +791,7 @@ class MapManagerMulti(MapManager):
         self.maps[name] = Map(name, walls, acids, group, tmx_data, portals, npcs, player_shots, mob_shots, doors, rooms)
 
 class MapManagerCli(MapManagerMulti):
+    """Classe du gestionnaire de cartes du client (joueur invité) en multijoueur"""
 
     def __init__(self, screen: pygame.Surface, player: player.Player, p2: player.Player):
         """
@@ -788,8 +802,11 @@ class MapManagerCli(MapManagerMulti):
             player: joueur dans l'environnement de ce gestionnaire de carte
             p2: représentation du joueur hôte
         """
+
         
         self.p2 = p2
+        super().__init__(screen, player)
+        
         self.screen = screen
         self.player = player
 
@@ -961,7 +978,7 @@ class MapManagerCli(MapManagerMulti):
                 break #current_room trouvée
 
     def update(self):
-        """Met à jour le groupe de calques ses collisions"""
+        """Met à jour le groupe de calques des collisions"""
 
         self.get_group().update() #appel la méthode update de tous les sprites du groupe
         self.check_collisions() #gère les collisions sur la carte
