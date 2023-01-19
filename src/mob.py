@@ -31,6 +31,8 @@ class Mob(Entity):
         self.name = name #nom du fichier image png
         self.fighting_mobs = fighting_mobs #liste des mobs combattans actuellement dans la même pièce de la carte
         self.src_pos_shot = self.rect.center #position de départ des tirs
+        self.shooting = False #indique si le monstre est en train de tirer
+        self.angle_modif = 0 #modification de l'angle de tir utilisée par certains monstres
     
     def teleport_spawn(self, point:tuple[int, int]):
         """
@@ -102,8 +104,10 @@ class Mob(Entity):
     def shoot(self):
         """Fait tirer le monstre en direction du joueur ciblé"""
 
+        self.shooting = True
+        
         shot = Shot(self.src_pos_shot, 3, 1, calc_angle(pygame.Vector2(self.rect.center), pygame.Vector2(self.player.feet.center)), oriented=True)
-        self.player.map_manager.get_group().add(shot)
+        self.player.map_manager.get_group().add(shot, layer = 4)
         self.player.map_manager.get_mob_shots().append(shot)
         pygame.mixer.Channel(2).play(pygame.mixer.Sound("../music/mobshot.wav"))
 
@@ -189,7 +193,6 @@ class Android(Mob):
         self.collision.height += 12
         self.weapon = Remington(50, 1, 2, "3", 0.5)
         self.weapon_rate_clock = 0
-        self.src_pos_shot = self.weapon.rect.center
 
     def update(self):
         """Gère les déplacements, attaques et destrucion du monstre"""
@@ -308,6 +311,8 @@ class Android(Mob):
     def shoot(self):
         """Méthode de tir spécialisée de l'android"""
 
+        self.shooting = True
+
         pygame.mixer.Channel(2).play(pygame.mixer.Sound("../music/mobshot.wav"))
         shots = self.weapon.shoot()
 
@@ -337,7 +342,6 @@ class Mobot(Mob):
         self.collision.height += 12
         self.weapon = Weapon(25, 1, 2, "10")
         self.weapon_rate_clock = 0
-        self.angle_modif = 0
 
     def update(self):
         """Gère les déplacements, attaques et destrucion du monstre"""
@@ -456,6 +460,8 @@ class Mobot(Mob):
     def shoot(self):
         """Méthode de tir spécialisée du mobot"""
 
+        self.shooting = True
+
         pygame.mixer.Channel(2).play(pygame.mixer.Sound("../music/mobshot.wav"))
         for i in range(-4, 4, 2):
             shots = self.weapon.shoot(i/4 * math.pi + self.angle_modif)
@@ -485,13 +491,14 @@ class Boss(Mob):
 
         self.type = 4
         self.speed = 0.2 * map_level
-        self.angle_modif = 0
         self.max_weapon_rate_clock = 80
         self.max_pdv = 100
         self.pdv = 100
 
     def shoot(self):
         """Méthode de tir spécialisée du boss"""
+
+        self.shooting = True
 
         shots = []
 

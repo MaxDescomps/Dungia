@@ -38,11 +38,17 @@ def threaded_client(conn,):
                     mob_info = copy.copy(mob.position) #copy pour ne pas modifier la vrai position du monstre
                     mob_info.append(mob.type)
 
+                    mob_info.append(mob.shooting)
+                    mob.shooting = False #assure que l'information d'un tir n'est envoyée qu'une fois au client
+
+                    mob_info.append(mob.pdv)
+                    mob_info.append(mob.angle_modif)
+
                     fighting_mobs_info.append(mob_info)
 
                 reply = [players[0].position, players[0].weapon.angle, players[0].map_manager.current_map, players[0].shooting, players[0].weapon_index, fighting_mobs_info]
 
-                players[0].shooting = False #assure que l'information d'un tir n'est reçue q'une fois
+                players[0].shooting = False #assure que l'information d'un tir n'est envoyée qu'une fois au client
 
                 #changement d'arme du joueur distant
                 if players[1].weapon is not players[1].weapons[players[1].weapon_index]:

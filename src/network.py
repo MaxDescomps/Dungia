@@ -27,4 +27,4 @@ class Network:
             self.client.send(pickle.dumps(data))
             return pickle.loads(self.client.recv(2048))
         except:
-            print("impossible de communiquer avec le serveur")
+            print("\n\n----------- impossible de communiquer avec le serveur -----------\n\n")

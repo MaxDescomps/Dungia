@@ -368,13 +368,10 @@ class MapManager:
         Args:
             name(str): nom du point de destination
         """
-        self.player.weapon.kill() #supprime l'arme du joueur du groupe de calques
 
         point = self.get_object(name) #l'objet du tmx sur lequel on se teleporte
         self.player.position = [point.x, point.y]
         self.player.save_location() #permet de ne pas se tp en boucle sur une collision?
-
-        self.get_map().group.add(self.player.weapon, layer = 5) #ajout de l'arme du joueur au groupe de calques
 
     def register_map(self, name:str, portals:list[Portal]=[], npcs:list[NPC]=[]):
         """
@@ -495,6 +492,7 @@ class MapManager:
         # dessiner le groupe de calques
         group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=2) #groupe de calques
         group.add(self.player, layer = 6) #ajout du joueur au groupe de calques
+        group.add(self.player.weapon, layer = 5) #ajout de l'arme du joueur au groupe de calques
 
         #ajout des npc au groupe
         for npc in npcs:
@@ -624,6 +622,11 @@ class MapManager:
 class MapManagerMulti(MapManager):
     """Classe du gestionnaire de cartes du mode multijoueur"""
 
+    def __init__(self, screen: pygame.Surface, player: player.Player, p2: player.PlayerMulti):
+        self.p2 = p2
+        super().__init__(screen, player)
+
+
     def teleport_player(self, name:str):
         """
         Téléporte le joueur sur un point de spawn dans une carte
@@ -631,21 +634,15 @@ class MapManagerMulti(MapManager):
         Args:
             name(str): nom du point de destination
         """
-        self.player.weapon.kill() #supprime l'arme du joueur du groupe de calques
-        self.p2.weapon.kill() #supprime l'arme du joueur du groupe de calques
-
         point = self.get_object(name) #l'objet du tmx sur lequel on se teleporte
         self.player.position = [point.x, point.y]
         self.p2.position = [point.x, point.y]
         self.p2.save_location() #permet de ne pas se tp en boucle sur une collision?
 
-        self.get_map().group.add(self.player.weapon, layer = 5) #ajout de l'arme du joueur au groupe de calques
-        self.get_map().group.add(self.p2.weapon, layer = 5) #ajout de l'arme du joueur au groupe de calques
-
 class MapManagerHost(MapManagerMulti):
     """Classe du gestionnaire de cartes du client-serveur (joueur hôte) en multijoueur"""
 
-    def __init__(self, screen: pygame.Surface, player: player.Player, p2: player.Player):
+    def __init__(self, screen: pygame.Surface, player: player.Player, p2: player.PlayerMulti):
         """
         Constructeur de la classe MapManagerHost
         
@@ -655,8 +652,7 @@ class MapManagerHost(MapManagerMulti):
             p2: représentation du joueur client
         """
 
-        self.p2 = p2
-        super().__init__(screen, player)
+        super().__init__(screen, player, p2)
 
     def register_map(self, name:str, portals:list[Portal]=[], npcs:list[NPC]=[]):
         """
@@ -778,6 +774,8 @@ class MapManagerHost(MapManagerMulti):
         group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=2) #groupe de calques
         group.add(self.player, layer = 6) #ajout du joueur au groupe de calques
         group.add(self.p2, layer = 6) #ajout du joueur 2 au groupe de calques
+        group.add(self.player.weapon, layer = 5) #ajout de l'arme du joueur au groupe de calques
+        group.add(self.p2.weapon, layer = 5) #ajout de l'arme du joueur 2 au groupe de calques
 
         #ajout des npc au groupe
         for npc in npcs:
@@ -793,7 +791,7 @@ class MapManagerHost(MapManagerMulti):
 class MapManagerCli(MapManagerMulti):
     """Classe du gestionnaire de cartes du client (joueur invité) en multijoueur"""
 
-    def __init__(self, screen: pygame.Surface, player: player.Player, p2: player.Player):
+    def __init__(self, screen: pygame.Surface, player: player.Player, p2: player.PlayerMulti):
         """
         Constructeur de la classe MapManagerCli
         
@@ -803,9 +801,7 @@ class MapManagerCli(MapManagerMulti):
             p2: représentation du joueur hôte
         """
 
-        
-        self.p2 = p2
-        super().__init__(screen, player)
+        super().__init__(screen, player, p2)
         
         self.screen = screen
         self.player = player
@@ -816,8 +812,6 @@ class MapManagerCli(MapManagerMulti):
         self.current_room = None #pièce actuelle du joueur
         self.p2_current_room = None #pièce actuelle du joueur2
 
-
-        self.zoom = 2 #zoom d'affichage
         self.map_level = 0 #le numéro de l'étage actuel
         self.boss_fight = False #indicateur de combat contre un boss
 
@@ -937,6 +931,8 @@ class MapManagerCli(MapManagerMulti):
         group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=2) #groupe de calques
         group.add(self.player, layer = 6) #ajout du joueur au groupe de calques
         group.add(self.p2, layer = 6) #ajout du joueur 2 au groupe de calques
+        group.add(self.player.weapon, layer = 5) #ajout de l'arme du joueur au groupe de calques
+        group.add(self.p2.weapon, layer = 5) #ajout de l'arme du joueur 2 au groupe de calques
 
         #ajout des npc au groupe
         for npc in npcs:
@@ -962,12 +958,20 @@ class MapManagerCli(MapManagerMulti):
             mob = Boss(self.p2_current_room.fighting_mobs, self.p2, 1, 2, self.map_level)
 
         mob.position = [mob_info[0], mob_info[1]]
+        mob.pdv = mob_info[4]
+        mob.angle_modif = mob_info[5]
         
         self.p2_current_room.fighting_mobs.append(mob)
         self.get_group().add(mob)
 
+        #arme du monstre
         if mob.weapon:
             self.get_group().add(mob.weapon, layer=1) #ajout de l'arme du mob au groupe de calques
+        
+        #tir du monstre
+        if mob_info[3]:
+            mob.update()
+            mob.shoot()
 
     def check_p2_room(self):
         self.p2_current_room = None

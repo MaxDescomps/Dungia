@@ -5,6 +5,7 @@ from dialog import DialogBox
 from pause_menu import *
 from network import Network
 import server_coop2
+from mob import *
 
 class Game:
     """Classe du jeu"""
@@ -159,6 +160,34 @@ class GameCli(Game):
             position(list[float]): position du client sur le serveur en le rejoignant
             network(Network): réseau du serveur
         """
+        def no_update(self):
+            self.save_location() #enregistre la position du mob avant deplacement pour pouvoir revenir en arrière en cas de collision
+            self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche
+            self.feet.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
+            self.src_pos_shot = self.rect.center #position de départ des tirs
+            # self.image = self.images[self.direction][self.animation_index] à faire
+
+        def no_update_mobot_android(self):
+            self.save_location() #enregistre la position du mob avant deplacement pour pouvoir revenir en arrière en cas de collision
+            self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche
+            self.feet.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
+            self.collision.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
+            # self.image = self.images[self.direction][self.animation_index] à faire
+            self.manage_weapon()
+
+        def no_update_drone(self):
+            self.save_location() #enregistre la position du mob avant deplacement pour pouvoir revenir en arrière en cas de collision
+            self.rect.topleft = self.position #la position du mob avec [0,0] le coin superieur gauche
+            self.feet.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
+            self.collision.midbottom = self.rect.midbottom #aligne les centres des rect mob.feet et mob.rect
+            self.src_pos_shot = self.rect.center #position de départ des tirs
+            # self.image = self.images[self.direction][self.animation_index] à faire
+
+        Mob.update = no_update
+        Drone.update = no_update_drone
+        Android.update = no_update_mobot_android
+        Mobot.update = no_update_mobot_android
+        Boss.update = no_update
 
         self.network = network
 
@@ -189,16 +218,28 @@ class GameCli(Game):
 
         # boucle de jeu
         while self.player.pdv > 0 and self.running:
-            
-            #récupération du j2
-            self.p2.rect.topleft = self.p2.position #la position du joueur avec [0,0] le coin superieur gauche
-            self.p2.feet.midbottom = self.p2.rect.midbottom #aligne les centres des rect player.feet et player.rect
 
             data = self.network.send([self.player.position, self.player.weapon.angle, self.player.shooting, self.player.weapon_index])
 
-            self.player.shooting = False #assure que l'information d'un tir n'est reçue q'une fois
+            self.player.shooting = False #assure que l'information d'un tir n'est envoyée q'une fois
 
             self.p2.position, self.p2.true_angle, self.p2.shooting, self.p2.weapon_index, fighting_mob_info = data[0], data[1], data[3], data[4], data[5]
+
+            #changement de carte
+            if self.map_manager.current_map != data[2]:
+                self.map_manager.register_map(data[2])
+                self.map_manager.current_map = data[2]
+                self.map_manager.map_level += 1
+                self.map_manager.teleport_player(f"spawn_{self.map_manager.current_map}")
+
+                self.p2.update()
+                self.map_manager.check_p2_room()
+
+                temp_room = self.map_manager.p2_current_room
+
+            #?self.map_manager.p2_current_room change de valeur en sortant du if précédent sans raison
+            if not self.map_manager.p2_current_room:
+                self.map_manager.p2_current_room = temp_room
 
             #efface les anciens mobs combattants
             for mob in self.map_manager.p2_current_room.fighting_mobs:
@@ -217,14 +258,6 @@ class GameCli(Game):
                 self.p2.weapon.kill() #retire l'ancienne arme des groupes d'affichage
                 self.p2.weapon = self.p2.weapons[self.p2.weapon_index]
                 self.map_manager.get_group().add(self.p2.weapon, layer=5) #ajoute la nouvelle arme au groupe d'affichage
-
-            #changement de carte
-            if self.player.map_manager.current_map != data[2]:
-                self.player.map_manager.register_map(data[2])
-                self.player.map_manager.current_map = data[2]
-                self.map_manager.map_level += 1
-                self.map_manager.teleport_player(f"spawn_{self.map_manager.current_map}")
-                self.p2.update()
 
             #si le serveur est connecté
             if self.p2.position:
