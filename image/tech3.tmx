@@ -251,13 +251,13 @@
   <object id="83" name="mob_spawn4" x="5303.83" y="4515.67">
    <point/>
   </object>
-  <object id="85" name="mob_spawn1" x="5112.91" y="3962.75">
+  <object id="85" name="mob_spawn1" x="5119.41" y="3968.75">
    <point/>
   </object>
   <object id="86" name="mob_spawn2" x="4920.67" y="3956.75">
    <point/>
   </object>
-  <object id="87" name="mob_spawn3" x="4965.17" y="3966.33">
+  <object id="87" name="mob_spawn3" x="4922.67" y="4017.33">
    <point/>
   </object>
   <object id="88" name="mob_spawn4" x="4944.33" y="4142.34">

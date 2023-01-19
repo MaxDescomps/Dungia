@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="90" height="90" tilewidth="32" tileheight="32" infinite="0" nextlayerid="7" nextobjectid="372">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="90" height="90" tilewidth="32" tileheight="32" infinite="0" nextlayerid="7" nextobjectid="375">
  <tileset firstgid="1" source="tech.tsx"/>
  <tileset firstgid="852" source="TX Tileset Stone Ground.tsx"/>
  <tileset firstgid="916" source="TX Tileset Wall.tsx"/>
@@ -361,6 +361,9 @@
   <object id="369" name="collision" x="2454.5" y="125" width="25.5" height="83"/>
   <object id="370" name="collision" x="2235" y="221.5" width="14.5" height="156"/>
   <object id="371" name="collision" x="2518.5" y="221.5" width="12" height="147.5"/>
+  <object id="372" name="collision" x="1494.91" y="2112" width="9.09091" height="128.545"/>
+  <object id="373" name="collision" x="1436" y="281" width="12" height="298.5"/>
+  <object id="374" name="collision" x="1592.75" y="278.25" width="8.75" height="300.25"/>
  </objectgroup>
  <objectgroup id="6" name="Rooms" visible="0">
   <object id="5" name="room" x="2294.67" y="1149.33" width="133.333" height="193.333"/>
