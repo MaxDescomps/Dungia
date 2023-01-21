@@ -227,6 +227,9 @@ class GameCli(Game):
 
             #changement de carte
             if self.map_manager.current_map != data[2]:
+                pygame.mixer.music.load("../music/battle_low.wav")
+                pygame.mixer.music.play(-1) #répète la musique à indéfiniment
+                
                 self.map_manager.register_map(data[2])
                 self.map_manager.current_map = data[2]
                 self.map_manager.map_level += 1

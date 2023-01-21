@@ -226,7 +226,7 @@ class Player(Entity):
         if not self.damage_clock:
             pygame.mixer.Channel(1).play(pygame.mixer.Sound("../music/player_hurt.wav"))
             self.damage_clock = 60
-            # self.pdv -= 1
+            self.pdv -= 1
             self.get_pdv_image()
 
     def handle_damage(self):
