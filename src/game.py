@@ -223,7 +223,7 @@ class GameCli(Game):
 
             self.player.shooting = False #assure que l'information d'un tir n'est envoyée q'une fois
 
-            self.p2.position, self.p2.true_angle, self.p2.shooting, self.p2.weapon_index, fighting_mob_info = data[0], data[1], data[3], data[4], data[5]
+            self.p2.position, self.p2.true_angle, self.p2.shooting, self.p2.weapon_index, fighting_mob_info, self.map_manager.last_mob_wave = data[0], data[1], data[3], data[4], data[5], not data[6]
 
             #changement de carte
             if self.map_manager.current_map != data[2]:

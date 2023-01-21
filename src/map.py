@@ -353,6 +353,7 @@ class MapManager:
 
         #si pièce neutre
         else:
+            #le joueur vient de battre un boss
             if self.boss_fight:
                 pygame.mixer.music.load("../music/win_low.wav")
                 pygame.mixer.music.play(-1) #répète la musique à indéfiniment
@@ -814,6 +815,7 @@ class MapManagerCli(MapManagerMulti):
 
         self.map_level = 0 #le numéro de l'étage actuel
         self.boss_fight = False #indicateur de combat contre un boss
+        self.last_mob_wave = True
 
         #génération de la première carte
         self.register_map("home", npcs=[
@@ -987,3 +989,233 @@ class MapManagerCli(MapManagerMulti):
         self.get_group().update() #appel la méthode update de tous les sprites du groupe
         self.check_collisions() #gère les collisions sur la carte
         self.check_p2_room() #met l'information de la pièce du joueur 2 à jour
+
+    def manage_room_hostility(self):
+        """
+        Gestion d'une pièce hostile
+        Fais apparaitre les monstres par vagues
+        Gère la fermeture et l'ouverture des portes
+        """
+        room = self.current_room
+
+        #si pièce hostile
+        if room.fighting_mobs:
+            #fermeture des portes
+            for door in room.doors:
+                door.closing = True
+
+            #combat contre un boss
+            for mob in room.fighting_mobs:
+                if mob.type == 4:
+                    pygame.mixer.music.load("../music/boss_low.wav")
+                    pygame.mixer.music.play(-1) #répète la musique à indéfiniment
+                    self.boss_fight = True
+
+        #si pièce neutre
+        elif self.last_mob_wave:
+            #le joueur vient de battre un boss
+            if self.boss_fight:
+                pygame.mixer.music.load("../music/win_low.wav")
+                pygame.mixer.music.play(-1) #répète la musique à indéfiniment
+                self.boss_fight = False
+
+            for door in room.doors:
+                door.opening = True
+
+    def check_collisions(self):
+        """Gère les collisions sur la carte"""
+
+        #joueur - pièce
+        #recherche de la pièce actuelle
+        self.current_room = None
+
+        for room in self.get_map().rooms:
+            if self.player.feet.colliderect(room.rect):
+                self.current_room = room
+                break #current_room trouvée
+
+        player_collided = False #indicateur de collision trouvée
+
+        #joueur - acide
+        if self.player.feet.collidelist(self.current_room.acids) > -1:
+            self.player.take_damage()
+
+        #joueur - portails
+        for portal in self.get_map().portals:
+            point = self.get_object(portal.origin_point)
+            portal_rect = pygame.Rect(point.x, point.y, point.width, point.height)#recree a chaque appel? + toute la map au lieu de room
+
+            if self.player.feet.colliderect(portal_rect):
+                self.map_level += 1 #étage suivant
+
+                self.current_map = portal.target_world
+                next_map_portal = self.select_new_map()
+
+                self.register_map(portal.target_world, portals=[
+                    Portal(from_world=portal.target_world, origin_point=f"portal_{portal.target_world}", target_world=next_map_portal, teleport_point=f"spawn_{next_map_portal}")
+                ], npcs=[
+                    NPC("paul", dialog=[f"On est à l'étage {self.map_level}!", "Il faut continuer..."])
+                ])
+
+                self.teleport_player(portal.teleport_point)
+
+                if self.map_level > 0:
+                    pygame.mixer.music.load("../music/battle_low.wav")
+                    pygame.mixer.music.play(-1) #répète la musique à indéfiniment
+                else:
+                    pygame.mixer.music.load("../music/mysterious.wav")
+                    pygame.mixer.music.play(-1) #répète la musique à indéfiniment
+
+                self.teleport_npcs()
+
+                player_collided = True
+                break #collision trouvée
+
+        if player_collided == False:
+
+            #joueur - mur
+            if self.player.feet.collidelist(self.current_room.walls) > -1:
+                self.player.move_back()
+            else:
+
+                #joueur - npc
+                for npc in self.get_npcs(): #?toute la map
+                    if self.player.feet.colliderect(npc.feet):
+                        self.player.move_back()
+                        player_collided = True
+                        break #collision trouvée
+
+                #joueur - porte
+                if not player_collided:
+                    in_doorway = False #dit si le joueur est dans le passage d'une porte
+                    for door in self.current_room.doors:
+                        if self.player.feet.colliderect(door.collision_rect):
+                            in_doorway = True
+
+                            #collision sur porte fermée
+                            if not door.opened or door.blocked:
+                                self.player.move_back()
+                                player_collided = True
+                            break #collision trouvée
+
+                #entrée dans une nouvelle pièce
+                if self.current_room:
+                    if not self.current_room.visited:
+                        if self.current_room is self.p2_current_room:
+                            if not in_doorway:
+                                if self.current_room.fighting_mobs or self.last_mob_wave:
+                                    self.current_room.visited = True
+                                    self.manage_room_hostility()
+                    else:
+                        if not self.current_room.fighting_mobs: #attend que les vagues de monstres soient vaincues
+                            self.manage_room_hostility()
+
+            #tirs du joueur
+            for shot in self.get_player_shots():
+
+                #tirs joueur - murs
+                if shot.colliderect.collidelist(self.get_walls()) > -1: #pas uniquement les murs de la pièce car les tirs peuvent en sortir
+                    shot.kill()#enlève le tir de tous les groupes d'affichage
+                    self.get_player_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+
+                else:
+                    if self.current_room.fighting_mobs: #si la pièce est hostile
+                        shot_destroyed = False
+
+                        #tirs joueur - portes
+                        for door in self.current_room.doors:
+                            if shot.colliderect.colliderect(door.collision_rect):
+                                shot.kill()#enlève le tir de tous les groupes d'affichage
+                                self.get_player_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                                shot_destroyed = True
+                                break
+
+                        if not shot_destroyed:
+                            for mob in self.current_room.fighting_mobs:
+
+                                #tirs joueur - monstres
+                                if shot.colliderect.colliderect(mob.collision):
+                                    shot.kill()#enlève le tir de tous les groupes d'affichage
+                                    self.get_player_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                                    mob.pdv -= shot.damage
+                                    break #tir détruit, fin de la recherche de collision
+
+            #tirs des monstres
+            for shot in self.get_mob_shots():
+
+                #tirs monstre - murs
+                if shot.colliderect.collidelist(self.get_walls()) > -1: #pas uniquement les murs de la pièce car les tirs peuvent en sortir
+                    shot.kill()#enlève le tir de tous les groupes d'affichage
+                    self.get_mob_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+
+                else:
+                    if self.current_room.fighting_mobs: #si la pièce est hostile
+                        shot_destroyed = False
+
+                        #tirs monstre - portes
+                        for door in self.current_room.doors:
+                            if shot.colliderect.colliderect(door.collision_rect):
+                                shot.kill()#enlève le tir de tous les groupes d'affichage
+                                self.get_mob_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                                shot_destroyed = True
+                                break
+
+                        if not shot_destroyed:
+                            #tirs monstre - joueur
+                            if shot.colliderect.colliderect(self.player.collision):
+                                shot.kill()#enlève le tir de tous les groupes d'affichage
+                                self.get_mob_shots().remove(shot)#enlève le tir de la liste des tirs de la carte
+                                self.player.take_damage()
+                                break #tir détruit, fin de la recherche de collision
+
+            #monstres
+            if self.current_room:
+                for mob in self.current_room.fighting_mobs:
+                    #monstre - joueur
+                    if mob.feet.colliderect(self.player.feet):
+                        mob.move_back()
+                        self.player.take_damage()
+
+                    #monstre - porte
+                    elif mob.feet.collidelist(self.current_room.doors) > -1:
+                        mob.move_back()
+                    
+                    #monstre - mur
+                    elif mob.feet.collidelist(self.current_room.walls) > -1:
+                        mob.move_back()
+
+                        mob_rect = copy.deepcopy(mob.feet)
+
+                        mob_rect.x += mob.speed * 10
+                        if mob_rect.collidelist(self.current_room.walls) > -1:
+                            mob.move_up()
+                        else:
+                            mob_rect.x -= mob.speed * 20
+                            if mob_rect.collidelist(self.current_room.walls) > -1:
+                                mob.move_down()
+                        
+                            mob_rect.x += mob.speed * 10
+                            mob_rect.y += mob.speed * 10
+                            if mob_rect.collidelist(self.current_room.walls) > -1:
+                                mob.move_right()
+                            else:
+                                mob_rect.y -= mob.speed * 20
+                                if mob_rect.collidelist(self.current_room.walls) > -1:
+                                    mob.move_left()
+
+                                else:
+                                    mob_rect.x += mob.speed * 10
+                                    if mob_rect.collidelist(self.current_room.walls) > -1:
+                                        mob.move_up()
+                                    else:
+                                        mob_rect.x -= mob.speed * 20
+                                        if mob_rect.collidelist(self.current_room.walls) > -1:
+                                            mob.move_left()
+                                        else:
+                                            mob_rect.y += mob.speed * 20
+                                            if mob_rect.collidelist(self.current_room.walls) > -1:
+                                                mob.move_down()
+                                            else:
+                                                mob_rect.x += mob.speed * 20
+                                                if mob_rect.collidelist(self.current_room.walls) > -1:
+                                                    mob.move_right()

@@ -46,7 +46,7 @@ def threaded_client(conn,):
 
                     fighting_mobs_info.append(mob_info)
 
-                reply = [players[0].position, players[0].weapon.angle, players[0].map_manager.current_map, players[0].shooting, players[0].weapon_index, fighting_mobs_info]
+                reply = [players[0].position, players[0].weapon.angle, players[0].map_manager.current_map, players[0].shooting, players[0].weapon_index, fighting_mobs_info, len(players[0].map_manager.current_room.mobs)]
 
                 players[0].shooting = False #assure que l'information d'un tir n'est envoyée qu'une fois au client
 
