@@ -20,7 +20,7 @@ CONTRÔLES:
   Echap pour ouvrir le menu pause ou pour quitter le jeu dans le menu de démarrage  
 
 MODE MULTIJOUEUR LOCAL:  
-  Le mode multijoueur en local est la dernière fonctionnalité du projet et est encore perfectible.
+  Le mode multijoueur en local est la dernière fonctionnalité du projet.
   
   Pour jouer à deux il faut un joueur hôte et un joueur invité.  
   Le joueur hôte appuie sur 'h' dans le menu de démarrage, et donne l'adresse ip qui lui est donnée dans son terminal à l'invité.  
