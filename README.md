@@ -1,7 +1,7 @@
 # Dungia
 
-Dungia est un jeu vidéo inspiré de Enter the Gungeon. Il inclut un mode solo et un mode multijoueur.
-Vous devrez parcourir les différentes pièces du donjon et vaincre les monstres pour arriver au boss gardant l'accès de l'étage suivant.
+Dungia est un jeu vidéo inspiré de Enter the Gungeon. Il inclut un mode solo et un mode multijoueur.  
+Vous devrez parcourir les différentes pièces du donjon et vaincre les monstres pour arriver au boss gardant l'accès de l'étage suivant.  
 
 INSTALLATION DES LIBRAIRIES:
 
@@ -9,10 +9,12 @@ INSTALLATION DES LIBRAIRIES:
   pip install pytmx  
   pip install pyscroll  
 
+
 LANCEMENT DU JEU:
 
   cd src  
   python3 main.py  
+
 
 CONTRÔLES:
 
@@ -22,8 +24,10 @@ CONTRÔLES:
   Tir avec le click gauche de la souris  
   Echap pour ouvrir le menu pause ou pour quitter le jeu dans le menu de démarrage 
   Dialogue avec les PNJ avec la barre d'espace
+  
 
 MODE MULTIJOUEUR EN RÉSEAU LOCAL:  
+
   Le mode multijoueur en réseau local est la dernière fonctionnalité du projet.
   
   Pour jouer à deux il faut un joueur hôte et un joueur invité.  
